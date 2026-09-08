@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import HeroTopStrip from "@/components/HeroTopStrip";
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
@@ -15,10 +16,11 @@ export default function Hero() {
   return (
     <section className="mx-auto max-w-6xl px-6 pt-16 pb-24 grid md:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
       <div
-        className={`transition-all duration-700 ease-out ${
+        className={`min-w-0 transition-all duration-700 ease-out ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         }`}
       >
+        <HeroTopStrip />
         <p className="text-royal text-sm mb-4">Now piloting in Abuja</p>
         <h1 className="font-display text-5xl md:text-6xl leading-[1.05] mb-6">
           Your fashion idea, planned and coordinated from start to finish.
