@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import ComingSoon from "@/components/ComingSoon";
+
+export const metadata: Metadata = {
+  title: "Create a Team — Hopayola",
+  description:
+    "Let Hopayola assemble and coordinate the right fashion professionals for your project.",
+};
 
 export default function CreateATeam() {
   return (

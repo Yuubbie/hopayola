@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Lifestyle — Hopayola",
+  description:
+    "Fashion and lifestyle content from Hopayola, coming soon.",
+};
+
 export default function Lifestyle() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-24">

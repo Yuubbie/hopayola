@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About — Hopayola",
+  description:
+    "Hopayola is building a network that connects people with fashion creatives and artisans, starting with our Abuja pilot.",
+};
+
 export default function About() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-24">
