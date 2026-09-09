@@ -72,7 +72,7 @@ export default function IntroSplash() {
           Hopayola
         </p>
         <p
-          className="text-sm md:text-base uppercase tracking-[0.2em] animate-splash-fade-in"
+          className="text-xs sm:text-sm md:text-base uppercase tracking-[0.12em] md:tracking-[0.2em] text-center px-8 max-w-xs md:max-w-none animate-splash-fade-in"
           style={{
             animationDelay: "0.6s",
             animationFillMode: "backwards",
