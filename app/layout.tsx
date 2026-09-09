@@ -19,7 +19,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hopayola.com"),
+  metadataBase: new URL("https://hopayola.vercel.app"),
   title: "Hopayola — Plan and coordinate your fashion project",
   description:
     "Hopayola connects you with fashion talent and coordinates the creation of your outfit, from measurements to delivery.",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     title: "Hopayola — Plan and coordinate your fashion project",
     description:
       "Hopayola connects you with fashion talent and coordinates the creation of your outfit, from measurements to delivery.",
-    url: "https://hopayola.com",
+    url: "https://hopayola.vercel.app",
     siteName: "Hopayola",
     type: "website",
   },
