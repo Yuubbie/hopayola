@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import IntroSplash from "@/components/IntroSplash";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body
         className={`${fraunces.variable} ${inter.variable} font-body bg-paper text-ink antialiased`}
       >
+        <GoogleAnalytics />
         <IntroSplash />
         <Navbar />
         {children}
