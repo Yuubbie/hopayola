@@ -19,9 +19,24 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://hopayola.com"),
   title: "Hopayola — Plan and coordinate your fashion project",
   description:
     "Hopayola connects you with fashion talent and coordinates the creation of your outfit, from measurements to delivery.",
+  openGraph: {
+    title: "Hopayola — Plan and coordinate your fashion project",
+    description:
+      "Hopayola connects you with fashion talent and coordinates the creation of your outfit, from measurements to delivery.",
+    url: "https://hopayola.com",
+    siteName: "Hopayola",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Hopayola — Plan and coordinate your fashion project",
+    description:
+      "Hopayola connects you with fashion talent and coordinates the creation of your outfit, from measurements to delivery.",
+  },
 };
 
 export default function RootLayout({
