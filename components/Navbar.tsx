@@ -16,16 +16,37 @@ const links = [
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+      if (data.user) {
+        supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .single()
+          .then(({ data: profile }) => setRole(profile?.role ?? null));
+      }
+    });
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
+        if (session?.user) {
+          supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", session.user.id)
+            .single()
+            .then(({ data: profile }) => setRole(profile?.role ?? null));
+        } else {
+          setRole(null);
+        }
       }
     );
 
@@ -38,6 +59,8 @@ export default function Navbar() {
     router.push("/");
     router.refresh();
   }
+
+  const showStartProject = user && role !== "artisan" && role !== "admin";
 
   return (
     <header className="sticky top-0 z-50 bg-paper/90 backdrop-blur border-b border-stone">
@@ -74,6 +97,14 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3 text-sm">
           {user ? (
             <>
+              {showStartProject && (
+                <Link
+                  href="/projects/new"
+                  className="text-ink/80 hover:text-royal transition-colors"
+                >
+                  Start a project
+                </Link>
+              )}
               <Link
                 href="/account"
                 className="text-ink/80 hover:text-royal transition-colors"
@@ -141,6 +172,15 @@ export default function Navbar() {
           <div className="border-t border-stone pt-5 flex flex-col gap-4">
             {user ? (
               <>
+                {showStartProject && (
+                  <Link
+                    href="/projects/new"
+                    onClick={() => setMenuOpen(false)}
+                    className="text-ink/80 hover:text-royal transition-colors"
+                  >
+                    Start a project
+                  </Link>
+                )}
                 <Link
                   href="/account"
                   onClick={() => setMenuOpen(false)}

@@ -20,6 +20,7 @@ export default function Footer() {
           <ul className="space-y-2 text-sm text-paper/80">
             <li><a href="/sign-up" className="hover:text-royal transition-colors">Sign up</a></li>
             <li><a href="/sign-in" className="hover:text-royal transition-colors">Sign in</a></li>
+            <li><a href="/artisan/sign-up" className="hover:text-royal transition-colors">Artisans, join us</a></li>
           </ul>
         </div>
       </div>
