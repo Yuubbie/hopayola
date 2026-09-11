@@ -143,6 +143,17 @@ export default async function Account({
                       {budget ? ` | ${budget}` : ""}
                     </p>
 
+                    {p.status === "concepts_ready" && (
+                      <div className="mt-3 pt-3 border-t border-stone">
+                        <Link
+                          href={`/projects/${p.id}/concepts`}
+                          className="text-xs text-royal hover:text-royal-deep font-medium"
+                        >
+                          View your design concepts
+                        </Link>
+                      </div>
+                    )}
+
                     {team && team.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-stone">
                         <p className="text-xs text-royal-deep">

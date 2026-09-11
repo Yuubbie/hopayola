@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { updateProjectStatus } from "./actions";
+import { updateProjectStatus, generateConcepts } from "./actions";
 
 const STATUS_OPTIONS = [
   "draft",
@@ -113,29 +113,43 @@ export default async function AdminProjects() {
                   </p>
                 )}
 
-                <form
-                  action={updateProjectStatus}
-                  className="flex items-center gap-2"
-                >
-                  <input type="hidden" name="projectId" value={p.id} />
-                  <select
-                    name="status"
-                    defaultValue={p.status}
-                    className="border border-stone rounded-lg px-3 py-1.5 text-sm"
+                <div className="flex flex-wrap items-center gap-2">
+                  <form
+                    action={updateProjectStatus}
+                    className="flex items-center gap-2"
                   >
-                    {STATUS_OPTIONS.map((s) => (
-                      <option key={s} value={s}>
-                        {s.replace(/_/g, " ")}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="submit"
-                    className="bg-royal text-paper rounded-lg px-4 py-1.5 text-sm hover:bg-royal-deep transition-colors"
-                  >
-                    Update
-                  </button>
-                </form>
+                    <input type="hidden" name="projectId" value={p.id} />
+                    <select
+                      name="status"
+                      defaultValue={p.status}
+                      className="border border-stone rounded-lg px-3 py-1.5 text-sm"
+                    >
+                      {STATUS_OPTIONS.map((s) => (
+                        <option key={s} value={s}>
+                          {s.replace(/_/g, " ")}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="submit"
+                      className="bg-royal text-paper rounded-lg px-4 py-1.5 text-sm hover:bg-royal-deep transition-colors"
+                    >
+                      Update
+                    </button>
+                  </form>
+
+                  {p.status === "submitted" && (
+                    <form action={generateConcepts}>
+                      <input type="hidden" name="projectId" value={p.id} />
+                      <button
+                        type="submit"
+                        className="border border-royal text-royal rounded-lg px-4 py-1.5 text-sm hover:bg-royal/5 transition-colors"
+                      >
+                        Generate concepts (placeholder)
+                      </button>
+                    </form>
+                  )}
+                </div>
               </div>
             </div>
           ))}
