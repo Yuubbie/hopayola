@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import PasswordInput from "@/components/password-input";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -56,19 +57,12 @@ export default function SignIn() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm mb-1" htmlFor="password">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
-              />
-            </div>
+            <PasswordInput
+              id="password"
+              value={password}
+              onChange={setPassword}
+              required
+            />
 
             {error && <p className="text-sm text-red-600">{error}</p>}
 
@@ -82,7 +76,7 @@ export default function SignIn() {
           </form>
 
           <p className="text-sm text-ink/60 mt-6">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/sign-up" className="text-royal hover:text-royal-deep">
               Sign up
             </Link>

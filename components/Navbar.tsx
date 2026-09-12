@@ -61,6 +61,7 @@ export default function Navbar() {
   }
 
   const showStartProject = user && role !== "artisan" && role !== "admin";
+  const showArtisanLink = role !== "artisan" && role !== "admin";
 
   return (
     <header className="sticky top-0 z-50 bg-paper/90 backdrop-blur border-b border-stone">
@@ -92,6 +93,14 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          {showArtisanLink && (
+            <Link
+              href="/artisan/sign-up"
+              className="text-ink/80 hover:text-royal transition-colors"
+            >
+              Artisans
+            </Link>
+          )}
         </nav>
 
         <div className="hidden md:flex items-center gap-3 text-sm">
@@ -168,6 +177,15 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          {showArtisanLink && (
+            <Link
+              href="/artisan/sign-up"
+              onClick={() => setMenuOpen(false)}
+              className="text-ink/80 hover:text-royal transition-colors"
+            >
+              Artisans
+            </Link>
+          )}
 
           <div className="border-t border-stone pt-5 flex flex-col gap-4">
             {user ? (

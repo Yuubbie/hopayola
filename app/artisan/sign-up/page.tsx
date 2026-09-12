@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import PasswordInput from "@/components/password-input";
 
 const SPECIALTY_OPTIONS = [
   "Tailoring",
@@ -125,20 +126,13 @@ export default function ArtisanSignUp() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm mb-1" htmlFor="password">
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    type="password"
-                    required
-                    minLength={6}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
-                  />
-                </div>
+                <PasswordInput
+                  id="password"
+                  value={password}
+                  onChange={setPassword}
+                  required
+                  minLength={6}
+                />
 
                 <div>
                   <p className="text-sm mb-1">Region</p>
