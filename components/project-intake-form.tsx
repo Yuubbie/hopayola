@@ -14,6 +14,7 @@ type SavedMeasurements = {
 type Props = {
   userId: string;
   savedMeasurements: SavedMeasurements;
+  initialOccasion?: string;
 };
 
 const MAX_PHOTOS = 5;
@@ -27,11 +28,19 @@ const OCCASION_OPTIONS = [
   "Cultural / Festival",
 ];
 
-export default function ProjectIntakeForm({ userId, savedMeasurements }: Props) {
+export default function ProjectIntakeForm({
+  userId,
+  savedMeasurements,
+  initialOccasion,
+}: Props) {
   const router = useRouter();
   const supabase = createClient();
 
-  const [occasion, setOccasion] = useState("");
+  const [occasion, setOccasion] = useState(
+    initialOccasion && OCCASION_OPTIONS.includes(initialOccasion)
+      ? initialOccasion
+      : ""
+  );
   const [styleDirection, setStyleDirection] = useState("");
   const [garmentType, setGarmentType] = useState("");
   const [tier, setTier] = useState<"standard" | "premium">("standard");

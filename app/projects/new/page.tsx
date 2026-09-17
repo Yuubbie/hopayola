@@ -2,7 +2,13 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ProjectIntakeForm from "@/components/project-intake-form";
 
-export default async function NewProject() {
+export default async function NewProject({
+  searchParams,
+}: {
+  searchParams: Promise<{ occasion?: string }>;
+}) {
+  const { occasion } = await searchParams;
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -29,6 +35,7 @@ export default async function NewProject() {
       <ProjectIntakeForm
         userId={user.id}
         savedMeasurements={profile?.saved_measurements ?? null}
+        initialOccasion={occasion ?? ""}
       />
     </main>
   );
