@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateProjectStatus, generateConcepts } from "./actions";
@@ -149,6 +150,13 @@ export default async function AdminProjects() {
                       </button>
                     </form>
                   )}
+
+                  <Link
+                    href={`/admin/projects/${p.id}`}
+                    className="border border-stone rounded-lg px-4 py-1.5 text-sm hover:bg-stone/20 transition-colors"
+                  >
+                    Manage milestones
+                  </Link>
                 </div>
               </div>
             </div>

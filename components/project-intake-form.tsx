@@ -18,6 +18,15 @@ type Props = {
 
 const MAX_PHOTOS = 5;
 
+const OCCASION_OPTIONS = [
+  "Wedding",
+  "Owambe / Party",
+  "Naming Ceremony",
+  "Corporate / Work",
+  "Everyday Wear",
+  "Cultural / Festival",
+];
+
 export default function ProjectIntakeForm({ userId, savedMeasurements }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -133,15 +142,22 @@ export default function ProjectIntakeForm({ userId, savedMeasurements }: Props) 
             <label className="block text-sm text-ink/50 mb-1" htmlFor="occasion">
               Occasion
             </label>
-            <input
+            <select
               id="occasion"
-              type="text"
               value={occasion}
               onChange={(e) => setOccasion(e.target.value)}
-              placeholder="Wedding guest, birthday, everyday wear..."
-              className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
+              className="w-full border border-stone rounded-lg px-3 py-2 text-sm bg-paper"
               required
-            />
+            >
+              <option value="" disabled>
+                Select an occasion
+              </option>
+              {OCCASION_OPTIONS.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
