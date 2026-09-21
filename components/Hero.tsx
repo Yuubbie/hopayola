@@ -52,9 +52,10 @@ export default function Hero() {
         }`}
       >
         <Image
-          src="/images/hero.jpg"
-          alt="Fashion design and tailoring in progress"
+          src="/images/hero-client.jpg"
+          alt="Hopayola client in a finished custom gown"
           fill
+          sizes="(max-width: 768px) 100vw, 50vw"
           className="object-cover"
           priority
         />

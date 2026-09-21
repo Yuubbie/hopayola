@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -68,19 +67,14 @@ export default function Navbar() {
       <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
         <Link
           href="/"
-          className="flex items-center gap-2"
+          className="flex items-center"
           onClick={() => setMenuOpen(false)}
         >
-          <Image
-            src="/images/logo.png"
+          <img
+            src="/images/logo-wordmark.png"
             alt="Hopayola"
-            width={28}
-            height={28}
-            className="h-7 w-auto"
+            className="h-10 md:h-12 w-auto"
           />
-          <span className="font-display text-2xl tracking-tight">
-            Hopayola
-          </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-8 text-sm">

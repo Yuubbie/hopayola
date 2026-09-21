@@ -3,12 +3,9 @@
 import Image from "next/image";
 
 const strip = [
-  "/images/marquee-1.jpg",
-  "/images/marquee-2.jpg",
-  "/images/marquee-3.jpg",
-  "/images/marquee-4.jpg",
-  "/images/marquee-5.jpg",
-  "/images/marquee-6.jpg",
+  "/images/hero-client.jpg",
+  "/images/marquee-clientO2.jpg",
+  "/images/marquee-clientO3.jpg",
 ];
 
 export default function HeroTopStrip() {
