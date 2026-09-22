@@ -1,48 +1,41 @@
 import Link from "next/link";
-import AfricanPattern from "@/components/AfricanPattern";
 
 const OCCASIONS = [
   {
     label: "Wedding",
     slug: "Wedding",
     blurb: "Aso ebi, gowns, and the big day look",
-    bg: "bg-royal",
-    text: "text-paper",
+    image: "/images/occasion-wedding.jpg",
   },
   {
     label: "Owambe / Party",
     slug: "Owambe%20%2F%20Party",
     blurb: "Bold, statement pieces for the dance floor",
-    bg: "bg-royal-deep",
-    text: "text-paper",
+    image: "/images/occasion-owambe.jpg",
   },
   {
     label: "Naming Ceremony",
     slug: "Naming%20Ceremony",
     blurb: "Family occasions, done with care",
-    bg: "bg-stone",
-    text: "text-ink",
+    image: "/images/occasion-naming.jpg",
   },
   {
     label: "Corporate / Work",
     slug: "Corporate%20%2F%20Work",
     blurb: "Sharp, professional, well cut",
-    bg: "bg-ink",
-    text: "text-paper",
+    image: "/images/occasion-corporate.jpg",
   },
   {
     label: "Everyday Wear",
     slug: "Everyday%20Wear",
     blurb: "Comfortable pieces made to your fit",
-    bg: "bg-stone",
-    text: "text-ink",
+    image: "/images/occasion-everyday.jpg",
   },
   {
     label: "Cultural / Festival",
     slug: "Cultural%20%2F%20Festival",
     blurb: "Traditional wear for the moments that matter",
-    bg: "bg-royal",
-    text: "text-paper",
+    image: "/images/occasion-cultural.jpg",
   },
 ];
 
@@ -61,22 +54,19 @@ export default function OccasionBrowse() {
           <Link
             key={item.slug}
             href={`/projects/new?occasion=${item.slug}`}
-            className={`group relative aspect-square rounded-2xl overflow-hidden block ${item.bg} transition-transform duration-300 hover:scale-[1.02]`}
+            className="group relative aspect-square rounded-2xl overflow-hidden block transition-transform duration-300 hover:scale-[1.02]"
           >
-            <div className="absolute inset-0">
-              <AfricanPattern
-                color={item.text === "text-paper" ? "#FAFAF8" : "#5B2A86"}
-              />
-            </div>
+            <img
+              src={item.image}
+              alt={item.label}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/10 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-5">
-              <h3
-                className={`font-display text-lg md:text-xl leading-tight mb-1 ${item.text}`}
-              >
+              <h3 className="font-display text-lg md:text-xl leading-tight mb-1 text-paper">
                 {item.label}
               </h3>
-              <p
-                className={`text-xs md:text-sm leading-snug ${item.text} opacity-70`}
-              >
+              <p className="text-xs md:text-sm leading-snug text-paper opacity-80">
                 {item.blurb}
               </p>
             </div>
