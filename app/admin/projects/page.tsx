@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateProjectStatus, generateConcepts } from "./actions";
+import AdminNav from "@/components/AdminNav";
 
 const STATUS_OPTIONS = [
   "draft",
@@ -65,6 +66,8 @@ export default async function AdminProjects() {
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-24">
+      <AdminNav />
+
       <h1 className="font-display text-3xl mb-2">Admin - Projects</h1>
       <p className="text-ink/60 mb-12">
         Review submitted projects and move them through the pipeline

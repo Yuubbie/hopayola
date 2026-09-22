@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { setArtisanVerified } from "./actions";
+import AdminNav from "@/components/AdminNav";
 
 export default async function AdminArtisans() {
   const supabase = await createClient();
@@ -29,6 +30,8 @@ export default async function AdminArtisans() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-24">
+      <AdminNav />
+
       <h1 className="font-display text-3xl mb-2">Artisans</h1>
       <p className="text-ink/60 mb-12">
         Review and verify artisans before they can claim client projects.
