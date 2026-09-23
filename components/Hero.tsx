@@ -21,7 +21,7 @@ export default function Hero() {
         }`}
       >
         <HeroTopStrip />
-        <p className="text-royal text-sm mb-4">Now piloting in Abuja</p>
+        <p className="text-royal text-sm mb-4">Trending styles from top artisans</p>
         <h1 className="font-display text-5xl md:text-6xl leading-[1.05] mb-6">
           Your fashion idea, planned and coordinated from start to finish.
         </h1>

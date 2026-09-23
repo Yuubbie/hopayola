@@ -14,7 +14,7 @@ export default function ShopAndPilot() {
           </p>
         </div>
         <Link
-          href="https://shop.hopayola.com"
+          href="https://hopayola.com/shop/"
           className="text-royal hover:text-royal-deep transition-colors font-medium"
         >
           Visit the shop

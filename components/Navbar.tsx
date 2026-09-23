@@ -10,7 +10,8 @@ const links = [
   { href: "/about", label: "About" },
   { href: "/fashion", label: "Fashion" },
   { href: "/lifestyle", label: "Lifestyle" },
-  { href: "https://shop.hopayola.com", label: "Shop" },
+  { href: "https://hopayola.com/shop/", label: "Shop" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function Navbar() {
