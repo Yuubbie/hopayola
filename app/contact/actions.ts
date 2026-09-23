@@ -19,6 +19,4 @@ export async function submitInquiry(formData: FormData) {
     subject,
     message,
   });
-
-  return { success: true };
 }
