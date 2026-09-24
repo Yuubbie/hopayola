@@ -4,6 +4,7 @@ import OccasionBrowse from "@/components/OccasionBrowse";
 import ProcessStrip from "@/components/ProcessStrip";
 import ShopAndPilot from "@/components/ShopAndPilot";
 import WelcomeModal from "@/components/WelcomeModal";
+import WaitlistSignup from "@/components/WaitlistSignup";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <OccasionBrowse />
       <ProcessStrip />
       <ShopAndPilot />
+      <WaitlistSignup />
     </main>
   );
 }
