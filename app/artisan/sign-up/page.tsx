@@ -22,6 +22,7 @@ export default function ArtisanSignUp() {
   const [skills, setSkills] = useState("");
   const [yearsExperience, setYearsExperience] = useState("");
   const [bio, setBio] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -206,11 +207,32 @@ export default function ArtisanSignUp() {
                   />
                 </div>
 
+                <div className="flex items-start gap-2">
+                  <input
+                    id="agreedToTerms"
+                    type="checkbox"
+                    required
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="mt-1"
+                  />
+                  <label htmlFor="agreedToTerms" className="text-sm text-ink/70">
+                    I agree to the{" "}
+                    <Link
+                      href="/terms"
+                      target="_blank"
+                      className="text-royal hover:text-royal-deep underline"
+                    >
+                      Terms &amp; Conditions
+                    </Link>
+                  </label>
+                </div>
+
                 {error && <p className="text-sm text-red-600">{error}</p>}
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !agreedToTerms}
                   className="w-full bg-royal text-paper py-3 rounded-full hover:bg-royal-deep transition-colors disabled:opacity-60"
                 >
                   {loading ? "Creating profile..." : "Sign up as an artisan"}
