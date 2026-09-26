@@ -34,6 +34,8 @@ export default async function NewProject({
 
       <ProjectIntakeForm
         userId={user.id}
+        clientName={profile?.full_name ?? "Unknown"}
+        clientEmail={user.email ?? "Unknown"}
         savedMeasurements={profile?.saved_measurements ?? null}
         initialOccasion={occasion ?? ""}
       />

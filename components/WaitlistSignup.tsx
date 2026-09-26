@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { notifyWaitlistSignup } from "@/app/actions/notifications";
 
 const INTEREST_OPTIONS = [
   "Client",
@@ -39,6 +40,7 @@ export default function WaitlistSignup() {
     }
 
     setSubmitted(true);
+    notifyWaitlistSignup(email, interest);
   }
 
   return (

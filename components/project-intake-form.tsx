@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { notifyProjectSubmission } from "@/app/actions/notifications";
 
 type SavedMeasurements = {
   bust?: string;
@@ -13,6 +14,8 @@ type SavedMeasurements = {
 
 type Props = {
   userId: string;
+  clientName: string;
+  clientEmail: string;
   savedMeasurements: SavedMeasurements;
   initialOccasion?: string;
 };
@@ -30,6 +33,8 @@ const OCCASION_OPTIONS = [
 
 export default function ProjectIntakeForm({
   userId,
+  clientName,
+  clientEmail,
   savedMeasurements,
   initialOccasion,
 }: Props) {
@@ -133,6 +138,8 @@ export default function ProjectIntakeForm({
       if (insertError) {
         throw new Error(`Could not save project: ${insertError.message}`);
       }
+
+      notifyProjectSubmission(clientName, clientEmail, garmentType.trim(), occasion.trim());
 
       router.push(`/account?project=${project.id}`);
     } catch (err) {
