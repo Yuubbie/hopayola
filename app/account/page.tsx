@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PayProjectButton from "@/components/pay-project-button";
+import MilestoneClientActions from "@/components/milestone-client-actions";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -83,14 +84,26 @@ export default async function Account({
     teamByProject.set(row.project_id, list);
   }
 
+  const { data: allMilestones } = await supabase
+    .from("project_milestones")
+    .select("*")
+    .in("project_id", projectIds.length > 0 ? projectIds : ["none"])
+    .order("milestone_order", { ascending: true });
+
+  const milestonesByProject = new Map<string, any[]>();
+  for (const m of allMilestones || []) {
+    const list = milestonesByProject.get(m.project_id) || [];
+    list.push(m);
+    milestonesByProject.set(m.project_id, list);
+  }
+
   return (
     <main className="mx-auto max-w-2xl px-6 py-24">
       <h1 className="font-display text-3xl mb-2">
         Hello, {profile?.full_name || "there"}
       </h1>
       <p className="text-ink/60 mb-12">
-        Your project dashboard is coming soon. For now, here&apos;s what&apos;s
-        on file.
+        Your projects, payments, and milestone reviews.
       </p>
 
       {justSubmittedId && (
@@ -122,6 +135,7 @@ export default async function Account({
                 const budget = formatBudget(p.budget_min, p.budget_max);
                 const deadline = formatDate(p.delivery_deadline);
                 const team = teamByProject.get(p.id);
+                const projectMilestones = milestonesByProject.get(p.id) || [];
 
                 return (
                   <li
@@ -170,8 +184,25 @@ export default async function Account({
                     {p.funded_at && (
                       <div className="mt-3 pt-3 border-t border-stone">
                         <p className="text-xs text-green-700">
-                          Payment received - funds held securely until milestones are confirmed
+                          Payment received. Artisans are paid after each verified milestone.
                         </p>
+                        {projectMilestones.length > 0 && (
+                          <ul className="mt-2 space-y-2">
+                            {projectMilestones.map((m) => (
+                              <li key={m.id} className="text-xs text-ink/70">
+                                <span className="font-medium">{m.milestone_name}</span>
+                                {" — "}
+                                {String(m.status).replace(/_/g, " ")}
+                                <MilestoneClientActions
+                                  milestoneId={m.id}
+                                  projectId={p.id}
+                                  status={m.status}
+                                  confirmedAt={m.confirmed_at}
+                                />
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     )}
                   </li>

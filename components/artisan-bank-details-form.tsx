@@ -35,7 +35,16 @@ export default function ArtisanBankDetailsForm({
 
   useEffect(() => {
     getNigerianBanks()
-      .then(setBanks)
+      .then((list) => {
+        const seen = new Set<string>();
+        setBanks(
+          list.filter((b) => {
+            if (seen.has(b.code)) return false;
+            seen.add(b.code);
+            return true;
+          })
+        );
+      })
       .catch(() => setError("Could not load bank list. Please refresh and try again."))
       .finally(() => setBanksLoading(false));
   }, []);
@@ -110,8 +119,8 @@ export default function ArtisanBankDetailsForm({
             <option value="" disabled>
               {banksLoading ? "Loading banks..." : "Select your bank"}
             </option>
-            {banks.map((bank) => (
-              <option key={bank.code} value={bank.code}>
+            {banks.map((bank, i) => (
+              <option key={`${bank.code}-${i}`} value={bank.code}>
                 {bank.name}
               </option>
             ))}

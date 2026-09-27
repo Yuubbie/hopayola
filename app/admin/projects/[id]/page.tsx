@@ -2,8 +2,19 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { addMilestone, updateMilestoneStatus } from "./actions";
+import { payoutMilestoneForm } from "@/app/actions/paystack-payout";
+import PayProjectButton from "@/components/pay-project-button";
 
-const MILESTONE_STATUS_OPTIONS = ["pending", "in_progress", "completed", "paid"];
+const MILESTONE_STATUS_OPTIONS = [
+  "pending",
+  "in_progress",
+  "submitted",
+  "client_confirmed",
+  "disputed",
+  "paid_out",
+  "completed",
+  "paid",
+];
 
 export default async function AdminProjectDetail({
   params,
@@ -75,10 +86,22 @@ export default async function AdminProjectDetail({
         Client: {clientProfile?.full_name || "Unknown"}
         {clientProfile?.phone ? ` | ${clientProfile.phone}` : ""}
       </p>
-      <p className="text-ink/60 mb-12 capitalize">
+      <p className="text-ink/60 mb-4 capitalize">
         {project.tier} package | {project.status.replace(/_/g, " ")} |{" "}
         {project.region}
       </p>
+      {project.funded_at ? (
+        <p className="text-sm text-green-700 mb-12">
+          Client payment recorded {new Date(project.funded_at).toLocaleString("en-GB")}
+        </p>
+      ) : (
+        <div className="mb-12">
+          <p className="text-sm text-ink/60 mb-2">
+            Client has not paid yet. Checkout total is milestone amounts + 5%.
+          </p>
+          <PayProjectButton projectId={id} />
+        </div>
+      )}
 
       {team && team.length > 0 && (
         <section className="border border-stone rounded-2xl p-6 mb-6">
@@ -143,6 +166,20 @@ export default async function AdminProjectDetail({
                     Update
                   </button>
                 </form>
+                {m.status !== "paid" &&
+                  m.status !== "paid_out" &&
+                  m.status !== "disputed" && (
+                    <form action={payoutMilestoneForm} className="mt-2">
+                      <input type="hidden" name="milestoneId" value={m.id} />
+                      <input type="hidden" name="projectId" value={id} />
+                      <button
+                        type="submit"
+                        className="text-xs text-royal hover:text-royal-deep"
+                      >
+                        Pay artisan now (Paystack Transfer)
+                      </button>
+                    </form>
+                  )}
               </li>
             ))}
           </ul>

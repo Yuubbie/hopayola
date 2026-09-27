@@ -58,7 +58,20 @@ export default function Lifestyle() {
         </div>
       </section>
 
-      <section className="bg-stone/30 py-20">
+      <section id="resources" className="scroll-mt-24 bg-stone/30 py-20">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <p className="text-royal text-sm mb-4">Free resources</p>
+          <h2 className="font-display text-3xl md:text-4xl mb-6">
+            Guides to get started
+          </h2>
+          <p className="text-ink/70 leading-relaxed mb-6">
+            Measurement guides, planning worksheets, and printable fashion
+            resources will live here. Hope is preparing this content.
+          </p>
+        </div>
+      </section>
+
+      <section className="py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <p className="text-royal text-sm mb-4">Recreate the Look</p>
           <h2 className="font-display text-3xl md:text-4xl mb-6">

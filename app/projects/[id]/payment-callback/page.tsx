@@ -53,8 +53,9 @@ export default async function PaymentCallback({
         <>
           <h1 className="font-display text-3xl mb-4">Payment received</h1>
           <p className="text-ink/70 leading-relaxed mb-8">
-            Your funds are held securely in escrow. They&apos;ll be released
-            to your artisan as each milestone is confirmed.
+            Payment received. Hopayola will schedule production and pay
+            assigned artisans as subcontractors after each verified
+            milestone.
           </p>
         </>
       ) : (

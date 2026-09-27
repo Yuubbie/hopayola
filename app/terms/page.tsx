@@ -31,6 +31,16 @@ export default function Terms() {
             platform, you agree to comply with these operational, legal, and
             financial standards.
           </p>
+          <p className="mt-3">
+            Hopayola Ltd (the &quot;Company&quot;) is the merchant of record
+            for all projects commissioned through the Platform. Clients
+            contract with the Company, not with individual artisans. The
+            Company is a digital fashion and production management
+            enterprise, not a bank, financial institution, trustee, or
+            licensed settlement service under the Banks and Other Financial
+            Institutions Act (BOFIA) or Central Bank of Nigeria (CBN)
+            regulations.
+          </p>
         </div>
 
         <div>
@@ -75,26 +85,58 @@ export default function Terms() {
           </h2>
           <ul className="list-disc pl-5 space-y-3">
             <li>
-              <strong>Commission &amp; Maintenance Fee:</strong> Hopayola
-              applies a standard service and infrastructure maintenance
-              deduction from the gross value of each completed commission.
-              This fee covers payment processing, platform hosting, AI
-              render pipelines, marketing, customer support, and dispute
-              arbitration.
+              <strong>Title to payments:</strong> Payments made by clients
+              are processed by the Company&apos;s payment partners (including
+              Paystack). Title to those payments passes to the Company upon
+              receipt and settlement. No client funds are held in trust,
+              segregated fiduciary custody, or on behalf of any artisan or
+              third party.
             </li>
             <li>
-              <strong>Milestone Payout Escrow:</strong> All client funds are
-              held securely via Paystack split-payment escrow. Payouts
-              release strictly upon verified completion of agreed production
-              milestones (Intake/Cutting, Assembly, Final Quality
-              Check/Fitting).
+              <strong>Advance project funding:</strong> Production is
+              scheduled across defined project phases (&quot;Milestones&quot;).
+              Amounts paid for a project or milestone constitute the
+              Company&apos;s earned or deferred project revenue, allocated
+              toward materials, pattern work, fittings, platform operations,
+              and subcontractor compensation.
+            </li>
+            <li>
+              <strong>Artisans as subcontractors:</strong> Verified artisans
+              are independent subcontractors of the Company. They have no
+              proprietary claim over customer payments and look exclusively
+              to the Company for payment of agreed fabrication fees. The
+              Company retains sole discretion over scheduling and
+              disbursement of those fees.
+            </li>
+            <li>
+              <strong>Commission &amp; Maintenance Fee:</strong> The Company
+              charges a client service fee at checkout (currently 5% of
+              milestone totals) and applies a platform commission (currently
+              5%) deducted from each artisan work-order amount. These fees
+              cover payment processing, platform hosting, AI render
+              pipelines, marketing, customer support, and dispute
+              arbitration. On Premium team projects, commission is
+              calculated on each team member&apos;s own milestone amount.
+            </li>
+            <li>
+              <strong>Conditional milestone disbursements:</strong>{" "}
+              Subcontractor compensation is paid on a completed-phase basis
+              after verification (for example Intake/Cutting, Assembly,
+              Final Quality Check/Fitting). Disbursements are made to the
+              artisan&apos;s verified bank account via the Company&apos;s
+              designated payout mechanisms (Paystack Transfers). Payout
+              requires: (i) the client (or deemed acceptance after the
+              stated review window) confirming the milestone, or Company
+              verification; (ii) no open dispute on that phase; and (iii) a
+              verified payout account on file.
             </li>
             <li>
               <strong>Chargebacks &amp; Rework Deductions:</strong> If a
               garment fails verified quality checks due to artisan error or
-              negligence, remediation costs (alteration fees, courier return
-              fees, or client refunds) will be deducted directly from the
-              artisan&apos;s pending payout ledger.
+              negligence, the Company may withhold or debit subcontractor
+              fees for the affected milestone. Remediation costs (alteration
+              fees, courier return fees, or client refunds) may be deducted
+              from the artisan&apos;s pending payout ledger.
             </li>
           </ul>
         </div>
@@ -238,8 +280,8 @@ export default function Terms() {
             physical inspection team reserves the right to evaluate the
             garment against the approved project brief, measurement
             profile, and uploaded fabric photos. The arbitration
-            team&apos;s decision regarding payout release or refund issuance
-            is final and binding.
+            team&apos;s decision regarding payout, rework, or refund
+            issuance is final and binding.
           </p>
         </div>
       </section>

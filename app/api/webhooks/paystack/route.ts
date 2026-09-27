@@ -16,14 +16,13 @@ export async function POST(req: NextRequest) {
   }
 
   const event = JSON.parse(rawBody);
+  const supabase = createServiceClient();
 
   if (event.event === "charge.success") {
     const projectId = event.data.metadata?.project_id;
     const reference = event.data.reference;
 
     if (projectId) {
-      const supabase = createServiceClient();
-
       await supabase
         .from("projects")
         .update({
@@ -32,6 +31,18 @@ export async function POST(req: NextRequest) {
         })
         .eq("id", projectId)
         .is("funded_at", null);
+    }
+  }
+
+  if (event.event === "transfer.success" || event.event === "transfer.failed") {
+    const reference = event.data?.reference as string | undefined;
+    if (reference) {
+      await supabase
+        .from("project_milestones")
+        .update({
+          status: event.event === "transfer.success" ? "paid" : "completed",
+        })
+        .eq("paystack_transfer_reference", reference);
     }
   }
 

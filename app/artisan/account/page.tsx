@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { claimProject } from "./actions";
+import MilestoneSubmitForm from "@/components/milestone-submit-form";
 
 const STATUS_LABELS: Record<string, string> = {
   concept_selected: "Ready to match",
@@ -57,13 +58,27 @@ export default async function ArtisanAccount() {
     .select("project_id, projects(*)")
     .eq("artisan_id", user.id);
 
+  const assignedIds = (myAssignments || []).map((a: any) => a.project_id);
+  const { data: myMilestones } = await supabase
+    .from("project_milestones")
+    .select("*")
+    .in("project_id", assignedIds.length > 0 ? assignedIds : ["none"])
+    .order("milestone_order", { ascending: true });
+
+  const milestonesByProject = new Map<string, any[]>();
+  for (const m of myMilestones || []) {
+    const list = milestonesByProject.get(m.project_id) || [];
+    list.push(m);
+    milestonesByProject.set(m.project_id, list);
+  }
+
   return (
     <main className="mx-auto max-w-2xl px-6 py-24">
       <h1 className="font-display text-3xl mb-2">
         Hello, {profile?.full_name || "there"}
       </h1>
       <p className="text-ink/60 mb-12">
-        Your artisan dashboard is coming soon. For now, here&apos;s what&apos;s
+        Your assigned work, payout profile, and open projects. For now, here&apos;s what&apos;s
         on file and what&apos;s open in your area.
       </p>
 
@@ -83,6 +98,22 @@ export default async function ArtisanAccount() {
                       {(a.projects?.status || "").replace(/_/g, " ")}
                     </span>
                   </div>
+                  {(milestonesByProject.get(a.project_id) || []).map((m) => (
+                    <div key={m.id} className="mt-3 pt-3 border-t border-stone text-xs">
+                      <p>
+                        <span className="font-medium">{m.milestone_name}</span>
+                        {" — "}
+                        {String(m.status).replace(/_/g, " ")}
+                      </p>
+                      {m.status !== "completed" &&
+                        m.status !== "paid" && (
+                          <MilestoneSubmitForm
+                            milestoneId={m.id}
+                            projectId={a.project_id}
+                          />
+                        )}
+                    </div>
+                  ))}
                 </li>
               ))}
             </ul>

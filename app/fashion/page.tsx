@@ -4,7 +4,7 @@ import FashionPathways from "@/components/FashionPathways";
 export const metadata: Metadata = {
   title: "Fashion — Hopayola",
   description:
-    "Hire a fashion talent, create a team, or design your outfit. Explore the ways to work with Hopayola.",
+    "Hire a fashion talent, create a team, or join as an artisan. Explore the ways to work with Hopayola.",
 };
 
 export default function Fashion() {

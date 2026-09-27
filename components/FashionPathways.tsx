@@ -19,10 +19,10 @@ const pathways = [
     image: "/images/create-a-team.jpg",
   },
   {
-    href: "/fashion/design-my-outfit",
-    title: "Design my outfit",
+    href: "/artisan/sign-up",
+    title: "Join as artisan",
     description:
-      "Share your measurements, references and occasion. Get styled with guided design support.",
+      "Tailors, designers, and specialists: join Hopayola, get matched to projects, and get paid by milestone.",
     image: "/images/design-my-outfit.jpg",
   },
 ];
@@ -34,7 +34,7 @@ export default function FashionPathways() {
         Three ways to start
       </h2>
       <p className="text-ink/60 mb-12 max-w-prose">
-        However you like to work, there's a path that fits.
+        However you like to work, there&apos;s a path that fits.
       </p>
 
       <div className="grid md:grid-cols-3 gap-8">

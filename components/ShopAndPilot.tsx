@@ -14,10 +14,10 @@ export default function ShopAndPilot() {
           </p>
         </div>
         <Link
-          href="https://shop.hopayola.com"
+          href="/lifestyle#resources"
           className="text-royal hover:text-royal-deep transition-colors font-medium"
         >
-          Visit the shop
+          Browse free resources
         </Link>
       </div>
 
@@ -27,7 +27,7 @@ export default function ShopAndPilot() {
             Currently piloting in Abuja
           </h3>
           <p className="text-paper/80 leading-relaxed mb-6">
-            We're starting local, learning what works, and building toward
+            We&apos;re starting local, learning what works, and building toward
             other cities from there.
           </p>
         </div>

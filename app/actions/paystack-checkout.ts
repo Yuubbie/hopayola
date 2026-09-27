@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { clientCheckoutTotal, toKobo } from "@/lib/payments";
 
 const PAYSTACK_BASE = "https://api.paystack.co";
 
@@ -52,11 +53,13 @@ export async function initiateProjectPayment(projectId: string) {
     },
     body: JSON.stringify({
       email: user.email,
-      amount: Math.round(totalAmount * 100),
+      amount: toKobo(clientCheckoutTotal(totalAmount)),
       currency: "NGN",
       callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/projects/${projectId}/payment-callback`,
       metadata: {
         project_id: projectId,
+        milestone_subtotal: totalAmount,
+        client_service_fee_rate: 0.05,
       },
     }),
   });

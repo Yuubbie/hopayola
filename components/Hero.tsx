@@ -27,7 +27,7 @@ export default function Hero() {
         </h1>
         <p className="text-ink/70 max-w-prose text-lg leading-relaxed mb-8">
           Hopayola connects you with tailors, designers and artisans, then
-          coordinates the entire project so you're not managing five people
+          coordinates the entire project so you&apos;re not managing five people
           on your own.
         </p>
         <div className="flex flex-wrap gap-4">
@@ -38,10 +38,10 @@ export default function Hero() {
             Hire a talent
           </Link>
           <Link
-            href="/fashion/design-my-outfit"
+            href="/artisan/sign-up"
             className="border border-ink/20 px-6 py-3 rounded-full hover:border-royal hover:text-royal transition-colors"
           >
-            Design my outfit
+            Join as artisan
           </Link>
         </div>
       </div>
