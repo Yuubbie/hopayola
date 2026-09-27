@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ArtisanProfileEditForm from "@/components/artisan-profile-edit-form";
+import ArtisanBankDetailsForm from "@/components/artisan-bank-details-form";
 
 export default async function EditArtisanProfile() {
   const supabase = await createClient();
@@ -36,15 +37,24 @@ export default async function EditArtisanProfile() {
         right picture of your work.
       </p>
 
-      <ArtisanProfileEditForm
-        userId={user.id}
-        initialFullName={profile?.full_name || ""}
-        initialAvailability={artisanProfile?.availability_status || "unavailable"}
-        initialSpecialty={artisanProfile?.specialty || []}
-        initialSkills={(artisanProfile?.skills || []).join(", ")}
-        initialYearsExperience={artisanProfile?.years_experience?.toString() || ""}
-        initialBio={artisanProfile?.bio || ""}
-      />
+      <div className="space-y-6">
+        <ArtisanProfileEditForm
+          userId={user.id}
+          initialFullName={profile?.full_name || ""}
+          initialAvailability={artisanProfile?.availability_status || "unavailable"}
+          initialSpecialty={artisanProfile?.specialty || []}
+          initialSkills={(artisanProfile?.skills || []).join(", ")}
+          initialYearsExperience={artisanProfile?.years_experience?.toString() || ""}
+          initialBio={artisanProfile?.bio || ""}
+        />
+
+        <ArtisanBankDetailsForm
+          artisanId={user.id}
+          initialBankCode={artisanProfile?.bank_code || null}
+          initialAccountNumber={artisanProfile?.bank_account_number || null}
+          initialAccountName={artisanProfile?.bank_account_name || null}
+        />
+      </div>
     </main>
   );
 }

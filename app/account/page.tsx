@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import PayProjectButton from "@/components/pay-project-button";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -158,6 +159,18 @@ export default async function Account({
                       <div className="mt-3 pt-3 border-t border-stone">
                         <p className="text-xs text-royal-deep">
                           Assigned to {team.map((t) => t.name).join(", ")}
+                        </p>
+                      </div>
+                    )}
+
+                    {!p.funded_at && (
+                      <PayProjectButton projectId={p.id} />
+                    )}
+
+                    {p.funded_at && (
+                      <div className="mt-3 pt-3 border-t border-stone">
+                        <p className="text-xs text-green-700">
+                          Payment received - funds held securely until milestones are confirmed
                         </p>
                       </div>
                     )}
