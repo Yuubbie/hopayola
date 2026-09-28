@@ -2,16 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createServiceClient } from "@/lib/supabase/service";
 
+function validSignature(rawBody: string, signature: string | null) {
+  const secret = process.env.PAYSTACK_SECRET_KEY || "";
+  if (!signature || !secret) return false;
+  const expected = crypto.createHmac("sha512", secret).update(rawBody).digest("hex");
+  const a = Buffer.from(expected, "utf8");
+  const b = Buffer.from(signature, "utf8");
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const signature = req.headers.get("x-paystack-signature");
 
-  const expectedSignature = crypto
-    .createHmac("sha512", process.env.PAYSTACK_SECRET_KEY || "")
-    .update(rawBody)
-    .digest("hex");
-
-  if (signature !== expectedSignature) {
+  if (!validSignature(rawBody, signature)) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
@@ -23,7 +28,7 @@ export async function POST(req: NextRequest) {
     const projectId = event.data.metadata?.project_id;
     const reference = event.data.reference;
 
-    if (projectId) {
+    if (projectId && event.data.status === "success") {
       await supabase
         .from("projects")
         .update({

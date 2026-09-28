@@ -3,7 +3,7 @@ import { createServiceClient } from "@/lib/supabase/service";
 
 async function verifyAndFundProject(reference: string, projectId: string) {
   const res = await fetch(
-    `https://api.paystack.co/transaction/verify/${reference}`,
+    `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
     {
       headers: {
         Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
@@ -14,6 +14,11 @@ async function verifyAndFundProject(reference: string, projectId: string) {
   const json = await res.json();
 
   if (!json.status || json.data.status !== "success") {
+    return false;
+  }
+
+  const paidProjectId = json.data.metadata?.project_id;
+  if (!paidProjectId || paidProjectId !== projectId) {
     return false;
   }
 
@@ -43,7 +48,7 @@ export default async function PaymentCallback({
 
   let success = false;
 
-  if (reference) {
+  if (reference && /^[A-Za-z0-9_-]{8,100}$/.test(reference)) {
     success = await verifyAndFundProject(reference, projectId);
   }
 
