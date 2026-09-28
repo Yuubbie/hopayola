@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { artisanPayoutNgn, toKobo } from "@/lib/payments";
+import { artisanPayoutNgn, toKobo, assertPaystackReady } from "@/lib/payments";
 
 const PAYSTACK_BASE = "https://api.paystack.co";
 
@@ -29,13 +29,24 @@ export async function payoutMilestone(milestoneId: string, projectId: string) {
   return runMilestonePayout(milestoneId, projectId);
 }
 
-export async function payoutMilestoneForm(formData: FormData) {
+export async function payoutMilestoneForm(
+  _prev: string | null,
+  formData: FormData
+): Promise<string | null> {
   const milestoneId = formData.get("milestoneId") as string;
   const projectId = formData.get("projectId") as string;
-  await payoutMilestone(milestoneId, projectId);
+  try {
+    await payoutMilestone(milestoneId, projectId);
+    return null;
+  } catch (err) {
+    return err instanceof Error
+      ? err.message
+      : "Payout could not be sent. Try again later.";
+  }
 }
 
 export async function runMilestonePayout(milestoneId: string, projectId: string) {
+  assertPaystackReady();
   if (!process.env.PAYSTACK_SECRET_KEY) {
     throw new Error("PAYSTACK_SECRET_KEY is not set.");
   }

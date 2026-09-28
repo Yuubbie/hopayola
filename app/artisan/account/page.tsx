@@ -78,8 +78,7 @@ export default async function ArtisanAccount() {
         Hello, {profile?.full_name || "there"}
       </h1>
       <p className="text-ink/60 mb-12">
-        Your assigned work, payout profile, and open projects. For now, here&apos;s what&apos;s
-        on file and what&apos;s open in your area.
+        Your jobs, payout status, and open projects in your area.
       </p>
 
       <div className="space-y-6">
@@ -103,7 +102,13 @@ export default async function ArtisanAccount() {
                       <p>
                         <span className="font-medium">{m.milestone_name}</span>
                         {" — "}
-                        {String(m.status).replace(/_/g, " ")}
+                        {m.status === "paid"
+                          ? "Paid"
+                          : m.confirmed_at
+                            ? "Client confirmed · payout pending"
+                            : m.status === "completed"
+                              ? "Submitted · awaiting client"
+                              : String(m.status).replace(/_/g, " ")}
                       </p>
                       {m.status !== "completed" &&
                         m.status !== "paid" && (

@@ -2,16 +2,13 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { addMilestone, updateMilestoneStatus } from "./actions";
-import { payoutMilestoneForm } from "@/app/actions/paystack-payout";
 import PayProjectButton from "@/components/pay-project-button";
+import AdminPayoutButton from "@/components/admin-payout-button";
+import { milestonePayoutLabel } from "@/lib/payments";
 
 const MILESTONE_STATUS_OPTIONS = [
   "pending",
   "in_progress",
-  "submitted",
-  "client_confirmed",
-  "disputed",
-  "paid_out",
   "completed",
   "paid",
 ];
@@ -136,8 +133,8 @@ export default async function AdminProjectDetail({
                       </span>
                     )}
                   </div>
-                  <span className="shrink-0 text-xs border border-stone rounded-full px-2 py-1 text-ink/60 capitalize">
-                    {m.status.replace(/_/g, " ")}
+                  <span className="shrink-0 text-xs border border-stone rounded-full px-2 py-1 text-ink/60">
+                    {milestonePayoutLabel(m)}
                   </span>
                 </div>
 
@@ -166,20 +163,9 @@ export default async function AdminProjectDetail({
                     Update
                   </button>
                 </form>
-                {m.status !== "paid" &&
-                  m.status !== "paid_out" &&
-                  m.status !== "disputed" && (
-                    <form action={payoutMilestoneForm} className="mt-2">
-                      <input type="hidden" name="milestoneId" value={m.id} />
-                      <input type="hidden" name="projectId" value={id} />
-                      <button
-                        type="submit"
-                        className="text-xs text-royal hover:text-royal-deep"
-                      >
-                        Pay artisan now (Paystack Transfer)
-                      </button>
-                    </form>
-                  )}
+                {m.status !== "paid" && m.status !== "paid_out" && (
+                  <AdminPayoutButton milestoneId={m.id} projectId={id} />
+                )}
               </li>
             ))}
           </ul>

@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
   }
 
   const event = JSON.parse(rawBody);
+  console.info("[paystack webhook]", event.event, event.data?.reference);
   const supabase = createServiceClient();
 
   if (event.event === "charge.success") {

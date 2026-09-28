@@ -192,7 +192,11 @@ export default async function Account({
                               <li key={m.id} className="text-xs text-ink/70">
                                 <span className="font-medium">{m.milestone_name}</span>
                                 {" — "}
-                                {String(m.status).replace(/_/g, " ")}
+                                {m.status === "paid"
+                                  ? "paid"
+                                  : m.confirmed_at
+                                    ? "confirmed · payout pending"
+                                    : String(m.status).replace(/_/g, " ")}
                                 <MilestoneClientActions
                                   milestoneId={m.id}
                                   projectId={p.id}

@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { clientCheckoutTotal, toKobo } from "@/lib/payments";
+import { clientCheckoutTotal, toKobo, assertPaystackReady } from "@/lib/payments";
 
 const PAYSTACK_BASE = "https://api.paystack.co";
 

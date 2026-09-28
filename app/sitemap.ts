@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/fashion",
     "/fashion/hire-a-talent",
     "/fashion/create-a-team",
-    "/fashion/design-my-outfit",
+    "/artisan/sign-up",
     "/lifestyle",
   ];
 
