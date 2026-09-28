@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import HeroTopStrip from "@/components/HeroTopStrip";
+import DemoOnboardingButton from "@/components/DemoOnboardingButton";
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
@@ -43,6 +44,7 @@ export default function Hero() {
           >
             Join as artisan
           </Link>
+          <DemoOnboardingButton className="text-sm text-royal underline underline-offset-4 hover:text-royal-deep px-2" />
         </div>
       </div>
 

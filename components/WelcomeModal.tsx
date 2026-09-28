@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import DemoOnboardingButton from "@/components/DemoOnboardingButton";
 
 const SESSION_KEY = "hopayola_welcome_seen";
 
@@ -60,9 +61,7 @@ export default function WelcomeModal() {
             className="flex items-center justify-between border border-stone rounded-2xl p-4 hover:border-royal transition-colors group"
           >
             <span>
-              <span className="block text-sm font-medium">
-                I'm a client
-              </span>
+              <span className="block text-sm font-medium">I&apos;m a client</span>
               <span className="block text-ink/50 text-sm">
                 Start a project and get matched with a team
               </span>
@@ -79,7 +78,7 @@ export default function WelcomeModal() {
           >
             <span>
               <span className="block text-sm font-medium">
-                I'm a tailor or artisan
+                I&apos;m a tailor or artisan
               </span>
               <span className="block text-ink/50 text-sm">
                 Join and start claiming projects
@@ -91,9 +90,13 @@ export default function WelcomeModal() {
           </Link>
         </div>
 
+        <DemoOnboardingButton
+          label="See a 30-second demo"
+          className="w-full text-center text-royal text-sm mt-5 hover:text-royal-deep"
+        />
         <button
           onClick={close}
-          className="w-full text-center text-ink/40 text-sm mt-6 hover:text-ink transition-colors"
+          className="w-full text-center text-ink/40 text-sm mt-3 hover:text-ink transition-colors"
         >
           Continue browsing
         </button>
