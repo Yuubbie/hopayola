@@ -1,110 +1,230 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 type Role = "client" | "artisan";
 
 type Frame = {
-  image: string;
-  alt: string;
   kicker: string;
   title: string;
   body: string;
+  scene: string;
 };
 
 const CLIENT: Frame[] = [
   {
-    image: "/images/hero-client.jpg",
-    alt: "Finished custom look",
     kicker: "Client · 1 of 6",
-    title: "Bring the idea",
-    body: "Start a project with the occasion, garment, budget, and deadline. Hopayola coordinates so you are not chasing five people.",
+    title: "Start a project",
+    body: "Occasion, garment, budget, deadline — one brief. Hopayola coordinates the rest.",
+    scene: "project",
   },
   {
-    image: "/images/occasion-wedding.jpg",
-    alt: "Occasion styling",
     kicker: "Client · 2 of 6",
-    title: "Share fabric and fit",
-    body: "Add references and measurements. Design support happens before anyone cuts cloth.",
+    title: "Share fit and fabric",
+    body: "Measurements and references before anyone cuts. You are not guessing the silhouette.",
+    scene: "fit",
   },
   {
-    image: "/images/create-a-team.jpg",
-    alt: "Planning a look",
     kicker: "Client · 3 of 6",
-    title: "Get a matched artisan",
-    body: "We assign a vetted tailor or team in your city. You see who is on the job from your account.",
+    title: "See your artisan",
+    body: "A vetted tailor or team is assigned. Their name sits on your project card.",
+    scene: "assigned",
   },
   {
-    image: "/images/occasion-corporate.jpg",
-    alt: "Everyday tailored look",
     kicker: "Client · 4 of 6",
-    title: "Pay the project once",
-    body: "Checkout is the milestone total plus 5%. Hopayola receives the payment as merchant of record.",
+    title: "Pay the project",
+    body: "One checkout: milestone total + 5%. Hopayola receives it as merchant of record.",
+    scene: "pay",
   },
   {
-    image: "/images/occasion-naming.jpg",
-    alt: "Named occasion look",
     kicker: "Client · 5 of 6",
     title: "Confirm each stage",
-    body: "Cutting, fitting, finish — the artisan submits proof. You confirm. Then they can be paid for that stage.",
+    body: "Artisan submits cutting or fitting. You tap Confirm. That stage can then be paid out.",
+    scene: "confirm",
   },
   {
-    image: "/images/occasion-owambe.jpg",
-    alt: "Occasion finish",
     kicker: "Client · 6 of 6",
-    title: "Wear it",
-    body: "Delivery is the last stage. You always know where the work stands.",
+    title: "Collect the outfit",
+    body: "Delivery is the last stage. Your account always shows where the work stands.",
+    scene: "done",
   },
 ];
 
 const ARTISAN: Frame[] = [
   {
-    image: "/images/design-my-outfit.jpg",
-    alt: "Workshop",
     kicker: "Artisan · 1 of 6",
-    title: "Join Hopayola",
-    body: "Sign up as artisan, set specialty, skills, region, and availability. Hope reviews new profiles.",
+    title: "Join as artisan",
+    body: "Email, specialty, region, skills. Same sign-up that is live on hopayola.com/artisan/sign-up.",
+    scene: "signup",
   },
   {
-    image: "/images/occasion-cultural.jpg",
-    alt: "Craft",
     kicker: "Artisan · 2 of 6",
-    title: "Add payout details",
-    body: "Verify your Nigerian bank account. That is where milestone payouts go after the client confirms.",
+    title: "Save payout details",
+    body: "Bank, 10-digit account, verify name, save. That is the account Hopayola pays.",
+    scene: "bank",
   },
   {
-    image: "/images/create-a-team.jpg",
-    alt: "Matching",
     kicker: "Artisan · 3 of 6",
-    title: "Claim work near you",
-    body: "Open projects in your region show on your dashboard. Claim a job you can deliver.",
+    title: "Claim a project",
+    body: "Open jobs in your city. Claim the ones you can deliver.",
+    scene: "claim",
   },
   {
-    image: "/images/occasion-everyday.jpg",
-    alt: "Making",
     kicker: "Artisan · 4 of 6",
-    title: "Work the milestones",
-    body: "Each job is split (cutting, fitting, finish). Submit a proof link when a stage is done.",
+    title: "Submit a milestone",
+    body: "When cutting or fitting is done, send proof from your dashboard.",
+    scene: "submit",
   },
   {
-    image: "/images/occasion-wedding.jpg",
-    alt: "Client review",
     kicker: "Artisan · 5 of 6",
-    title: "Client confirms",
-    body: "The client reviews from their account. Confirm releases that stage for payout.",
+    title: "Wait for confirm",
+    body: "The client reviews. Status becomes confirmed · payout pending.",
+    scene: "pending",
   },
   {
-    image: "/images/hero-client.jpg",
-    alt: "Paid work",
     kicker: "Artisan · 6 of 6",
-    title: "Get paid per stage",
-    body: "Hopayola pays you as a subcontractor (amount minus 5%) after confirm. Transfers need Paystack enabled on the business.",
+    title: "Get paid for the stage",
+    body: "After confirm, Hopayola sends the artisan payout (minus 5%) to the saved bank.",
+    scene: "paid",
   },
 ];
 
-const INTERVAL_MS = 5500;
+const INTERVAL_MS = 6000;
+
+function Scene({ id }: { id: string }) {
+  return (
+    <div className="h-full w-full bg-[#f6f1ea] p-5 md:p-8 flex items-center justify-center">
+      <div className="w-full max-w-md bg-paper rounded-2xl border border-stone shadow-sm p-5 text-left">
+        {id === "project" && (
+          <>
+            <p className="text-royal text-xs mb-2">New project</p>
+            <div className="space-y-2 text-sm">
+              <Row k="Occasion" v="Corporate / Work" />
+              <Row k="Garment" v="Three piece suit" />
+              <Row k="Budget" v="NGN 50,000 – 80,000" />
+              <Row k="Due" v="20 Oct 2026" />
+            </div>
+            <FakeBtn>Submit project</FakeBtn>
+          </>
+        )}
+        {id === "fit" && (
+          <>
+            <p className="text-royal text-xs mb-2">Fit profile</p>
+            <div className="space-y-2 text-sm">
+              <Row k="Chest" v="38 in" />
+              <Row k="Waist" v="32 in" />
+              <Row k="Fabric" v="Navy wool — 4 yards" />
+            </div>
+            <FakeBtn>Save measurements</FakeBtn>
+          </>
+        )}
+        {id === "assigned" && (
+          <>
+            <p className="text-royal text-xs mb-2">Your project</p>
+            <p className="font-medium text-sm mb-1">Three Piece Suit</p>
+            <p className="text-royal-deep text-sm">Assigned to Yubbiee Uby</p>
+            <p className="text-ink/50 text-xs mt-2">Standard package · In production</p>
+          </>
+        )}
+        {id === "pay" && (
+          <>
+            <p className="text-royal text-xs mb-2">Checkout</p>
+            <Row k="Milestones" v="NGN 20,000" />
+            <Row k="Service 5%" v="NGN 1,000" />
+            <Row k="Total" v="NGN 21,000" />
+            <FakeBtn>Pay with Paystack</FakeBtn>
+          </>
+        )}
+        {id === "confirm" && (
+          <>
+            <p className="text-green-700 text-xs mb-2">Payment received</p>
+            <p className="text-sm font-medium">Cutting — completed</p>
+            <div className="flex gap-2 mt-3">
+              <span className="bg-royal text-paper text-xs rounded-full px-3 py-1.5">
+                Confirm & pay artisan
+              </span>
+              <span className="text-xs text-red-700 py-1.5">Dispute</span>
+            </div>
+          </>
+        )}
+        {id === "done" && (
+          <>
+            <p className="text-royal text-xs mb-2">Project</p>
+            <p className="font-medium text-sm">Three Piece Suit</p>
+            <p className="text-sm text-ink/60 mt-1">Delivery — paid</p>
+            <p className="text-green-700 text-xs mt-3">Ready for pickup</p>
+          </>
+        )}
+        {id === "signup" && (
+          <>
+            <p className="text-royal text-xs mb-2">Artisan sign up</p>
+            <Row k="Name" v="Yubbiee Uby" />
+            <Row k="Specialty" v="Tailoring" />
+            <Row k="Region" v="Abuja" />
+            <FakeBtn>Create artisan account</FakeBtn>
+          </>
+        )}
+        {id === "bank" && (
+          <>
+            <p className="text-royal text-xs mb-2">Payout details</p>
+            <Row k="Bank" v="Ecobank Nigeria" />
+            <Row k="Account" v="1234567890" />
+            <Row k="Name" v="Verified · Yubbiee Uby" />
+            <FakeBtn>Save payout details</FakeBtn>
+          </>
+        )}
+        {id === "claim" && (
+          <>
+            <p className="text-royal text-xs mb-2">Open near you</p>
+            <p className="font-medium text-sm">Three Piece Suit — Corporate</p>
+            <p className="text-ink/50 text-xs mt-1">Abuja · Standard · Due 20 Oct</p>
+            <FakeBtn>Claim this project</FakeBtn>
+          </>
+        )}
+        {id === "submit" && (
+          <>
+            <p className="text-royal text-xs mb-2">Your claimed project</p>
+            <p className="text-sm font-medium">Cutting — in progress</p>
+            <p className="text-ink/50 text-xs mt-1">Proof URL (optional)</p>
+            <FakeBtn>Mark stage complete</FakeBtn>
+          </>
+        )}
+        {id === "pending" && (
+          <>
+            <p className="text-sm font-medium">Cutting — completed</p>
+            <p className="text-ink/50 text-xs mt-2">Client confirmed · payout pending</p>
+          </>
+        )}
+        {id === "paid" && (
+          <>
+            <p className="text-sm font-medium">Cutting — paid</p>
+            <Row k="Stage amount" v="NGN 10,000" />
+            <Row k="You receive (95%)" v="NGN 9,500" />
+            <p className="text-green-700 text-xs mt-3">Sent to Ecobank · 1234567890</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Row({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex justify-between gap-4 text-sm py-1 border-b border-stone/80">
+      <span className="text-ink/45">{k}</span>
+      <span className="text-ink text-right">{v}</span>
+    </div>
+  );
+}
+
+function FakeBtn({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mt-4 bg-royal text-paper text-sm text-center rounded-full py-2.5">
+      {children}
+    </div>
+  );
+}
 
 export default function DemoOnboarding({
   open,
@@ -163,7 +283,7 @@ export default function DemoOnboarding({
         <button
           onClick={close}
           aria-label="Close demo"
-          className="absolute top-3 right-4 z-10 text-paper md:text-ink/40 hover:text-ink text-3xl leading-none"
+          className="absolute top-3 right-4 z-10 text-ink/40 hover:text-ink text-3xl leading-none"
         >
           &times;
         </button>
@@ -177,7 +297,7 @@ export default function DemoOnboarding({
               Watch how Hopayola works
             </h2>
             <p className="text-ink/60 mb-8 max-w-prose">
-              A short walkthrough — pick a path. It plays like a video.
+              Pick a path. Each scene is the real screen for that step — not a random photo.
             </p>
             <div className="grid sm:grid-cols-2 gap-4">
               <button
@@ -191,7 +311,7 @@ export default function DemoOnboarding({
               >
                 <span className="block font-display text-xl mb-1">I&apos;m a client</span>
                 <span className="text-sm text-ink/55">
-                  Brief, pay, confirm stages, receive the outfit.
+                  Project, pay, confirm, collect.
                 </span>
               </button>
               <button
@@ -205,74 +325,62 @@ export default function DemoOnboarding({
               >
                 <span className="block font-display text-xl mb-1">I&apos;m an artisan</span>
                 <span className="text-sm text-ink/55">
-                  Sign up, claim jobs, submit work, get paid per milestone.
+                  Sign up, bank, claim, submit, get paid.
                 </span>
               </button>
             </div>
           </div>
         ) : (
           <>
-            <div className="relative aspect-[16/10] bg-ink">
-              <Image
-                key={frame.image + index}
-                src={frame.image}
-                alt={frame.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 768px"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/10 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 text-paper">
-                <p className="text-royal text-xs uppercase tracking-widest mb-1">
-                  {frame.kicker}
-                </p>
-                <h2 id="demo-title" className="font-display text-2xl md:text-3xl mb-2">
-                  {frame.title}
-                </h2>
-                <p className="text-paper/85 text-sm md:text-base max-w-xl leading-relaxed">
-                  {frame.body}
-                </p>
-              </div>
+            <div className="relative aspect-[16/10] min-h-[280px]">
+              <Scene id={frame.scene} />
             </div>
-
-            <div className="px-5 md:px-8 py-4 flex flex-wrap items-center gap-3 border-t border-stone">
-              <div className="flex gap-1 flex-1 min-w-[120px]">
-                {frames.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    aria-label={`Scene ${i + 1}`}
-                    onClick={() => setIndex(i)}
-                    className={`h-1.5 flex-1 rounded-full ${
-                      i === index ? "bg-royal" : "bg-stone"
-                    }`}
-                  />
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => setPlaying((p) => !p)}
-                className="text-xs text-ink/60 hover:text-ink"
-              >
-                {playing ? "Pause" : "Play"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole(null)}
-                className="text-xs text-ink/60 hover:text-ink"
-              >
-                Switch path
-              </button>
-              {last && (
-                <Link
-                  href={role === "artisan" ? "/artisan/sign-up" : "/projects/new"}
-                  onClick={close}
-                  className="ml-auto bg-royal text-paper text-sm px-4 py-2 rounded-full hover:bg-royal-deep"
+            <div className="px-5 md:px-8 py-4 border-t border-stone">
+              <p className="text-royal text-xs uppercase tracking-widest mb-1">
+                {frame.kicker}
+              </p>
+              <h2 id="demo-title" className="font-display text-2xl mb-1">
+                {frame.title}
+              </h2>
+              <p className="text-ink/65 text-sm mb-4">{frame.body}</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex gap-1 flex-1 min-w-[120px]">
+                  {frames.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-label={`Scene ${i + 1}`}
+                      onClick={() => setIndex(i)}
+                      className={`h-1.5 flex-1 rounded-full ${
+                        i === index ? "bg-royal" : "bg-stone"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPlaying((p) => !p)}
+                  className="text-xs text-ink/60 hover:text-ink"
                 >
-                  {role === "artisan" ? "Join as artisan" : "Start a project"}
-                </Link>
-              )}
+                  {playing ? "Pause" : "Play"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole(null)}
+                  className="text-xs text-ink/60 hover:text-ink"
+                >
+                  Switch path
+                </button>
+                {last && (
+                  <Link
+                    href={role === "artisan" ? "/artisan/sign-up" : "/projects/new"}
+                    onClick={close}
+                    className="ml-auto bg-royal text-paper text-sm px-4 py-2 rounded-full hover:bg-royal-deep"
+                  >
+                    {role === "artisan" ? "Join as artisan" : "Start a project"}
+                  </Link>
+                )}
+              </div>
             </div>
           </>
         )}
