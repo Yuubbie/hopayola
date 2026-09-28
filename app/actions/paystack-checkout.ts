@@ -45,6 +45,8 @@ export async function initiateProjectPayment(projectId: string) {
     throw new Error("You are not authorized to pay for this project.");
   }
 
+  assertPaystackReady();
+
   const res = await fetch(`${PAYSTACK_BASE}/transaction/initialize`, {
     method: "POST",
     headers: {
