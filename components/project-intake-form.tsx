@@ -85,11 +85,6 @@ export default function ProjectIntakeForm({
       setError("Occasion and garment type are required.");
       return;
     }
-    if (fabricFiles.length === 0) {
-      setError("Upload at least one fabric photo.");
-      return;
-    }
-
     setSubmitting(true);
 
     try {
@@ -207,9 +202,9 @@ export default function ProjectIntakeForm({
       </section>
 
       <section className="border border-stone rounded-2xl p-6">
-        <h2 className="font-display text-lg mb-4">Fabric photos</h2>
+        <h2 className="font-display text-lg mb-4">Fabric or reference photos <span className="text-ink/40 text-sm font-normal">(optional)</span></h2>
         <p className="text-ink/50 text-sm mb-4">
-          Up to {MAX_PHOTOS} photos. Clear, well-lit shots work best.
+          Skip this if you do not have fabric or a picture yet — describe the idea in the notes. Up to {MAX_PHOTOS} photos if you do.
         </p>
 
         <input
