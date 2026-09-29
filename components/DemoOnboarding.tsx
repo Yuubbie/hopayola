@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 
 type Role = "client" | "artisan";
@@ -218,7 +218,7 @@ function Row({ k, v }: { k: string; v: string }) {
   );
 }
 
-function FakeBtn({ children }: { children: React.ReactNode }) {
+function FakeBtn({ children }: { children: ReactNode }) {
   return (
     <div className="mt-4 bg-royal text-paper text-sm text-center rounded-full py-2.5">
       {children}

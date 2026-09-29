@@ -202,9 +202,12 @@ export default function ProjectIntakeForm({
       </section>
 
       <section className="border border-stone rounded-2xl p-6">
-        <h2 className="font-display text-lg mb-4">Fabric or reference photos <span className="text-ink/40 text-sm font-normal">(optional)</span></h2>
+        <h2 className="font-display text-lg mb-4">
+          Fabric or reference photos{" "}
+          <span className="text-ink/40 text-sm font-normal">(optional)</span>
+        </h2>
         <p className="text-ink/50 text-sm mb-4">
-          Skip this if you do not have fabric or a picture yet — describe the idea in the notes. Up to {MAX_PHOTOS} photos if you do.
+          Skip this if you do not have fabric or a picture yet - describe the idea in the notes. Up to {MAX_PHOTOS} photos if you do.
         </p>
 
         <input
