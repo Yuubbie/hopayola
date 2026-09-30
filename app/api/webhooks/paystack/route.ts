@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createServiceClient } from "@/lib/supabase/service";
+import { settleTransfer } from "@/lib/payout-core";
+
+const TRANSFER_OUTCOMES: Record<string, "success" | "failed" | "reversed"> = {
+  "transfer.success": "success",
+  "transfer.failed": "failed",
+  "transfer.reversed": "reversed",
+};
 
 function validSignature(rawBody: string, signature: string | null) {
   const secret = process.env.PAYSTACK_SECRET_KEY || "";
@@ -20,16 +27,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  const event = JSON.parse(rawBody);
+  let event: any;
+  try {
+    event = JSON.parse(rawBody);
+  } catch (err) {
+    return NextResponse.json({ error: "Bad payload" }, { status: 400 });
+  }
+
   console.info("[paystack webhook]", event.event, event.data?.reference);
   const supabase = createServiceClient();
 
   if (event.event === "charge.success") {
-    const projectId = event.data.metadata?.project_id;
-    const reference = event.data.reference;
+    const projectId = event.data?.metadata?.project_id;
+    const reference = event.data?.reference;
 
-    if (projectId && event.data.status === "success") {
-      await supabase
+    if (projectId && event.data?.status === "success") {
+      const { error } = await supabase
         .from("projects")
         .update({
           paystack_reference: reference,
@@ -37,18 +50,24 @@ export async function POST(req: NextRequest) {
         })
         .eq("id", projectId)
         .is("funded_at", null);
+
+      if (error) {
+        console.error("[paystack webhook] funding update failed", error.message);
+        return NextResponse.json({ error: "Database error" }, { status: 500 });
+      }
     }
   }
 
-  if (event.event === "transfer.success" || event.event === "transfer.failed") {
+  const outcome = TRANSFER_OUTCOMES[event.event as string];
+  if (outcome) {
     const reference = event.data?.reference as string | undefined;
     if (reference) {
-      await supabase
-        .from("project_milestones")
-        .update({
-          status: event.event === "transfer.success" ? "paid" : "completed",
-        })
-        .eq("paystack_transfer_reference", reference);
+      try {
+        await settleTransfer(reference, outcome, event.data?.reason);
+      } catch (err) {
+        console.error("[paystack webhook] transfer update failed", err);
+        return NextResponse.json({ error: "Database error" }, { status: 500 });
+      }
     }
   }
 
