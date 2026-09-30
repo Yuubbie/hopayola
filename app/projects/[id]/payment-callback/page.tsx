@@ -1,19 +1,20 @@
 import Link from "next/link";
-import { createServiceClient } from "@/lib/supabase/service";
+import { fundProjectFromPayment } from "@/lib/fund-project";
 
 async function verifyAndFundProject(reference: string, projectId: string) {
   const res = await fetch(
-    `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
+    "https://api.paystack.co/transaction/verify/" + encodeURIComponent(reference),
     {
       headers: {
-        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        Authorization: "Bearer " + process.env.PAYSTACK_SECRET_KEY,
       },
+      cache: "no-store",
     }
   );
 
   const json = await res.json();
 
-  if (!json.status || json.data.status !== "success") {
+  if (!json.status || !json.data) {
     return false;
   }
 
@@ -22,18 +23,19 @@ async function verifyAndFundProject(reference: string, projectId: string) {
     return false;
   }
 
-  const supabase = createServiceClient();
-
-  await supabase
-    .from("projects")
-    .update({
-      paystack_reference: reference,
-      funded_at: new Date().toISOString(),
-    })
-    .eq("id", projectId)
-    .is("funded_at", null);
-
-  return true;
+  try {
+    const result = await fundProjectFromPayment({
+      projectId,
+      reference,
+      amountKobo: Number(json.data.amount),
+      currency: String(json.data.currency || ""),
+      status: String(json.data.status || ""),
+    });
+    return result.ok;
+  } catch (err) {
+    console.error("[payment callback] funding failed", err);
+    return false;
+  }
 }
 
 export default async function PaymentCallback({

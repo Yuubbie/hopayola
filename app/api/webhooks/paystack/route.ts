@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createServiceClient } from "@/lib/supabase/service";
 import { settleTransfer } from "@/lib/payout-core";
+import { fundProjectFromPayment } from "@/lib/fund-project";
 
 const TRANSFER_OUTCOMES: Record<string, "success" | "failed" | "reversed"> = {
   "transfer.success": "success",
@@ -35,24 +36,25 @@ export async function POST(req: NextRequest) {
   }
 
   console.info("[paystack webhook]", event.event, event.data?.reference);
-  const supabase = createServiceClient();
 
   if (event.event === "charge.success") {
     const projectId = event.data?.metadata?.project_id;
     const reference = event.data?.reference;
 
-    if (projectId && event.data?.status === "success") {
-      const { error } = await supabase
-        .from("projects")
-        .update({
-          paystack_reference: reference,
-          funded_at: new Date().toISOString(),
-        })
-        .eq("id", projectId)
-        .is("funded_at", null);
-
-      if (error) {
-        console.error("[paystack webhook] funding update failed", error.message);
+    if (projectId && reference) {
+      try {
+        const result = await fundProjectFromPayment({
+          projectId: String(projectId),
+          reference: String(reference),
+          amountKobo: Number(event.data?.amount),
+          currency: String(event.data?.currency || ""),
+          status: String(event.data?.status || ""),
+        });
+        if (!result.ok) {
+          console.error("[paystack webhook] payment rejected:", result.reason);
+        }
+      } catch (err) {
+        console.error("[paystack webhook] funding failed", err);
         return NextResponse.json({ error: "Database error" }, { status: 500 });
       }
     }
