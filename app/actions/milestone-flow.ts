@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { runMilestonePayout } from "@/app/actions/paystack-payout";
+import { runMilestonePayout } from "@/lib/run-milestone-payout";
 
 async function getUser() {
   const supabase = await createClient();

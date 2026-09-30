@@ -7,62 +7,26 @@ import { createClient } from "@/lib/supabase/client";
 import PasswordInput from "@/components/password-input";
 import { notifySignup } from "@/app/actions/notifications";
 
-const SPECIALTY_OPTIONS = [
-  "Tailoring",
-  "Embellishment",
-  "Design",
-  "Beading",
-  "Alterations",
-];
-
-export default function ArtisanSignUp() {
+export default function SignUp() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [specialty, setSpecialty] = useState<string[]>([]);
-  const [skills, setSkills] = useState("");
-  const [yearsExperience, setYearsExperience] = useState("");
-  const [bio, setBio] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const supabase = createClient();
 
-  function toggleSpecialty(value: string) {
-    setSpecialty((prev) =>
-      prev.includes(value) ? prev.filter((s) => s !== value) : [...prev, value]
-    );
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-
-    if (specialty.length === 0) {
-      setError("Pick at least one specialty.");
-      return;
-    }
-
     setLoading(true);
+    setError(null);
 
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: {
-          full_name: fullName,
-          intended_role: "artisan",
-          artisan_region: "abuja",
-          artisan_specialty: specialty.join(","),
-          artisan_skills: skills
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-            .join(","),
-          artisan_years_experience: yearsExperience || null,
-          artisan_bio: bio || null,
-        },
+        data: { full_name: fullName },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
@@ -75,7 +39,7 @@ export default function ArtisanSignUp() {
     }
 
     setSubmitted(true);
-    notifySignup(fullName, email, "artisan");
+    notifySignup(fullName, email, "client");
   }
 
   return (
@@ -87,17 +51,16 @@ export default function ArtisanSignUp() {
               <h1 className="font-display text-3xl mb-4">Check your email</h1>
               <p className="text-ink/70 leading-relaxed">
                 We sent a confirmation link to <strong>{email}</strong>.
-                Click it to activate your artisan profile.
+                Click it to finish creating your account.
               </p>
             </div>
           ) : (
             <>
               <h1 className="font-display text-3xl mb-2">
-                Join as an artisan
+                Create your client account
               </h1>
               <p className="text-ink/60 mb-8">
-                Hopayola is launching in Abuja first. Set up your profile and
-                start getting matched with projects.
+                Save measurements, start a project, pay, and confirm each stage.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -137,78 +100,6 @@ export default function ArtisanSignUp() {
                   minLength={6}
                 />
 
-                <div>
-                  <p className="text-sm mb-1">Region</p>
-                  <p className="text-sm text-ink/50 border border-stone rounded-lg px-4 py-2.5">
-                    Abuja (pilot)
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm mb-2">Specialty</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {SPECIALTY_OPTIONS.map((option) => (
-                      <label
-                        key={option}
-                        className="flex items-center gap-2 text-sm border border-stone rounded-lg px-3 py-2 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={specialty.includes(option)}
-                          onChange={() => toggleSpecialty(option)}
-                        />
-                        {option}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm mb-1" htmlFor="skills">
-                    Skills{" "}
-                    <span className="text-ink/40">(comma separated)</span>
-                  </label>
-                  <input
-                    id="skills"
-                    type="text"
-                    value={skills}
-                    onChange={(e) => setSkills(e.target.value)}
-                    placeholder="Hand beading, draping, agbada stitching"
-                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    className="block text-sm mb-1"
-                    htmlFor="yearsExperience"
-                  >
-                    Years of experience{" "}
-                    <span className="text-ink/40">(optional)</span>
-                  </label>
-                  <input
-                    id="yearsExperience"
-                    type="number"
-                    min="0"
-                    value={yearsExperience}
-                    onChange={(e) => setYearsExperience(e.target.value)}
-                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm mb-1" htmlFor="bio">
-                    Bio <span className="text-ink/40">(optional)</span>
-                  </label>
-                  <textarea
-                    id="bio"
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    placeholder="A few lines about your work and experience"
-                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none min-h-[80px]"
-                  />
-                </div>
-
                 <div className="flex items-start gap-2">
                   <input
                     id="agreedToTerms"
@@ -237,7 +128,7 @@ export default function ArtisanSignUp() {
                   disabled={loading || !agreedToTerms}
                   className="w-full bg-royal text-paper py-3 rounded-full hover:bg-royal-deep transition-colors disabled:opacity-60"
                 >
-                  {loading ? "Creating profile..." : "Sign up as an artisan"}
+                  {loading ? "Creating account..." : "Sign up as a client"}
                 </button>
               </form>
 
@@ -250,6 +141,15 @@ export default function ArtisanSignUp() {
                   Sign in
                 </Link>
               </p>
+              <p className="text-sm text-ink/60 mt-2">
+                Tailor or designer?{" "}
+                <Link
+                  href="/artisan/sign-up"
+                  className="text-royal hover:text-royal-deep"
+                >
+                  Join as artisan
+                </Link>
+              </p>
             </>
           )}
         </div>
@@ -257,8 +157,8 @@ export default function ArtisanSignUp() {
 
       <div className="hidden md:block relative">
         <Image
-          src="/images/marquee-4.jpg"
-          alt="Hopayola artisans"
+          src="/images/hero-client.jpg"
+          alt="Hopayola client"
           fill
           className="object-cover"
           priority

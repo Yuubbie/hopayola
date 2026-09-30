@@ -11,7 +11,27 @@ function paystackHeaders() {
   };
 }
 
+async function requireArtisan() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in.");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "artisan" && profile?.role !== "admin") {
+    throw new Error("Not authorized.");
+  }
+  return { supabase, user };
+}
+
 export async function getNigerianBanks() {
+  await requireArtisan();
   const res = await fetch(`${PAYSTACK_BASE}/bank?country=nigeria&currency=NGN`, {
     headers: paystackHeaders(),
   });
@@ -28,15 +48,24 @@ export async function getNigerianBanks() {
 }
 
 export async function resolveBankAccount(accountNumber: string, bankCode: string) {
+  await requireArtisan();
+  const digits = accountNumber.replace(/\D/g, "");
+  const code = bankCode.replace(/\D/g, "");
+  if (digits.length !== 10 || !code) {
+    throw new Error("Select a bank and enter a valid 10-digit account number.");
+  }
+
   const res = await fetch(
-    `${PAYSTACK_BASE}/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`,
+    `${PAYSTACK_BASE}/bank/resolve?account_number=${encodeURIComponent(digits)}&bank_code=${encodeURIComponent(code)}`,
     { headers: paystackHeaders() }
   );
 
   const json = await res.json();
 
   if (!json.status) {
-    throw new Error(json.message || "Could not verify this account. Check the details and try again.");
+    throw new Error(
+      json.message || "Could not verify this account. Check the details and try again."
+    );
   }
 
   return {
@@ -46,20 +75,27 @@ export async function resolveBankAccount(accountNumber: string, bankCode: string
 }
 
 export async function saveArtisanBankDetails(
-  artisanId: string,
+  _artisanId: string,
   accountNumber: string,
   bankCode: string,
-  bankName: string,
+  _bankName: string,
   accountName: string
 ) {
+  const { supabase, user } = await requireArtisan();
+  const digits = accountNumber.replace(/\D/g, "");
+  const code = bankCode.replace(/\D/g, "");
+  if (digits.length !== 10 || !code || !accountName.trim()) {
+    throw new Error("Invalid bank details.");
+  }
+
   const recipientRes = await fetch(`${PAYSTACK_BASE}/transferrecipient`, {
     method: "POST",
     headers: paystackHeaders(),
     body: JSON.stringify({
       type: "nuban",
-      name: accountName,
-      account_number: accountNumber,
-      bank_code: bankCode,
+      name: accountName.trim(),
+      account_number: digits,
+      bank_code: code,
       currency: "NGN",
     }),
   });
@@ -67,22 +103,22 @@ export async function saveArtisanBankDetails(
   const recipientJson = await recipientRes.json();
 
   if (!recipientJson.status) {
-    throw new Error(recipientJson.message || "Could not register this bank account with Paystack.");
+    throw new Error(
+      recipientJson.message || "Could not register this bank account with Paystack."
+    );
   }
 
   const recipientCode = recipientJson.data.recipient_code as string;
 
-  const supabase = await createClient();
-
   const { error } = await supabase
     .from("artisan_profiles")
     .update({
-      bank_account_number: accountNumber,
-      bank_code: bankCode,
-      bank_account_name: accountName,
+      bank_account_number: digits,
+      bank_code: code,
+      bank_account_name: accountName.trim(),
       paystack_recipient_code: recipientCode,
     })
-    .eq("id", artisanId);
+    .eq("id", user.id);
 
   if (error) {
     throw new Error(`Bank details verified but could not save: ${error.message}`);

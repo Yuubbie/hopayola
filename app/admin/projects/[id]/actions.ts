@@ -3,12 +3,33 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
+const ALLOWED_STATUS = new Set(["pending", "in_progress", "completed", "paid"]);
+
+async function requireAdmin() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in.");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") throw new Error("Not authorized.");
+  return supabase;
+}
+
 export async function addMilestone(formData: FormData) {
   const projectId = formData.get("projectId") as string;
-  const milestoneName = formData.get("milestoneName") as string;
+  const milestoneName = (formData.get("milestoneName") as string)?.trim();
   const amount = formData.get("amount") as string;
 
-  const supabase = await createClient();
+  if (!projectId || !milestoneName) throw new Error("Missing milestone details.");
+
+  const supabase = await requireAdmin();
 
   const { count } = await supabase
     .from("project_milestones")
@@ -21,7 +42,7 @@ export async function addMilestone(formData: FormData) {
     .from("project_milestones")
     .insert({
       project_id: projectId,
-      milestone_name: milestoneName,
+      milestone_name: milestoneName.slice(0, 120),
       milestone_order: nextOrder,
       amount: amount ? Number(amount) : null,
       status: "pending",
@@ -43,7 +64,11 @@ export async function updateMilestoneStatus(formData: FormData) {
   const projectId = formData.get("projectId") as string;
   const status = formData.get("status") as string;
 
-  const supabase = await createClient();
+  if (!ALLOWED_STATUS.has(status)) {
+    throw new Error("Invalid milestone status.");
+  }
+
+  const supabase = await requireAdmin();
 
   const updates: Record<string, unknown> = { status };
   if (status === "paid") {

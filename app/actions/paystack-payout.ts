@@ -1,8 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { claimAndPayout } from "@/lib/payout-core";
+import { runMilestonePayout } from "@/lib/run-milestone-payout";
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -40,13 +39,4 @@ export async function payoutMilestoneForm(
       ? err.message
       : "Payout could not be sent. Try again later.";
   }
-}
-
-export async function runMilestonePayout(milestoneId: string, projectId: string) {
-  const result = await claimAndPayout(milestoneId, projectId);
-
-  revalidatePath("/admin/projects/" + projectId);
-  revalidatePath("/account");
-  revalidatePath("/artisan/account");
-  return result;
 }
