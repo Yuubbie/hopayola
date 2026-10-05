@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { claimProject } from "./actions";
 import MilestoneSubmitForm from "@/components/milestone-submit-form";
+import ProjectChat from "@/components/ProjectChat";
 
 const STATUS_LABELS: Record<string, string> = {
   concept_selected: "Ready to match",
@@ -119,6 +120,7 @@ export default async function ArtisanAccount() {
                         )}
                     </div>
                   ))}
+                  <ProjectChat projectId={a.project_id} viewerRole="artisan" />
                 </li>
               ))}
             </ul>

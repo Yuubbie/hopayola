@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PayProjectButton from "@/components/pay-project-button";
 import MilestoneClientActions from "@/components/milestone-client-actions";
+import ProjectChat from "@/components/ProjectChat";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -209,6 +210,7 @@ export default async function Account({
                         )}
                       </div>
                     )}
+                    <ProjectChat projectId={p.id} viewerRole="client" />
                   </li>
                 );
               })}
