@@ -14,39 +14,51 @@ type Frame = {
 
 const CLIENT: Frame[] = [
   {
-    kicker: "Client · 1 of 6",
+    kicker: "Client · 1 of 8",
+    title: "Create a client account",
+    body: "hopayola.com/sign-up — name, email, password. Not the artisan form.",
+    scene: "clientsignup",
+  },
+  {
+    kicker: "Client · 2 of 8",
+    title: "Free measurement guide",
+    body: "Download it on Lifestyle. Croquis sheets and Little Artisans are paid in the shop.",
+    scene: "resources",
+  },
+  {
+    kicker: "Client · 3 of 8",
     title: "Start a project",
-    body: "Occasion, garment, budget, deadline — one brief. Hopayola coordinates the rest.",
+    body: "Occasion and garment are required. Photos are optional if you do not have a picture yet.",
     scene: "project",
   },
   {
-    kicker: "Client · 2 of 6",
-    title: "Share fit and fabric",
-    body: "Measurements and references before anyone cuts. You are not guessing the silhouette.",
+    kicker: "Client · 4 of 8",
+    title: "Share fit if you have it",
+    body: "Measurements help. Skip fabric photos and describe the idea in notes if needed.",
     scene: "fit",
   },
   {
-    kicker: "Client · 3 of 6",
+    kicker: "Client · 5 of 8",
     title: "See your artisan",
-    body: "A vetted tailor or team is assigned. Their name sits on your project card.",
+    body: "Admin assigns a vetted tailor. Their name sits on your project card.",
     scene: "assigned",
   },
   {
-    kicker: "Client · 4 of 6",
+    kicker: "Client · 6 of 8",
     title: "Pay the project",
-    body: "One checkout: milestone total + 5%. Hopayola receives it as merchant of record.",
+    body: "One checkout: milestone total + 5%. Hopayola is merchant of record.",
     scene: "pay",
   },
   {
-    kicker: "Client · 5 of 6",
+    kicker: "Client · 7 of 8",
     title: "Confirm each stage",
-    body: "Artisan submits cutting or fitting. You tap Confirm. That stage can then be paid out.",
+    body: "Artisan submits cutting or fitting. You tap Confirm. Then Hopayola can pay that stage.",
     scene: "confirm",
   },
   {
-    kicker: "Client · 6 of 6",
+    kicker: "Client · 8 of 8",
     title: "Collect the outfit",
-    body: "Delivery is the last stage. Your account always shows where the work stands.",
+    body: "Delivery is the last stage. Your account shows paid vs pending.",
     scene: "done",
   },
 ];
@@ -96,6 +108,24 @@ function Scene({ id }: { id: string }) {
   return (
     <div className="h-full w-full bg-[#f6f1ea] p-5 md:p-8 flex items-center justify-center">
       <div className="w-full max-w-md bg-paper rounded-2xl border border-stone shadow-sm p-5 text-left">
+        {id === "clientsignup" && (
+          <>
+            <p className="text-royal text-xs mb-2">Client sign up</p>
+            <Row k="Name" v="Unwana Ubong" />
+            <Row k="Email" v="you@email.com" />
+            <p className="text-ink/50 text-xs mt-2">Terms &amp; Conditions</p>
+            <FakeBtn>Sign up as a client</FakeBtn>
+          </>
+        )}
+        {id === "resources" && (
+          <>
+            <p className="text-royal text-xs mb-2">Lifestyle · Resources</p>
+            <Row k="Measurement guide" v="Free PDF" />
+            <Row k="Croquis sketch sheets" v="Shop" />
+            <Row k="Little Artisans" v="Shop" />
+            <FakeBtn>Download free guide</FakeBtn>
+          </>
+        )}
         {id === "project" && (
           <>
             <p className="text-royal text-xs mb-2">New project</p>
@@ -105,6 +135,7 @@ function Scene({ id }: { id: string }) {
               <Row k="Budget" v="NGN 50,000 – 80,000" />
               <Row k="Due" v="20 Oct 2026" />
             </div>
+            <p className="text-ink/45 text-xs mt-2">Fabric photos (optional)</p>
             <FakeBtn>Submit project</FakeBtn>
           </>
         )}
@@ -311,7 +342,7 @@ export default function DemoOnboarding({
               >
                 <span className="block font-display text-xl mb-1">I&apos;m a client</span>
                 <span className="text-sm text-ink/55">
-                  Project, pay, confirm, collect.
+                  Sign up, free guide, project, pay, confirm.
                 </span>
               </button>
               <button
