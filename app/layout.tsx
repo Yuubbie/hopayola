@@ -19,15 +19,26 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hopayola.vercel.app"),
+  metadataBase: new URL("https://www.hopayola.com"),
   title: "Hopayola — Plan and coordinate your fashion project",
   description:
     "Hopayola connects you with fashion talent and coordinates the creation of your outfit, from measurements to delivery.",
+  manifest: "/manifest.webmanifest",
+  themeColor: "#5b2d8e",
+  appleWebApp: {
+    capable: true,
+    title: "Hopayola",
+    statusBarStyle: "default",
+  },
+  icons: {
+    icon: "/images/logo.png",
+    apple: "/images/logo.png",
+  },
   openGraph: {
     title: "Hopayola — Plan and coordinate your fashion project",
     description:
       "Hopayola connects you with fashion talent and coordinates the creation of your outfit, from measurements to delivery.",
-    url: "https://hopayola.vercel.app",
+    url: "https://www.hopayola.com",
     siteName: "Hopayola",
     type: "website",
   },
