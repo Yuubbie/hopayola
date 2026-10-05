@@ -6,18 +6,18 @@ export default function ShopAndPilot() {
       <div className="bg-stone rounded-3xl p-10 flex flex-col justify-between">
         <div>
           <h3 className="font-display text-2xl mb-3">
-            Free resources to get started
+            Guides to get started
           </h3>
           <p className="text-ink/70 leading-relaxed mb-6">
-            Measurement guides, planning worksheets and printable fashion
-            resources, made to help you plan before you build.
+            Free measurement guide to begin. Sketch sheets and Little Artisans
+            are sold in the shop.
           </p>
         </div>
         <Link
           href="/lifestyle#resources"
           className="text-royal hover:text-royal-deep transition-colors font-medium"
         >
-          Browse free resources
+          Browse resources
         </Link>
       </div>
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Lifestyle — Hopayola",
@@ -20,12 +21,12 @@ const PILLARS = [
   {
     title: "From Concept to Closet",
     description:
-      "Real project breakdowns tracking a client's raw fabric photograph through the AI concept pipeline to the finished, delivered garment.",
+      "Real project breakdowns tracking a client's fabric and brief through to the finished, delivered garment.",
   },
   {
     title: "Style Forecasts",
     description:
-      "Our design engine synthesizes emerging African street style, occasionwear trends, and global contemporary influences.",
+      "Occasionwear, street, and contemporary cuts — what people are actually sewing now.",
   },
 ];
 
@@ -39,7 +40,8 @@ export default function Lifestyle() {
             Wear Your Heritage, Cut to the Modern Moment.
           </h1>
           <p className="text-paper/70 max-w-prose mx-auto leading-relaxed">
-            Stories, style narratives, and cultural spotlights exploring contemporary African fashion, craftsmanship, and bespoke living.
+            Stories, style narratives, and cultural spotlights exploring
+            contemporary African fashion, craftsmanship, and bespoke living.
           </p>
         </div>
       </section>
@@ -52,22 +54,79 @@ export default function Lifestyle() {
           {PILLARS.map((pillar) => (
             <div key={pillar.title} className="border border-stone rounded-2xl p-8">
               <h3 className="font-display text-xl mb-3">{pillar.title}</h3>
-              <p className="text-ink/70 leading-relaxed text-sm">{pillar.description}</p>
+              <p className="text-ink/70 leading-relaxed text-sm">
+                {pillar.description}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
       <section id="resources" className="scroll-mt-24 bg-stone/30 py-20">
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <p className="text-royal text-sm mb-4">Free resources</p>
-          <h2 className="font-display text-3xl md:text-4xl mb-6">
-            Guides to get started
+        <div className="mx-auto max-w-6xl px-6">
+          <p className="text-royal text-sm mb-4 text-center">Resources</p>
+          <h2 className="font-display text-3xl md:text-4xl mb-4 text-center">
+            Guides and worksheets
           </h2>
-          <p className="text-ink/70 leading-relaxed mb-6">
-            Measurement guides, planning worksheets, and printable fashion
-            resources will live here. Hope is preparing this content.
+          <p className="text-ink/70 leading-relaxed mb-12 text-center max-w-2xl mx-auto">
+            One starter guide is free. Sketch sheets and Little Artisans are
+            sold in the Hopayola shop — not a public download.
           </p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <article className="bg-paper border border-stone rounded-2xl p-6 flex flex-col">
+              <p className="text-xs uppercase tracking-widest text-royal mb-2">
+                Free
+              </p>
+              <h3 className="font-display text-xl mb-2">Measurement guide</h3>
+              <p className="text-ink/60 text-sm leading-relaxed mb-6 flex-1">
+                How to take bust, waist, hip, and height before you start a
+                project. Print it or keep it on your phone.
+              </p>
+              <a
+                href="/resources/measurement-guide.pdf"
+                className="text-center bg-royal text-paper rounded-full py-2.5 text-sm hover:bg-royal-deep"
+              >
+                Download PDF
+              </a>
+            </article>
+
+            <article className="bg-paper border border-stone rounded-2xl p-6 flex flex-col">
+              <p className="text-xs uppercase tracking-widest text-ink/40 mb-2">
+                Shop
+              </p>
+              <h3 className="font-display text-xl mb-2">
+                Fashion croquis sketch sheets
+              </h3>
+              <p className="text-ink/60 text-sm leading-relaxed mb-6 flex-1">
+                Printable figure sheets for sketching silhouettes. Paid — not
+                included in the free starter pack.
+              </p>
+              <a
+                href="https://shop.hopayola.com"
+                className="text-center border border-ink/20 rounded-full py-2.5 text-sm hover:border-royal hover:text-royal"
+              >
+                Get it in the shop
+              </a>
+            </article>
+
+            <article className="bg-paper border border-stone rounded-2xl p-6 flex flex-col">
+              <p className="text-xs uppercase tracking-widest text-ink/40 mb-2">
+                Shop
+              </p>
+              <h3 className="font-display text-xl mb-2">Little Artisans</h3>
+              <p className="text-ink/60 text-sm leading-relaxed mb-6 flex-1">
+                Paid booklet. Buy from the shop — it is not a free download on
+                this site.
+              </p>
+              <a
+                href="https://shop.hopayola.com"
+                className="text-center border border-ink/20 rounded-full py-2.5 text-sm hover:border-royal hover:text-royal"
+              >
+                Get it in the shop
+              </a>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -78,11 +137,15 @@ export default function Lifestyle() {
             Every feature starts your own project.
           </h2>
           <p className="text-ink/70 leading-relaxed mb-10">
-            Every lifestyle feature links directly to the Hopayola Project Intake flow, allowing you to adopt featured silhouettes with your own yardage.
+            Use the free measurement guide, then send a brief — with or without
+            photos.
           </p>
-          <a href="/projects/new" className="inline-block bg-royal text-paper px-6 py-3 rounded-full hover:bg-royal-deep transition-colors">
+          <Link
+            href="/projects/new"
+            className="inline-block bg-royal text-paper px-6 py-3 rounded-full hover:bg-royal-deep transition-colors"
+          >
             Start a Project
-          </a>
+          </Link>
         </div>
       </section>
     </main>
