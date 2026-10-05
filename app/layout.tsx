@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import IntroSplash from "@/components/IntroSplash";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PwaInstall from "@/components/PwaInstall";
+import HelpChat from "@/components/HelpChat";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -68,6 +69,7 @@ export default function RootLayout({
         {children}
         <Footer />
         <PwaInstall />
+        <HelpChat />
       </body>
     </html>
   );
