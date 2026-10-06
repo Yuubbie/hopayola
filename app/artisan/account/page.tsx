@@ -122,7 +122,12 @@ export default async function ArtisanAccount() {
                     </div>
                   ))}
                   {a.projects && (
-                    <ProjectSequence project={a.projects} role="artisan" />
+                    <ProjectSequence
+                      project={a.projects}
+                      role="artisan"
+                      milestones={milestonesByProject.get(a.project_id) || []}
+                      viewerId={user.id}
+                    />
                   )}
                   <ProjectChat projectId={a.project_id} viewerRole="artisan" />
                 </li>

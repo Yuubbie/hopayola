@@ -26,6 +26,7 @@ export async function addMilestone(formData: FormData) {
   const projectId = formData.get("projectId") as string;
   const milestoneName = (formData.get("milestoneName") as string)?.trim();
   const amount = formData.get("amount") as string;
+  const artisanId = (formData.get("artisanId") as string) || "";
 
   if (!projectId || !milestoneName) throw new Error("Missing milestone details.");
 
@@ -46,6 +47,7 @@ export async function addMilestone(formData: FormData) {
       milestone_order: nextOrder,
       amount: amount ? Number(amount) : null,
       status: "pending",
+      artisan_id: artisanId || null,
     })
     .select();
 

@@ -105,6 +105,13 @@ export async function artisanShipProject(formData: FormData) {
   }
   const { supabase, role } = await load();
   if (role !== "artisan" && role !== "admin") throw new Error("Not allowed.");
+  const { data: ms } = await supabase
+    .from("project_milestones")
+    .select("confirmed_at")
+    .eq("project_id", projectId);
+  if (!ms?.length || ms.some((m) => !m.confirmed_at)) {
+    throw new Error("Client must review every milestone before you send the outfit.");
+  }
   const { error } = await supabase
     .from("projects")
     .update({
@@ -159,4 +166,34 @@ export async function clientMarkReceived(formData: FormData) {
   }
 
   revalidate(projectId);
+}
+
+export async function seedDefaultMilestones(projectId: string) {
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
+  const { count } = await service
+    .from("project_milestones")
+    .select("*", { count: "exact", head: true })
+    .eq("project_id", projectId);
+  if ((count || 0) > 0) return;
+  await service.from("project_milestones").insert([
+    {
+      project_id: projectId,
+      milestone_name: "Milestone 1",
+      milestone_order: 1,
+      status: "pending",
+    },
+    {
+      project_id: projectId,
+      milestone_name: "Milestone 2",
+      milestone_order: 2,
+      status: "pending",
+    },
+    {
+      project_id: projectId,
+      milestone_name: "Milestone 3",
+      milestone_order: 3,
+      status: "pending",
+    },
+  ]);
 }

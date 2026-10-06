@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { runMilestonePayout } from "@/lib/run-milestone-payout";
 
 async function getUser() {
   const supabase = await createClient();
@@ -22,7 +21,7 @@ async function loadMilestone(
   const { data, error } = await service
     .from("project_milestones")
     .select(
-      "id, project_id, status, funded_at, submitted_at, disputed_at, payout_state"
+      "id, project_id, status, funded_at, submitted_at, disputed_at, payout_state, artisan_id"
     )
     .eq("id", milestoneId)
     .eq("project_id", projectId)
@@ -55,6 +54,14 @@ export async function submitMilestone(formData: FormData) {
   const { user } = await getUser();
   const service = createServiceClient();
 
+  const milestone = await loadMilestone(service, milestoneId, projectId);
+  if (isLocked(milestone)) {
+    throw new Error("This milestone is already paid or being paid out.");
+  }
+  if (milestone.artisan_id && milestone.artisan_id !== user.id) {
+    throw new Error("This milestone is assigned to another artisan.");
+  }
+
   const { data: assignment } = await service
     .from("project_team_members")
     .select("artisan_id")
@@ -62,13 +69,8 @@ export async function submitMilestone(formData: FormData) {
     .eq("artisan_id", user.id)
     .maybeSingle();
 
-  if (!assignment) {
+  if (!assignment && milestone.artisan_id !== user.id) {
     throw new Error("You are not assigned to this project.");
-  }
-
-  const milestone = await loadMilestone(service, milestoneId, projectId);
-  if (isLocked(milestone)) {
-    throw new Error("This milestone is already paid or being paid out.");
   }
 
   const now = new Date().toISOString();
@@ -96,10 +98,7 @@ export async function submitMilestone(formData: FormData) {
   refresh(projectId);
 }
 
-export async function confirmMilestone(
-  _prev: string | null,
-  formData: FormData
-): Promise<string | null> {
+export async function confirmMilestoneReview(formData: FormData) {
   const milestoneId = formData.get("milestoneId") as string;
   const projectId = formData.get("projectId") as string;
 
@@ -113,49 +112,26 @@ export async function confirmMilestone(
     .single();
 
   if (!project || project.client_id !== user.id) {
-    return "You are not authorized to confirm this milestone.";
+    throw new Error("You are not authorized to review this milestone.");
   }
 
-  let milestone;
-  try {
-    milestone = await loadMilestone(service, milestoneId, projectId);
-  } catch (err) {
-    return "Milestone not found.";
-  }
-
+  const milestone = await loadMilestone(service, milestoneId, projectId);
   if (isLocked(milestone)) {
-    return "This milestone is already paid or being paid out.";
-  }
-  if (!milestone.funded_at) {
-    return "This milestone has not been funded yet.";
+    throw new Error("This milestone is already paid.");
   }
   if (!milestone.submitted_at) {
-    return "The artisan has not submitted this milestone yet.";
-  }
-  if (milestone.disputed_at) {
-    return "This milestone is disputed and cannot be confirmed.";
+    throw new Error("The artisan has not submitted this milestone yet.");
   }
 
-  const now = new Date().toISOString();
   const { error } = await service
     .from("project_milestones")
-    .update({ confirmed_at: now })
+    .update({ confirmed_at: new Date().toISOString() })
     .eq("id", milestoneId)
     .eq("project_id", projectId)
     .neq("status", "paid");
 
-  if (error) return "Could not confirm: " + error.message;
-
-  let payoutMessage: string | null = null;
-  try {
-    await runMilestonePayout(milestoneId, projectId);
-  } catch (err) {
-    payoutMessage =
-      "Confirmed. Artisan payout is pending. Hopayola will complete it shortly.";
-  }
-
+  if (error) throw new Error(error.message);
   refresh(projectId);
-  return payoutMessage;
 }
 
 export async function disputeMilestone(formData: FormData) {
@@ -192,6 +168,5 @@ export async function disputeMilestone(formData: FormData) {
     .neq("status", "paid");
 
   if (error) throw new Error(error.message);
-
   refresh(projectId);
 }

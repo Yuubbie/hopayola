@@ -206,6 +206,26 @@ export default async function AdminProjectDetail({
               className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
             />
           </div>
+          <div>
+            <label className="block text-sm text-ink/50 mb-1" htmlFor="artisanId">
+              Artisan for this milestone
+            </label>
+            <select
+              id="artisanId"
+              name="artisanId"
+              className="w-full border border-stone rounded-lg px-3 py-2 text-sm bg-paper"
+            >
+              <option value="">Same as claimed artisan</option>
+              {(team || []).map((t: { artisan_id: string; profiles?: { full_name?: string } | null }) => (
+                <option key={t.artisan_id} value={t.artisan_id}>
+                  {(t as { profiles?: { full_name?: string } }).profiles?.full_name || t.artisan_id}
+                </option>
+              ))}
+            </select>
+            <p className="text-[11px] text-ink/40 mt-1">
+              Premium / extra hands: pick another team artisan for this stage.
+            </p>
+          </div>
           <button
             type="submit"
             className="bg-royal text-paper rounded-lg px-4 py-2 text-sm hover:bg-royal-deep transition-colors"
@@ -217,7 +237,11 @@ export default async function AdminProjectDetail({
 
       <section className="border border-stone rounded-2xl p-6 mt-8">
         <h2 className="font-display text-lg mb-2">Sequence</h2>
-        <ProjectSequence project={project} role="admin" />
+        <ProjectSequence
+          project={project}
+          role="admin"
+          milestones={milestones || []}
+        />
       </section>
 
       <section className="border border-stone rounded-2xl p-6 mt-8">

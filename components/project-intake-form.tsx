@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { notifyProjectSubmission } from "@/app/actions/notifications";
+import { seedDefaultMilestones } from "@/app/actions/project-flow";
 
 type SavedMeasurements = {
   bust?: string;
@@ -134,6 +135,7 @@ export default function ProjectIntakeForm({
         throw new Error(`Could not save project: ${insertError.message}`);
       }
 
+      await seedDefaultMilestones(project.id);
       notifyProjectSubmission(clientName, clientEmail, garmentType.trim(), occasion.trim());
 
       router.push(`/account?project=${project.id}`);

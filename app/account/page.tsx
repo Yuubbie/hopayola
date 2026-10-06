@@ -177,7 +177,11 @@ export default async function Account({
                       </div>
                     )}
 
-                    <ProjectSequence project={p} role="client" />
+                    <ProjectSequence
+                      project={p}
+                      role="client"
+                      milestones={projectMilestones}
+                    />
 
                     {p.funded_at && (
                       <div className="mt-3 pt-3 border-t border-stone">
