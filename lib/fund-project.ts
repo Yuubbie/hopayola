@@ -23,7 +23,9 @@ export async function fundProjectFromPayment(input: {
 
   const { data: project, error: pErr } = await supabase
     .from("projects")
-    .select("id, funded_at, checkout_reference, checkout_amount_kobo")
+    .select(
+      "id, funded_at, checkout_reference, checkout_amount_kobo, budget_min, budget_max"
+    )
     .eq("id", projectId)
     .maybeSingle();
 
@@ -40,19 +42,9 @@ export async function fundProjectFromPayment(input: {
     return { ok: false, reason: "Amount paid does not match amount expected." };
   }
 
-  const { data: milestones, error: mErr } = await supabase
-    .from("project_milestones")
-    .select("amount")
-    .eq("project_id", projectId);
-
-  if (mErr) throw new Error(mErr.message);
-
-  const subtotal = (milestones ?? []).reduce(
-    (sum, m) => sum + Number(m.amount || 0),
-    0
-  );
+  const subtotal = Number(project.budget_max || project.budget_min || 0);
   if (subtotal <= 0 || toKobo(clientCheckoutTotal(subtotal)) !== expectedKobo) {
-    return { ok: false, reason: "Milestones changed after checkout." };
+    return { ok: false, reason: "Payment amount does not match project budget." };
   }
 
   const now = new Date().toISOString();

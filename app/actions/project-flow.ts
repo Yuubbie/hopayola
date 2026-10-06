@@ -129,7 +129,7 @@ export async function clientMarkReceived(formData: FormData) {
 
   const { data: project, error: pErr } = await supabase
     .from("projects")
-    .select("id, funded_at, client_id")
+    .select("id, funded_at, client_id, budget_min, budget_max, funded_subtotal")
     .eq("id", projectId)
     .eq("client_id", user.id)
     .single();
@@ -149,20 +149,30 @@ export async function clientMarkReceived(formData: FormData) {
     .eq("client_id", user.id);
   if (error) throw new Error(error.message);
 
-  const { data: milestones } = await supabase
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
+  const { data: milestones } = await service
     .from("project_milestones")
-    .select("id, status, confirmed_at")
-    .eq("project_id", projectId);
+    .select("id, status, confirmed_at, submitted_at")
+    .eq("project_id", projectId)
+    .order("milestone_order", { ascending: true });
 
-  for (const m of milestones || []) {
-    if (m.status === "paid" || m.status === "paid_out") continue;
-    if (!m.confirmed_at) {
-      await supabase
-        .from("project_milestones")
-        .update({ confirmed_at: now, status: "completed" })
-        .eq("id", m.id);
-    }
-    await runMilestonePayout(m.id, projectId);
+  const payRow = (milestones || []).find((m) => m.status !== "paid" && m.status !== "paid_out");
+  if (payRow) {
+    const total = Number(
+      project.funded_subtotal || project.budget_max || project.budget_min || 0
+    );
+    await service
+      .from("project_milestones")
+      .update({
+        amount: total,
+        funded_at: project.funded_at,
+        submitted_at: payRow.submitted_at || now,
+        confirmed_at: payRow.confirmed_at || now,
+        status: "completed",
+      })
+      .eq("id", payRow.id);
+    await runMilestonePayout(payRow.id, projectId);
   }
 
   revalidate(projectId);

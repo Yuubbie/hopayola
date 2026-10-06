@@ -19,7 +19,7 @@ export async function initiateProjectPayment(projectId: string) {
 
   const { data: project, error: projectError } = await supabase
     .from("projects")
-    .select("client_id, funded_at, fabric_received_at")
+    .select("client_id, funded_at, fabric_received_at, budget_min, budget_max")
     .eq("id", projectId)
     .single();
 
@@ -36,21 +36,9 @@ export async function initiateProjectPayment(projectId: string) {
     throw new Error("Pay after the artisan confirms your fabric has arrived.");
   }
 
-  const { data: milestones, error: milestonesError } = await supabase
-    .from("project_milestones")
-    .select("amount")
-    .eq("project_id", projectId);
-
-  if (milestonesError || !milestones || milestones.length === 0) {
-    throw new Error("This project has no milestones set up yet. Contact support.");
-  }
-
-  const totalAmount = milestones.reduce(
-    (sum, m) => sum + Number(m.amount || 0),
-    0
-  );
+  const totalAmount = Number(project.budget_max || project.budget_min || 0);
   if (totalAmount <= 0) {
-    throw new Error("This project's milestone amounts have not been set yet.");
+    throw new Error("Set a budget on the project so we can take one payment.");
   }
 
   assertPaystackReady();
