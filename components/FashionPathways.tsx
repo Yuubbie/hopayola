@@ -6,7 +6,7 @@ const pathways = [
     href: "/fashion/hire-a-talent",
     title: "Hire a talent",
     description:
-      "Browse tailors, designers, bead artisans and pattern drafters. Work with one professional directly.",
+      "See artisans who are available now, then start a project on Hopayola.",
     image:
       "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&q=80",
   },

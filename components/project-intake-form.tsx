@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { notifyProjectSubmission } from "@/app/actions/notifications";
 import { seedDefaultMilestones } from "@/app/actions/project-flow";
+import { generateConceptsAction } from "@/app/actions/generate-concepts";
 
 type SavedMeasurements = {
   bust?: string;
@@ -19,6 +20,7 @@ type Props = {
   clientEmail: string;
   savedMeasurements: SavedMeasurements;
   initialOccasion?: string;
+  initialTier?: "standard" | "premium";
 };
 
 const MAX_PHOTOS = 5;
@@ -38,6 +40,7 @@ export default function ProjectIntakeForm({
   clientEmail,
   savedMeasurements,
   initialOccasion,
+  initialTier,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -49,7 +52,9 @@ export default function ProjectIntakeForm({
   );
   const [styleDirection, setStyleDirection] = useState("");
   const [garmentType, setGarmentType] = useState("");
-  const [tier, setTier] = useState<"standard" | "premium">("standard");
+  const [tier, setTier] = useState<"standard" | "premium">(
+    initialTier === "premium" ? "premium" : "standard"
+  );
   const [deliveryDeadline, setDeliveryDeadline] = useState("");
   const [budgetMin, setBudgetMin] = useState("");
   const [budgetMax, setBudgetMax] = useState("");
@@ -136,6 +141,7 @@ export default function ProjectIntakeForm({
       }
 
       await seedDefaultMilestones(project.id);
+      await generateConceptsAction(project.id, tier);
       notifyProjectSubmission(clientName, clientEmail, garmentType.trim(), occasion.trim());
 
       router.push(`/account?project=${project.id}`);
