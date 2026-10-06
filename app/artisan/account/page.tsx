@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { claimProject } from "./actions";
 import MilestoneSubmitForm from "@/components/milestone-submit-form";
 import ProjectChat from "@/components/ProjectChat";
+import ProjectSequence from "@/components/ProjectSequence";
 
 const STATUS_LABELS: Record<string, string> = {
   concept_selected: "Ready to match",
@@ -50,7 +51,7 @@ export default async function ArtisanAccount() {
   const { data: openProjects } = await supabase
     .from("projects")
     .select("*")
-    .eq("status", "concept_selected")
+    .in("status", ["submitted", "concept_selected"])
     .eq("region", artisanProfile?.region || "abuja")
     .order("created_at", { ascending: false });
 
@@ -120,6 +121,9 @@ export default async function ArtisanAccount() {
                         )}
                     </div>
                   ))}
+                  {a.projects && (
+                    <ProjectSequence project={a.projects} role="artisan" />
+                  )}
                   <ProjectChat projectId={a.project_id} viewerRole="artisan" />
                 </li>
               ))}

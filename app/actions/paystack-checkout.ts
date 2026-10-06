@@ -19,7 +19,7 @@ export async function initiateProjectPayment(projectId: string) {
 
   const { data: project, error: projectError } = await supabase
     .from("projects")
-    .select("client_id, funded_at")
+    .select("client_id, funded_at, fabric_received_at")
     .eq("id", projectId)
     .single();
 
@@ -31,6 +31,9 @@ export async function initiateProjectPayment(projectId: string) {
   }
   if (project.funded_at) {
     throw new Error("This project has already been paid for.");
+  }
+  if (!project.fabric_received_at) {
+    throw new Error("Pay after the artisan confirms your fabric has arrived.");
   }
 
   const { data: milestones, error: milestonesError } = await supabase

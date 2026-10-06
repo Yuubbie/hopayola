@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import PayProjectButton from "@/components/pay-project-button";
-import MilestoneClientActions from "@/components/milestone-client-actions";
 import ProjectChat from "@/components/ProjectChat";
+import ProjectSequence from "@/components/ProjectSequence";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -178,14 +177,12 @@ export default async function Account({
                       </div>
                     )}
 
-                    {!p.funded_at && (
-                      <PayProjectButton projectId={p.id} />
-                    )}
+                    <ProjectSequence project={p} role="client" />
 
                     {p.funded_at && (
                       <div className="mt-3 pt-3 border-t border-stone">
                         <p className="text-xs text-green-700">
-                          Payment received. Artisans are paid after each verified milestone.
+                          Payment held by Hopayola. Artisan is paid when you mark the outfit received.
                         </p>
                         {projectMilestones.length > 0 && (
                           <ul className="mt-2 space-y-2">
@@ -198,12 +195,7 @@ export default async function Account({
                                   : m.confirmed_at
                                     ? "confirmed · payout pending"
                                     : String(m.status).replace(/_/g, " ")}
-                                <MilestoneClientActions
-                                  milestoneId={m.id}
-                                  projectId={p.id}
-                                  status={m.status}
-                                  confirmedAt={m.confirmed_at}
-                                />
+
                               </li>
                             ))}
                           </ul>

@@ -6,6 +6,7 @@ import PayProjectButton from "@/components/pay-project-button";
 import AdminPayoutButton from "@/components/admin-payout-button";
 import { milestonePayoutLabel } from "@/lib/payments";
 import ProjectChat from "@/components/ProjectChat";
+import ProjectSequence from "@/components/ProjectSequence";
 
 const MILESTONE_STATUS_OPTIONS = [
   "pending",
@@ -212,6 +213,11 @@ export default async function AdminProjectDetail({
             Add milestone
           </button>
         </form>
+      </section>
+
+      <section className="border border-stone rounded-2xl p-6 mt-8">
+        <h2 className="font-display text-lg mb-2">Sequence</h2>
+        <ProjectSequence project={project} role="admin" />
       </section>
 
       <section className="border border-stone rounded-2xl p-6 mt-8">
