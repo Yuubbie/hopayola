@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function Fashion() {
   return (
     <main>
-      <div className="mx-auto max-w-6xl px-6 pt-16 pb-4">
+      <div className="mx-auto max-w-6xl px-6 md:px-10 pt-24 md:pt-28 pb-8">
         <h1 className="font-display text-4xl mb-3">Fashion</h1>
         <p className="text-ink/60 max-w-prose">
           Artisans available to start, and projects open to claim.

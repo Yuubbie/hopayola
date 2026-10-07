@@ -98,7 +98,7 @@ export default async function Account({
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-24">
+    <main className="mx-auto max-w-2xl px-6 md:px-10 py-24 md:py-28">
       <h1 className="font-display text-3xl mb-2">
         Hello, {profile?.full_name || "there"}
       </h1>
@@ -117,12 +117,20 @@ export default async function Account({
         <section className="border border-stone rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg">Your projects</h2>
-            <Link
-              href="/projects/new"
-              className="text-sm text-royal hover:text-royal-deep"
-            >
-              Start a project
-            </Link>
+            <div className="flex gap-4">
+              <Link
+                href="/lifestyle#wardrobe"
+                className="text-sm text-ink/50 hover:text-royal"
+              >
+                Wardrobe
+              </Link>
+              <Link
+                href="/projects/new"
+                className="text-sm text-royal hover:text-royal-deep"
+              >
+                Start a project
+              </Link>
+            </div>
           </div>
 
           {!projects || projects.length === 0 ? (

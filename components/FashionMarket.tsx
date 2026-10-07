@@ -39,7 +39,7 @@ export default async function FashionMarket() {
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-24 space-y-16">
+    <div className="mx-auto max-w-6xl px-6 md:px-10 pb-24 md:pb-32 space-y-20">
       <section>
         <h2 className="font-display text-2xl mb-2">Artisans available</h2>
         <p className="text-ink/55 text-sm mb-6">

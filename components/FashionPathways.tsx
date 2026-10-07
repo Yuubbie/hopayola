@@ -29,7 +29,7 @@ const pathways = [
 
 export default function FashionPathways() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
+    <section className="mx-auto max-w-6xl px-6 md:px-10 py-20 md:py-28">
       <h2 className="font-display text-3xl md:text-4xl mb-2">
         Three ways to start
       </h2>
