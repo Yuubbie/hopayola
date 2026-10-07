@@ -1,59 +1,72 @@
 import Link from "next/link";
 import { createServiceClient } from "@/lib/supabase/service";
 
+function specialtyText(specialty: unknown) {
+  if (Array.isArray(specialty)) return specialty.filter(Boolean).join(", ");
+  if (typeof specialty === "string" && specialty.trim()) return specialty;
+  return "Specialty TBC";
+}
+
 export default async function FashionMarket() {
   const supabase = createServiceClient();
 
   const { data: artisans } = await supabase
     .from("artisan_profiles")
-    .select("id, region, specialty, bio, verified, profiles(full_name)")
-    .order("verified", { ascending: false })
+    .select("id, region, specialty, bio, verified")
     .limit(24);
 
-  const { data: projects } = await supabase
+  const artisanIds = (artisans || []).map((a) => a.id);
+  const { data: names } = artisanIds.length
+    ? await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", artisanIds)
+    : { data: [] as { id: string; full_name: string | null }[] };
+
+  const nameById = new Map(
+    (names || []).map((n) => [n.id, n.full_name || "Artisan"])
+  );
+
+  const { data: allProjects } = await supabase
     .from("projects")
     .select("id, garment_type, occasion, region, tier, status, created_at")
-    .in("status", ["submitted", "concept_selected", "concepts_ready"])
     .order("created_at", { ascending: false })
-    .limit(12);
+    .limit(24);
+
+  const closed = new Set(["completed", "cancelled", "paid"]);
+  const projects = (allProjects || []).filter(
+    (p) => !closed.has(String(p.status || ""))
+  );
 
   return (
     <div className="mx-auto max-w-6xl px-6 pb-24 space-y-16">
       <section>
         <h2 className="font-display text-2xl mb-2">Artisans available</h2>
         <p className="text-ink/55 text-sm mb-6">
-          Sign up as a client, then start a project to work with them on Hopayola
-          — not off-platform.
+          Anyone can browse. Sign in to start a project — work stays on
+          Hopayola.
         </p>
         {!artisans?.length ? (
           <p className="text-sm text-ink/45">No artisans listed yet.</p>
         ) : (
           <ul className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {artisans.map((a: {
-              id: string;
-              region?: string | null;
-              specialty?: string[] | null;
-              bio?: string | null;
-              verified?: boolean | null;
-              profiles?: { full_name?: string | null } | null;
-            }) => (
+            {artisans.map((a) => (
               <li
                 key={a.id}
                 className="border border-stone rounded-2xl p-5"
               >
                 <p className="font-medium text-sm">
-                  {a.profiles?.full_name || "Artisan"}
+                  {nameById.get(a.id) || "Artisan"}
                   {a.verified ? (
                     <span className="text-royal text-xs ml-2">Verified</span>
                   ) : null}
                 </p>
                 <p className="text-xs text-ink/50 mt-1 capitalize">
-                  {(a.specialty || []).join(", ") || "Specialty TBC"} ·{" "}
-                  {a.region || "Abuja"}
+                  {specialtyText(a.specialty)} · {a.region || "Abuja"}
                 </p>
-                {a.bio && (
+                {a.bio ? (
                   <p className="text-xs text-ink/60 mt-2 line-clamp-3">{a.bio}</p>
-                )}
+                ) : null}
                 <Link
                   href="/projects/new"
                   className="inline-block mt-3 text-xs text-royal"
@@ -69,7 +82,7 @@ export default async function FashionMarket() {
       <section>
         <h2 className="font-display text-2xl mb-2">Projects available</h2>
         <p className="text-ink/55 text-sm mb-6">
-          Artisans claim these from their account. Clients: start your own brief.
+          Open briefs. Artisans claim from their account.
         </p>
         {!projects?.length ? (
           <p className="text-sm text-ink/45">No open projects right now.</p>
@@ -84,7 +97,8 @@ export default async function FashionMarket() {
                   {p.garment_type || "Project"}
                   {p.occasion ? ` · ${p.occasion}` : ""}
                   <span className="block text-xs text-ink/45 capitalize">
-                    {p.tier} · {p.region} · {String(p.status).replace(/_/g, " ")}
+                    {p.tier} · {p.region} ·{" "}
+                    {String(p.status || "").replace(/_/g, " ")}
                   </span>
                 </span>
                 <Link
