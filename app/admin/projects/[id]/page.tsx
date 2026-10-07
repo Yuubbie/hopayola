@@ -216,9 +216,11 @@ export default async function AdminProjectDetail({
               className="w-full border border-stone rounded-lg px-3 py-2 text-sm bg-paper"
             >
               <option value="">Same as claimed artisan</option>
-              {(team || []).map((t: { artisan_id: string; profiles?: { full_name?: string } | null }) => (
+              {(team || []).map((t: any) => (
                 <option key={t.artisan_id} value={t.artisan_id}>
-                  {(t as { profiles?: { full_name?: string } }).profiles?.full_name || t.artisan_id}
+                  {t.profiles?.full_name ||
+                    t.profiles?.[0]?.full_name ||
+                    t.artisan_id}
                 </option>
               ))}
             </select>
