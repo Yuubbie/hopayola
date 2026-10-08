@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { createServiceClient } from "@/lib/supabase/service";
+import { createClient } from "@/lib/supabase/server";
+import { claimProject } from "@/app/artisan/account/actions";
 
 function specialtyText(specialty: unknown) {
   if (Array.isArray(specialty)) return specialty.filter(Boolean).join(", ");
@@ -9,6 +11,19 @@ function specialtyText(specialty: unknown) {
 
 export default async function FashionMarket() {
   const supabase = createServiceClient();
+  const auth = await createClient();
+  const {
+    data: { user },
+  } = await auth.auth.getUser();
+  let isArtisan = false;
+  if (user) {
+    const { data: ap } = await auth
+      .from("artisan_profiles")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+    isArtisan = Boolean(ap);
+  }
 
   const { data: artisans } = await supabase
     .from("artisan_profiles")
@@ -82,7 +97,7 @@ export default async function FashionMarket() {
       <section>
         <h2 className="font-display text-2xl mb-2">Projects available</h2>
         <p className="text-ink/55 text-sm mb-6">
-          Open briefs. Artisans claim from their account.
+          Open briefs. Artisans can claim here or from their account.
         </p>
         {!projects?.length ? (
           <p className="text-sm text-ink/45">No open projects right now.</p>
@@ -101,12 +116,30 @@ export default async function FashionMarket() {
                     {String(p.status || "").replace(/_/g, " ")}
                   </span>
                 </span>
-                <Link
-                  href="/artisan/sign-up"
-                  className="text-xs text-royal shrink-0 self-center"
-                >
-                  Join to claim
-                </Link>
+                {p.status === "artisan_assigned" ||
+                p.status === "in_production" ||
+                p.status === "milestone_review" ? (
+                  <span className="text-xs text-ink/40 shrink-0 self-center">
+                    Claimed
+                  </span>
+                ) : isArtisan ? (
+                  <form action={claimProject} className="shrink-0 self-center">
+                    <input type="hidden" name="projectId" value={p.id} />
+                    <button
+                      type="submit"
+                      className="text-xs bg-royal text-paper rounded-full px-3 py-1.5"
+                    >
+                      Claim
+                    </button>
+                  </form>
+                ) : (
+                  <Link
+                    href="/artisan/sign-up"
+                    className="text-xs text-royal shrink-0 self-center"
+                  >
+                    Join to claim
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

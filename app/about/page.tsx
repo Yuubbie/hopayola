@@ -25,7 +25,7 @@ const BENEFITS = [
     title: "Milestone-protected payments",
     benefit: "Transparent payments for every order.",
     details:
-      "As merchant of record, Hopayola structures projects into production phases. Payments are received by the company and artisans are paid after verified milestone completions such as cutting, assembly, and final fitting.",
+      "As merchant of record, Hopayola takes one client payment after fabric is received and holds it. The artisan is paid when the client marks the outfit received — not as three split payouts.",
   },
   {
     title: "Fabric & courier protection",
@@ -37,7 +37,7 @@ const BENEFITS = [
     title: "StitchCoins rewards",
     benefit: "Earn discounts and perks in the community.",
     details:
-      "Points from style challenges, reviews, and fit ratings can be redeemed for labor discounts, extra design renders, and VIP matching.",
+      "You earn points when a commissioned piece is marked received. They show in your Lifestyle wardrobe. Redemption for discounts comes later.",
   },
   {
     title: "Steal the look",
@@ -57,7 +57,7 @@ export default function About() {
   return (
     <main>
       <section className="grid md:grid-cols-2 items-center">
-        <div className="px-6 md:pl-10 md:pr-12 py-16 md:py-24">
+        <div className="px-6 md:px-10 md:pl-14 py-24 md:py-32">
           <p className="text-royal text-sm mb-4">About Hopayola</p>
           <h1 className="font-display text-5xl md:text-6xl leading-[1.05] mb-6">
             Bridging Traditional African Craftsmanship and Modern Fashion Tech.
@@ -79,7 +79,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
+      <section className="mx-auto max-w-6xl px-6 md:px-10 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
         <div className="relative aspect-[4/5] rounded-3xl overflow-hidden order-2 md:order-1">
           <Image
             src="/images/marquee-1.jpg"
@@ -102,8 +102,8 @@ export default function About() {
         </div>
       </section>
 
-      <section className="bg-stone/30 py-20">
-        <div className="mx-auto max-w-4xl px-6 text-center">
+      <section className="bg-stone/30 py-20 md:py-28">
+        <div className="mx-auto max-w-4xl px-6 md:px-10 text-center">
           <p className="text-royal text-sm mb-4">The Problem We Solve</p>
           <h2 className="font-display text-3xl md:text-4xl mb-6">
             Bespoke fashion shouldn&apos;t feel unpredictable.

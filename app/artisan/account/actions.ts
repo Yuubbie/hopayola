@@ -55,4 +55,6 @@ export async function claimProject(formData: FormData) {
   }
 
   revalidatePath("/artisan/account");
+  revalidatePath("/fashion");
+  revalidatePath("/fashion/hire-a-talent");
 }

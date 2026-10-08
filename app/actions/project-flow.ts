@@ -175,7 +175,18 @@ export async function clientMarkReceived(formData: FormData) {
     await runMilestonePayout(payRow.id, projectId);
   }
 
+  const { data: prof } = await service
+    .from("profiles")
+    .select("points")
+    .eq("id", user.id)
+    .maybeSingle();
+  await service
+    .from("profiles")
+    .update({ points: Number(prof?.points || 0) + 50 })
+    .eq("id", user.id);
+
   revalidate(projectId);
+  revalidatePath("/lifestyle");
 }
 
 export async function seedDefaultMilestones(projectId: string) {

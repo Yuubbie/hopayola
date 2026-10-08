@@ -17,8 +17,8 @@ const ROLE_OPTIONS = [
 export default function Contact() {
   return (
     <main>
-      <section className="bg-ink text-paper py-20">
-        <div className="mx-auto max-w-4xl px-6 text-center">
+      <section className="bg-ink text-paper py-24 md:py-32">
+        <div className="mx-auto max-w-4xl px-6 md:px-10 text-center">
           <h1 className="font-display text-4xl md:text-5xl mb-6">
             Get in Touch with Hopayola.
           </h1>
@@ -29,7 +29,7 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-20 grid md:grid-cols-2 gap-16">
+      <section className="mx-auto max-w-5xl px-6 md:px-10 py-20 md:py-28 grid md:grid-cols-2 gap-16">
         <div>
           <h2 className="font-display text-2xl mb-6">Direct Channels</h2>
           <ul className="space-y-4 text-ink/70 text-sm">
@@ -72,17 +72,17 @@ export default function Contact() {
                 How are fabric handoffs managed?
               </p>
               <p className="text-ink/70 leading-relaxed">
-                Arrange scheduled courier pickup during project checkout.
+                Client sends fabric via GIG or Bolt, then marks it sent.
+                Work and payment start after the artisan confirms it arrived.
               </p>
             </div>
             <div>
               <p className="font-medium mb-1">
-                How do milestone releases work?
+                How does payment work?
               </p>
               <p className="text-ink/70 leading-relaxed">
-                Your payment is held securely in escrow and released to the
-                artisan only after you review and approve specific
-                production milestones.
+                You pay once after fabric is received. Hopayola holds it.
+                The artisan is paid when you mark the outfit received.
               </p>
             </div>
             <div>
@@ -90,8 +90,8 @@ export default function Contact() {
                 How do I send accurate body measurements?
               </p>
               <p className="text-ink/70 leading-relaxed">
-                Follow our measurement guide to get accurate results before
-                starting your project.
+                Follow our measurement guide on Lifestyle before you start a
+                project.
               </p>
             </div>
           </div>
