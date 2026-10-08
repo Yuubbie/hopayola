@@ -14,90 +14,102 @@ type Frame = {
 
 const CLIENT: Frame[] = [
   {
-    kicker: "Client · 1 of 8",
+    kicker: "Client · 1 of 9",
     title: "Create a client account",
-    body: "hopayola.com/sign-up — name, email, password. Not the artisan form.",
+    body: "hopayola.com/sign-up — not the artisan form.",
     scene: "clientsignup",
   },
   {
-    kicker: "Client · 2 of 8",
-    title: "Free measurement guide",
-    body: "Download it on Lifestyle. Croquis sheets and Little Artisans are paid in the shop.",
+    kicker: "Client · 2 of 9",
+    title: "Lifestyle first",
+    body: "Free measurement guide. Shop pieces can be added to your wardrobe later.",
     scene: "resources",
   },
   {
-    kicker: "Client · 3 of 8",
+    kicker: "Client · 3 of 9",
     title: "Start a project",
-    body: "Occasion and garment are required. Photos are optional if you do not have a picture yet.",
+    body: "Occasion and garment required. Optional photos, budget, deadline.",
     scene: "project",
   },
   {
-    kicker: "Client · 4 of 8",
-    title: "Share fit if you have it",
-    body: "Measurements help. Skip fabric photos and describe the idea in notes if needed.",
-    scene: "fit",
+    kicker: "Client · 4 of 9",
+    title: "Pick a look",
+    body: "Standard: 3 concepts. Premium: 7. Choose one before making starts.",
+    scene: "concepts",
   },
   {
-    kicker: "Client · 5 of 8",
-    title: "See your artisan",
-    body: "Admin assigns a vetted tailor. Their name sits on your project card.",
+    kicker: "Client · 5 of 9",
+    title: "An artisan claims you",
+    body: "They claim from Fashion or their account. Their name appears on your card.",
     scene: "assigned",
   },
   {
-    kicker: "Client · 6 of 8",
-    title: "Pay the project",
-    body: "One checkout: milestone total + 5%. Hopayola is merchant of record.",
+    kicker: "Client · 6 of 9",
+    title: "Send fabric",
+    body: "GIG or Bolt. Work and payment wait until the artisan marks fabric received.",
+    scene: "fabric",
+  },
+  {
+    kicker: "Client · 7 of 9",
+    title: "Pay once",
+    body: "After fabric is in: one Paystack payment (your budget + 5%). Hopayola holds it.",
     scene: "pay",
   },
   {
-    kicker: "Client · 7 of 8",
-    title: "Confirm each stage",
-    body: "Artisan submits cutting or fitting. You tap Confirm. Then Hopayola can pay that stage.",
+    kicker: "Client · 8 of 9",
+    title: "Review the work",
+    body: "Milestones 1–3 are reviews only — approve or request changes. Not three payments.",
     scene: "confirm",
   },
   {
-    kicker: "Client · 8 of 8",
-    title: "Collect the outfit",
-    body: "Delivery is the last stage. Your account shows paid vs pending.",
+    kicker: "Client · 9 of 9",
+    title: "Mark it received",
+    body: "Artisan ships (GIG/Bolt). You tap received. Then the artisan is paid. You get points; the piece is in your wardrobe.",
     scene: "done",
   },
 ];
 
 const ARTISAN: Frame[] = [
   {
-    kicker: "Artisan · 1 of 6",
+    kicker: "Artisan · 1 of 7",
     title: "Join as artisan",
-    body: "Email, specialty, region, skills. Same sign-up that is live on hopayola.com/artisan/sign-up.",
+    body: "hopayola.com/artisan/sign-up — specialty, region, skills.",
     scene: "signup",
   },
   {
-    kicker: "Artisan · 2 of 6",
+    kicker: "Artisan · 2 of 7",
     title: "Save payout details",
-    body: "Bank, 10-digit account, verify name, save. That is the account Hopayola pays.",
+    body: "Bank, 10-digit account, verify name. Paid only when the client marks received.",
     scene: "bank",
   },
   {
-    kicker: "Artisan · 3 of 6",
+    kicker: "Artisan · 3 of 7",
     title: "Claim a project",
-    body: "Open jobs in your city. Claim the ones you can deliver.",
+    body: "Fashion list or your account. Open jobs in your city.",
     scene: "claim",
   },
   {
-    kicker: "Artisan · 4 of 6",
-    title: "Submit a milestone",
-    body: "When cutting or fitting is done, send proof from your dashboard.",
+    kicker: "Artisan · 4 of 7",
+    title: "Confirm fabric",
+    body: "Client sends via GIG or Bolt. You confirm it arrived. Then they can pay.",
+    scene: "confirmfabric",
+  },
+  {
+    kicker: "Artisan · 5 of 7",
+    title: "Ask for review",
+    body: "Submit milestone 1, 2, then 3 with optional proof. Client approves or asks for changes.",
     scene: "submit",
   },
   {
-    kicker: "Artisan · 5 of 6",
-    title: "Wait for confirm",
-    body: "The client reviews. Status becomes confirmed · payout pending.",
-    scene: "pending",
+    kicker: "Artisan · 6 of 7",
+    title: "Ship the outfit",
+    body: "When the last review is approved, send with GIG or Bolt.",
+    scene: "ship",
   },
   {
-    kicker: "Artisan · 6 of 6",
-    title: "Get paid for the stage",
-    body: "After confirm, Hopayola sends the artisan payout (minus 5%) to the saved bank.",
+    kicker: "Artisan · 7 of 7",
+    title: "Get paid once",
+    body: "When the client marks the outfit received, Hopayola pays you (budget minus 5%) to your bank.",
     scene: "paid",
   },
 ];
@@ -150,41 +162,62 @@ function Scene({ id }: { id: string }) {
             <FakeBtn>Save measurements</FakeBtn>
           </>
         )}
+        {id === "concepts" && (
+          <>
+            <p className="text-royal text-xs mb-2">Your looks</p>
+            <Row k="Concept 1" v="Standard" />
+            <Row k="Concept 2" v="Standard" />
+            <Row k="Concept 3" v="Standard" />
+            <FakeBtn>Choose this look</FakeBtn>
+          </>
+        )}
         {id === "assigned" && (
           <>
             <p className="text-royal text-xs mb-2">Your project</p>
             <p className="font-medium text-sm mb-1">Three Piece Suit</p>
-            <p className="text-royal-deep text-sm">Assigned to Yubbiee Uby</p>
-            <p className="text-ink/50 text-xs mt-2">Standard package · In production</p>
+            <p className="text-royal-deep text-sm">Claimed by Yubbiee Uby</p>
+            <p className="text-ink/50 text-xs mt-2">Fashion · Claim</p>
+          </>
+        )}
+        {id === "fabric" && (
+          <>
+            <p className="text-royal text-xs mb-2">Send fabric</p>
+            <p className="text-sm text-ink/70 mb-3">
+              Book GIG or Bolt. Then mark sent. Payment waits until fabric is received.
+            </p>
+            <FakeBtn>I sent fabric · Bolt</FakeBtn>
           </>
         )}
         {id === "pay" && (
           <>
-            <p className="text-royal text-xs mb-2">Checkout</p>
-            <Row k="Milestones" v="NGN 20,000" />
+            <p className="text-royal text-xs mb-2">One payment</p>
+            <Row k="Project" v="NGN 20,000" />
             <Row k="Service 5%" v="NGN 1,000" />
-            <Row k="Total" v="NGN 21,000" />
+            <Row k="Held by Hopayola" v="NGN 21,000" />
             <FakeBtn>Pay with Paystack</FakeBtn>
           </>
         )}
         {id === "confirm" && (
           <>
-            <p className="text-green-700 text-xs mb-2">Payment received</p>
-            <p className="text-sm font-medium">Cutting — completed</p>
+            <p className="text-royal text-xs mb-2">Milestone 2 of 3 · review</p>
+            <p className="text-sm font-medium">Approve or request changes</p>
+            <p className="text-ink/50 text-xs mt-1">Not a payment — money stays held.</p>
             <div className="flex gap-2 mt-3">
               <span className="bg-royal text-paper text-xs rounded-full px-3 py-1.5">
-                Confirm & pay artisan
+                Approve
               </span>
-              <span className="text-xs text-red-700 py-1.5">Dispute</span>
+              <span className="text-xs border border-stone rounded-full px-3 py-1.5">
+                Request changes
+              </span>
             </div>
           </>
         )}
         {id === "done" && (
           <>
-            <p className="text-royal text-xs mb-2">Project</p>
+            <p className="text-royal text-xs mb-2">Outfit arrived</p>
             <p className="font-medium text-sm">Three Piece Suit</p>
-            <p className="text-sm text-ink/60 mt-1">Delivery — paid</p>
-            <p className="text-green-700 text-xs mt-3">Ready for pickup</p>
+            <p className="text-sm text-ink/60 mt-1">+50 points · In wardrobe</p>
+            <FakeBtn>I received the outfit</FakeBtn>
           </>
         )}
         {id === "signup" && (
@@ -207,32 +240,40 @@ function Scene({ id }: { id: string }) {
         )}
         {id === "claim" && (
           <>
-            <p className="text-royal text-xs mb-2">Open near you</p>
+            <p className="text-royal text-xs mb-2">Fashion · open jobs</p>
             <p className="font-medium text-sm">Three Piece Suit — Corporate</p>
-            <p className="text-ink/50 text-xs mt-1">Abuja · Standard · Due 20 Oct</p>
-            <FakeBtn>Claim this project</FakeBtn>
+            <p className="text-ink/50 text-xs mt-1">Abuja · Standard</p>
+            <FakeBtn>Claim</FakeBtn>
+          </>
+        )}
+        {id === "confirmfabric" && (
+          <>
+            <p className="text-royal text-xs mb-2">Fabric</p>
+            <p className="text-sm">Client sent via Bolt</p>
+            <FakeBtn>Fabric received</FakeBtn>
           </>
         )}
         {id === "submit" && (
           <>
             <p className="text-royal text-xs mb-2">Your claimed project</p>
-            <p className="text-sm font-medium">Cutting — in progress</p>
+            <p className="text-sm font-medium">Milestone 1 — ready for review</p>
             <p className="text-ink/50 text-xs mt-1">Proof URL (optional)</p>
-            <FakeBtn>Mark stage complete</FakeBtn>
+            <FakeBtn>Ask client to review</FakeBtn>
           </>
         )}
-        {id === "pending" && (
+        {id === "ship" && (
           <>
-            <p className="text-sm font-medium">Cutting — completed</p>
-            <p className="text-ink/50 text-xs mt-2">Client confirmed · payout pending</p>
+            <p className="text-royal text-xs mb-2">Ship outfit</p>
+            <p className="text-sm text-ink/70">GIG or Bolt, then mark shipped.</p>
+            <FakeBtn>I shipped · GIG</FakeBtn>
           </>
         )}
         {id === "paid" && (
           <>
-            <p className="text-sm font-medium">Cutting — paid</p>
-            <Row k="Stage amount" v="NGN 10,000" />
-            <Row k="You receive (95%)" v="NGN 9,500" />
-            <p className="text-green-700 text-xs mt-3">Sent to Ecobank · 1234567890</p>
+            <p className="text-sm font-medium">Client marked received</p>
+            <Row k="Held payment" v="NGN 20,000" />
+            <Row k="You receive (95%)" v="NGN 19,000" />
+            <p className="text-green-700 text-xs mt-3">One payout · Ecobank</p>
           </>
         )}
       </div>
@@ -342,7 +383,7 @@ export default function DemoOnboarding({
               >
                 <span className="block font-display text-xl mb-1">I&apos;m a client</span>
                 <span className="text-sm text-ink/55">
-                  Sign up, free guide, project, pay, confirm.
+                  Project, fabric, one payment, reviews, received.
                 </span>
               </button>
               <button
@@ -356,7 +397,7 @@ export default function DemoOnboarding({
               >
                 <span className="block font-display text-xl mb-1">I&apos;m an artisan</span>
                 <span className="text-sm text-ink/55">
-                  Sign up, bank, claim, submit, get paid.
+                  Claim, confirm fabric, reviews, ship, paid on received.
                 </span>
               </button>
             </div>
