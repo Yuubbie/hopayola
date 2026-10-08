@@ -60,7 +60,7 @@ export default function SignUp() {
                 Create your client account
               </h1>
               <p className="text-ink/60 mb-8">
-                Save measurements, start a project, pay, and confirm each stage.
+                Start a project, send fabric, pay once, review the work, mark received.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
