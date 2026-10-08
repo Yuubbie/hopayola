@@ -4,11 +4,6 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { runMilestonePayout } from "@/lib/run-milestone-payout";
 
-const GIG = "https://www.giglogistics.com/";
-const BOLT = "https://www.bolt.eu/en/send/";
-
-export const COURIER_LINKS = { gig: GIG, bolt: BOLT } as const;
-
 function revalidate(projectId: string) {
   revalidatePath("/account");
   revalidatePath("/artisan/account");

@@ -5,8 +5,8 @@ import {
   artisanShipProject,
   clientMarkReceived,
   clientSendFabric,
-  COURIER_LINKS,
 } from "@/app/actions/project-flow";
+import { COURIER_LINKS } from "@/lib/couriers";
 import PayProjectButton from "@/components/pay-project-button";
 import MilestoneSubmitForm from "@/components/milestone-submit-form";
 import MilestoneClientActions from "@/components/milestone-client-actions";
@@ -46,7 +46,9 @@ function CourierForms({
         <form
           key={c}
           action={action}
-          onSubmit={() => window.open(COURIER_LINKS[c], "_blank")}
+          onSubmit={() => {
+            window.open(COURIER_LINKS[c], "_blank", "noopener,noreferrer");
+          }}
         >
           <input type="hidden" name="projectId" value={projectId} />
           <input type="hidden" name="courier" value={c} />
