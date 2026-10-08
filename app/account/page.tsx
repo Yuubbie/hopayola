@@ -33,6 +33,8 @@ function formatBudget(min: number | null, max: number | null) {
   return `Up to ${fmt(max as number)}`;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function Account({
   searchParams,
 }: {
@@ -51,9 +53,9 @@ export default async function Account({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("*")
+    .select("full_name, role")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   if (profile?.role === "artisan") {
     redirect(welcome === "artisan" ? "/artisan/account?welcome=1" : "/artisan/account");
@@ -71,10 +73,13 @@ export default async function Account({
 
   const projectIds = (projects || []).map((p) => p.id);
 
-  const { data: teamAssignments } = await supabase
-    .from("project_team_members")
-    .select("project_id, role_on_project, profiles(full_name)")
-    .in("project_id", projectIds.length > 0 ? projectIds : ["none"]);
+  const { data: teamAssignments } =
+    projectIds.length > 0
+      ? await supabase
+          .from("project_team_members")
+          .select("project_id, role_on_project, profiles(full_name)")
+          .in("project_id", projectIds)
+      : { data: [] as { project_id: string; role_on_project: string }[] };
 
   const teamByProject = new Map<string, { name: string; role: string }[]>();
   for (const row of teamAssignments || []) {
@@ -84,11 +89,14 @@ export default async function Account({
     teamByProject.set(row.project_id, list);
   }
 
-  const { data: allMilestones } = await supabase
-    .from("project_milestones")
-    .select("*")
-    .in("project_id", projectIds.length > 0 ? projectIds : ["none"])
-    .order("milestone_order", { ascending: true });
+  const { data: allMilestones } =
+    projectIds.length > 0
+      ? await supabase
+          .from("project_milestones")
+          .select("*")
+          .in("project_id", projectIds)
+          .order("milestone_order", { ascending: true })
+      : { data: [] as { project_id: string }[] };
 
   const milestonesByProject = new Map<string, any[]>();
   for (const m of allMilestones || []) {
@@ -186,9 +194,25 @@ export default async function Account({
                     )}
 
                     <ProjectSequence
-                      project={p}
+                      project={{
+                        id: p.id,
+                        funded_at: p.funded_at,
+                        fabric_sent_at: p.fabric_sent_at,
+                        fabric_received_at: p.fabric_received_at,
+                        shipped_at: p.shipped_at,
+                        client_received_at: p.client_received_at,
+                        status: p.status,
+                      }}
                       role="client"
-                      milestones={projectMilestones}
+                      milestones={projectMilestones.map((m) => ({
+                        id: m.id,
+                        milestone_name: m.milestone_name,
+                        milestone_order: m.milestone_order,
+                        status: m.status,
+                        submitted_at: m.submitted_at,
+                        confirmed_at: m.confirmed_at,
+                        artisan_id: m.artisan_id,
+                      }))}
                     />
 
                     {p.funded_at && (

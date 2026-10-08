@@ -1,3 +1,5 @@
+"use client";
+
 import { submitMilestone } from "@/app/actions/milestone-flow";
 
 export default function MilestoneSubmitForm({

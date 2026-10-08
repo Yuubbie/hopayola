@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { notifyProjectSubmission } from "@/app/actions/notifications";
-import { seedDefaultMilestones } from "@/app/actions/project-flow";
+import { seedDefaultMilestones } from "@/app/actions/seed-milestones";
 import { generateConceptsAction } from "@/app/actions/generate-concepts";
 
 type SavedMeasurements = {
@@ -140,9 +140,22 @@ export default function ProjectIntakeForm({
         throw new Error(`Could not save project: ${insertError.message}`);
       }
 
-      await seedDefaultMilestones(project.id);
-      await generateConceptsAction(project.id, tier);
-      notifyProjectSubmission(clientName, clientEmail, garmentType.trim(), occasion.trim());
+      try {
+        await seedDefaultMilestones(project.id);
+      } catch {
+        /* milestones can be added later */
+      }
+      try {
+        await generateConceptsAction(project.id, tier);
+      } catch {
+        /* placeholders can wait */
+      }
+      notifyProjectSubmission(
+        clientName,
+        clientEmail,
+        garmentType.trim(),
+        occasion.trim()
+      );
 
       router.push(`/account?project=${project.id}`);
     } catch (err) {
