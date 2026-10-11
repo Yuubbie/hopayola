@@ -17,7 +17,10 @@ export type Session = {
   intent?: Intent;
   city?: string;
   budget?: number;
+  beds?: number;
   nights?: number;
+  inspectionHeld?: string;
   websiteUrl?: string;
   agencyName?: string;
+  extraListings?: Listing[];
 };

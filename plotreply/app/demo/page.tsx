@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Mark } from "@/components/Logo";
 import type { ChatTurn, Session } from "@/lib/types";
 import { sanitizeWebsite } from "@/lib/website";
+import { loadExtraListings } from "@/lib/listings-store";
 
 export default function DemoPage() {
   const [input, setInput] = useState("");
@@ -61,21 +62,29 @@ export default function DemoPage() {
     setInput("");
     setTurns((t) => [...t, { role: "user", text }]);
     setPending(true);
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text,
-        session: {
-          ...session,
-          websiteUrl: sanitizeWebsite(website),
-          agencyName: agency.trim() || undefined,
-        },
-      }),
-    });
-    const data = await res.json();
-    setSession(data.session);
-    setTurns((t) => [...t, { role: "bot", text: data.text }]);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          listings: loadExtraListings(),
+          session: {
+            ...session,
+            websiteUrl: sanitizeWebsite(website),
+            agencyName: agency.trim() || undefined,
+          },
+        }),
+      });
+      const data = await res.json();
+      setSession(data.session);
+      setTurns((t) => [...t, { role: "bot", text: data.text }]);
+    } catch {
+      setTurns((t) => [
+        ...t,
+        { role: "bot", text: "Inbox is offline. Try again in a moment." },
+      ]);
+    }
     setPending(false);
   }
 

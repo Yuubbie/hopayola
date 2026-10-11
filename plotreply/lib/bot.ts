@@ -2,8 +2,7 @@ import { SEED_LISTINGS } from "./seed";
 import type { Intent, Listing, Session } from "./types";
 import { websiteLine } from "./website";
 
-const naira = (n: number) =>
-  "₦" + n.toLocaleString("en-NG");
+const naira = (n: number) => "₦" + n.toLocaleString("en-NG");
 
 function detectIntent(text: string): Intent | undefined {
   const t = text.toLowerCase();
@@ -30,13 +29,41 @@ function detectBudget(text: string): number | undefined {
   return Math.round(n);
 }
 
+function detectBeds(text: string): number | undefined {
+  const m = text.toLowerCase().match(/(\d+)\s*-?\s*bed/);
+  if (!m) return undefined;
+  return parseInt(m[1], 10);
+}
+
+function detectSlot(text: string): string | undefined {
+  const t = text.trim();
+  if (
+    /(monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow|today|\d{1,2}\s*(am|pm))/i.test(
+      t,
+    ) &&
+    t.length < 80
+  ) {
+    return t;
+  }
+  return undefined;
+}
+
+function catalogue(session: Session): Listing[] {
+  const extra = session.extraListings || [];
+  const seen = new Set(extra.map((l) => l.id));
+  return [...extra, ...SEED_LISTINGS.filter((l) => !seen.has(l.id))];
+}
+
 function matchListings(s: Session): Listing[] {
-  return SEED_LISTINGS.filter((l) => {
-    if (s.intent && l.intent !== s.intent) return false;
-    if (s.city && l.city !== s.city) return false;
-    if (s.budget && l.intent !== "shortlet" && l.priceNgn > s.budget * 1.15) return false;
-    return true;
-  }).slice(0, 3);
+  return catalogue(s)
+    .filter((l) => {
+      if (s.intent && l.intent !== s.intent) return false;
+      if (s.city && l.city.toLowerCase() !== s.city.toLowerCase()) return false;
+      if (s.beds && l.beds !== s.beds) return false;
+      if (s.budget && l.intent !== "shortlet" && l.priceNgn > s.budget * 1.15) return false;
+      return true;
+    })
+    .slice(0, 3);
 }
 
 function card(l: Listing) {
@@ -48,7 +75,8 @@ export function reply(userText: string, session: Session): { text: string; sessi
   const intent = detectIntent(userText) ?? session.intent;
   const city = detectCity(userText) ?? session.city;
   const budget = detectBudget(userText) ?? session.budget;
-  const next: Session = { ...session, intent, city, budget };
+  const beds = detectBeds(userText) ?? session.beds;
+  const next: Session = { ...session, intent, city, budget, beds };
 
   const t = userText.toLowerCase();
   const site = next.websiteUrl;
@@ -73,6 +101,21 @@ export function reply(userText: string, session: Session): { text: string; sessi
     return {
       session: next,
       text: "Do not pay anyone in this chat. PlotReply never collects rent, caution, or holding fees. Inspect or check in with the agent first.",
+    };
+  }
+
+  const slot = detectSlot(userText);
+  if (slot && next.intent && next.city) {
+    next.inspectionHeld = slot;
+    if (next.intent === "shortlet") {
+      return {
+        session: next,
+        text: `${slot} noted for the host. Guest count if you have it. No payment in this chat — they confirm the hold.`,
+      };
+    }
+    return {
+      session: next,
+      text: `${slot} held for inspection. Landmark + ID reminder goes out 2 hours before. The agent only wakes for this slot. Do not pay in this chat.`,
     };
   }
 

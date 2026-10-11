@@ -25,7 +25,8 @@ export default function Home() {
             <p className="mt-4 text-sm text-ink/55">
               Send CEOs <span className="font-medium text-ink">/demo</span> — they paste their
               website, copy a private link, and clients browse that catalogue then chat what they
-              want.
+              want. Add a house on <span className="font-medium text-ink">/onboard</span> and the
+              inbox will match it.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link

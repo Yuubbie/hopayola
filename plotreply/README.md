@@ -10,7 +10,9 @@ npm install
 npm run dev
 ```
 
-Open **http://127.0.0.1:3200** (not 3100, not https). On this Windows setup the production server on 3200 responds; `localhost:3100` can hang.
+Open **http://127.0.0.1:3200**. `npm run dev` now starts Next in development mode on that host/port.
+
+Onboarded listings persist in the browser and are matched in `/demo`. Cloud persistence still needs Supabase.
 
 - `/` landing
 - `/demo` talk to the bot (seed Lagos / Abuja / PH listings)
