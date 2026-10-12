@@ -16,6 +16,14 @@ export default function ResetPassword() {
     e.preventDefault();
     setLoading(true);
     setStatus(null);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      setLoading(false);
+      setStatus("This reset link is invalid or expired. Request a new one.");
+      return;
+    }
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (error) {
