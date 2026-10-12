@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { claimProject } from "./actions";
-import MilestoneSubmitForm from "@/components/milestone-submit-form";
 import ProjectChat from "@/components/ProjectChat";
 import ProjectSequence from "@/components/ProjectSequence";
 
@@ -134,28 +133,6 @@ export default async function ArtisanAccount() {
                       {(a.projects?.status || "").replace(/_/g, " ")}
                     </span>
                   </div>
-                  {(milestonesByProject.get(a.project_id) || []).map((m) => (
-                    <div key={m.id} className="mt-3 pt-3 border-t border-stone text-xs">
-                      <p>
-                        <span className="font-medium">{m.milestone_name}</span>
-                        {" — "}
-                        {m.status === "paid"
-                          ? "Paid"
-                          : m.confirmed_at
-                            ? "Client confirmed · payout pending"
-                            : m.status === "completed"
-                              ? "Submitted · awaiting client"
-                              : String(m.status).replace(/_/g, " ")}
-                      </p>
-                      {m.status !== "completed" &&
-                        m.status !== "paid" && (
-                          <MilestoneSubmitForm
-                            milestoneId={m.id}
-                            projectId={a.project_id}
-                          />
-                        )}
-                    </div>
-                  ))}
                   {a.projects && (
                     <ProjectSequence
                       project={a.projects}

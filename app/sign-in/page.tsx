@@ -65,6 +65,11 @@ export default function SignIn() {
             />
 
             {error && <p className="text-sm text-red-600">{error}</p>}
+            <p className="text-sm">
+              <Link href="/forgot-password" className="text-royal hover:text-royal-deep">
+                Forgot password?
+              </Link>
+            </p>
 
             <button
               type="submit"

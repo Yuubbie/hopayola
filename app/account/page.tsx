@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ProjectChat from "@/components/ProjectChat";
 import ProjectSequence from "@/components/ProjectSequence";
+import { clientCancelProject } from "@/app/actions/project-flow";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -191,6 +192,18 @@ export default async function Account({
                           Assigned to {team.map((t) => t.name).join(", ")}
                         </p>
                       </div>
+                    )}
+
+                    {!p.funded_at && p.status !== "cancelled" && (
+                      <form action={clientCancelProject} className="mt-2">
+                        <input type="hidden" name="projectId" value={p.id} />
+                        <button
+                          type="submit"
+                          className="text-[11px] text-ink/40 hover:text-red-700"
+                        >
+                          Delete this project
+                        </button>
+                      </form>
                     )}
 
                     <ProjectSequence

@@ -44,12 +44,37 @@ export async function clientSendFabric(formData: FormData) {
   revalidate(projectId);
 }
 
+export async function clientCancelProject(formData: FormData) {
+  const projectId = String(formData.get("projectId") || "");
+  const { supabase, user } = await load();
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id, funded_at, client_received_at, status")
+    .eq("id", projectId)
+    .eq("client_id", user.id)
+    .maybeSingle();
+  if (!project) throw new Error("Project not found.");
+  if (project.funded_at) {
+    throw new Error("Paid projects cannot be deleted. Contact support.");
+  }
+  const { error } = await supabase
+    .from("projects")
+    .update({ status: "cancelled" })
+    .eq("id", projectId)
+    .eq("client_id", user.id);
+  if (error) throw new Error(error.message);
+  revalidate(projectId);
+  revalidatePath("/lifestyle");
+}
+
 export async function artisanConfirmFabric(formData: FormData) {
   const projectId = String(formData.get("projectId") || "");
-  const { supabase, user, role } = await load();
+  const { user, role } = await load();
   if (role !== "artisan" && role !== "admin") throw new Error("Not allowed.");
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
   if (role === "artisan") {
-    const { data: team } = await supabase
+    const { data: team } = await service
       .from("project_team_members")
       .select("id")
       .eq("project_id", projectId)
@@ -57,7 +82,7 @@ export async function artisanConfirmFabric(formData: FormData) {
       .maybeSingle();
     if (!team) throw new Error("Claim this project first.");
   }
-  const { error } = await supabase
+  const { error } = await service
     .from("projects")
     .update({
       fabric_received_at: new Date().toISOString(),
@@ -98,16 +123,18 @@ export async function artisanShipProject(formData: FormData) {
   if (courier !== "gig" && courier !== "bolt") {
     throw new Error("Choose GIG or Bolt.");
   }
-  const { supabase, role } = await load();
+  const { role } = await load();
   if (role !== "artisan" && role !== "admin") throw new Error("Not allowed.");
-  const { data: ms } = await supabase
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
+  const { data: ms } = await service
     .from("project_milestones")
     .select("confirmed_at")
     .eq("project_id", projectId);
   if (!ms?.length || ms.some((m) => !m.confirmed_at)) {
     throw new Error("Client must review every milestone before you send the outfit.");
   }
-  const { error } = await supabase
+  const { error } = await service
     .from("projects")
     .update({
       shipped_at: new Date().toISOString(),

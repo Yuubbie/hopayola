@@ -31,7 +31,28 @@ type Milestone = {
   artisan_id?: string | null;
 };
 
-function CourierForms({
+function CourierOpen({ prompt }: { prompt: string }) {
+  return (
+    <div className="mt-2">
+      <p className="text-xs text-ink/60 mb-2">{prompt}</p>
+      <div className="flex flex-wrap gap-2">
+        {(["gig", "bolt"] as const).map((c) => (
+          <a
+            key={c}
+            href={COURIER_LINKS[c]}
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs border border-royal text-royal rounded-full px-3 py-1.5"
+          >
+            {c === "gig" ? "GIG" : "Bolt"}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ConfirmCourier({
   action,
   projectId,
   prompt,
@@ -41,29 +62,26 @@ function CourierForms({
   prompt: string;
 }) {
   return (
-    <div className="mt-2">
-      <p className="text-xs text-ink/60 mb-2">{prompt}</p>
-      <div className="flex flex-wrap gap-2">
-        {(["gig", "bolt"] as const).map((c) => (
-          <form
-            key={c}
-            action={action}
-            onSubmit={() => {
-              window.open(COURIER_LINKS[c], "_blank", "noopener,noreferrer");
-            }}
-          >
-            <input type="hidden" name="projectId" value={projectId} />
-            <input type="hidden" name="courier" value={c} />
-            <button
-              type="submit"
-              className="text-xs bg-royal text-paper rounded-full px-3 py-1.5"
-            >
-              {c === "gig" ? "GIG" : "Bolt"}
-            </button>
-          </form>
-        ))}
+    <form action={action} className="mt-3 space-y-2">
+      <p className="text-xs text-ink/70">{prompt}</p>
+      <div className="flex flex-wrap gap-2 items-center">
+        <label className="text-xs text-ink/50">
+          <input type="radio" name="courier" value="gig" required className="mr-1" />
+          GIG
+        </label>
+        <label className="text-xs text-ink/50">
+          <input type="radio" name="courier" value="bolt" required className="mr-1" />
+          Bolt
+        </label>
+        <input type="hidden" name="projectId" value={projectId} />
+        <button
+          type="submit"
+          className="text-xs bg-royal text-paper rounded-full px-3 py-1.5"
+        >
+          Confirm
+        </button>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -83,28 +101,27 @@ export default function ProjectSequence({
   );
   const allReviewed =
     ordered.length > 0 && ordered.every((m) => Boolean(m.confirmed_at));
+  const workStarted = Boolean(project.fabric_received_at && project.funded_at);
 
   return (
     <div className="mt-3 pt-3 border-t border-stone">
       <p className="text-xs font-medium mb-2">Project sequence</p>
       <ol className="text-xs text-ink/70 space-y-1 mb-3">
-        <li>{true ? "✓" : "○"} Start / claim</li>
-        <li>
-          {project.fabric_sent_at ? "✓" : "○"} Fabric sent
-        </li>
-        <li>
-          {project.fabric_received_at ? "✓" : "○"} Fabric received
-        </li>
+        <li>✓ Start / claim</li>
+        <li>{project.fabric_sent_at ? "✓" : "○"} Fabric sent</li>
+        <li>{project.fabric_received_at ? "✓" : "○"} Fabric received</li>
         <li>{project.funded_at ? "✓" : "○"} Payment held</li>
         {ordered.map((m, i) => (
           <li key={m.id}>
             {m.confirmed_at ? "✓" : m.submitted_at ? "◐" : "○"} Milestone {i + 1}
             {m.milestone_name ? ` · ${m.milestone_name}` : ""}
             {m.confirmed_at
-              ? " · reviewed"
+              ? " · client reviewed"
               : m.submitted_at
-                ? " · awaiting client"
-                : ""}
+                ? " · waiting for client review"
+                : workStarted
+                  ? " · send photo when this stage is done"
+                  : ""}
           </li>
         ))}
         <li>{project.shipped_at ? "✓" : "○"} Outfit sent (after all reviews)</li>
@@ -113,8 +130,40 @@ export default function ProjectSequence({
         </li>
       </ol>
 
-      {ordered.length > 0 && (role === "client" || role === "artisan") && (
-        <ul className="space-y-3 mb-3">
+      {role === "client" && !project.fabric_sent_at && (
+        <>
+          <CourierOpen prompt="Send fabric through (opens GIG or Bolt — nothing is marked until you confirm)" />
+          <ConfirmCourier
+            action={clientSendFabric}
+            projectId={project.id}
+            prompt="Only after the rider has the fabric: I sent it through"
+          />
+        </>
+      )}
+
+      {role === "artisan" &&
+        project.fabric_sent_at &&
+        !project.fabric_received_at && (
+          <form action={artisanConfirmFabric} className="mt-2">
+            <input type="hidden" name="projectId" value={project.id} />
+            <p className="text-xs text-ink/60 mb-2">
+              Confirm only when the fabric is in your hands.
+            </p>
+            <button
+              type="submit"
+              className="text-xs bg-royal text-paper rounded-full px-3 py-1.5"
+            >
+              I received the fabric
+            </button>
+          </form>
+        )}
+
+      {role === "client" &&
+        project.fabric_received_at &&
+        !project.funded_at && <PayProjectButton projectId={project.id} />}
+
+      {workStarted && (role === "client" || role === "artisan") && (
+        <ul className="space-y-3 mb-3 mt-3">
           {ordered.map((m, i) => {
             const mine =
               !m.artisan_id || !viewerId || m.artisan_id === viewerId;
@@ -125,7 +174,6 @@ export default function ProjectSequence({
                   {m.milestone_name ? ` — ${m.milestone_name}` : ""}
                 </p>
                 {role === "artisan" &&
-                  project.funded_at &&
                   mine &&
                   !m.submitted_at &&
                   m.status !== "paid" && (
@@ -137,6 +185,11 @@ export default function ProjectSequence({
                 {role === "artisan" && !mine && (
                   <p className="text-[11px] text-ink/40 mt-1">
                     Assigned to another artisan
+                  </p>
+                )}
+                {role === "artisan" && m.submitted_at && !m.confirmed_at && (
+                  <p className="text-[11px] text-ink/50 mt-1">
+                    Waiting for the client to review this stage.
                   </p>
                 )}
                 {role === "client" && (
@@ -154,17 +207,13 @@ export default function ProjectSequence({
         </ul>
       )}
 
-      {role === "client" && !project.fabric_sent_at && (
-        <CourierForms
-          action={clientSendFabric}
-          projectId={project.id}
-          prompt="Send fabric through"
-        />
-      )}
-
-      {role === "client" &&
+      {role === "artisan" &&
         project.fabric_received_at &&
-        !project.funded_at && <PayProjectButton projectId={project.id} />}
+        !project.funded_at && (
+          <p className="text-xs text-ink/50 mt-2">
+            Waiting for the client to pay. Then you can send milestone photos.
+          </p>
+        )}
 
       {role === "client" &&
         project.shipped_at &&
@@ -180,33 +229,20 @@ export default function ProjectSequence({
           </form>
         )}
 
-      {role === "artisan" &&
-        project.fabric_sent_at &&
-        !project.fabric_received_at && (
-          <form action={artisanConfirmFabric}>
-            <input type="hidden" name="projectId" value={project.id} />
-            <button
-              type="submit"
-              className="text-xs bg-royal text-paper rounded-full px-3 py-1.5"
-            >
-              Confirm fabric received
-            </button>
-          </form>
-        )}
-
       {role === "artisan" && allReviewed && !project.shipped_at && (
-        <CourierForms
-          action={artisanShipProject}
-          projectId={project.id}
-          prompt="Send outfit through"
-        />
+        <>
+          <CourierOpen prompt="Send outfit through (opens GIG or Bolt — mark sent only after it has gone)" />
+          <ConfirmCourier
+            action={artisanShipProject}
+            projectId={project.id}
+            prompt="I have sent the outfit through"
+          />
+        </>
       )}
 
       {role === "admin" && (
         <p className="text-[11px] text-ink/45">
-          Assign a different artisan per milestone if needed (premium / extra
-          hands). Client reviews each milestone before shipping. Payout when
-          received.
+          Client reviews each milestone before shipping. Payout when received.
         </p>
       )}
     </div>
