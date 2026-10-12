@@ -49,7 +49,7 @@ export default async function ArtisanAccount() {
     .maybeSingle();
 
   const service = createServiceClient();
-  const email = (user.email || profile?.email || "").toLowerCase();
+  const email = (user.email || "").toLowerCase();
 
   const { data: emailProfiles } = email
     ? await service.from("profiles").select("id").ilike("email", email)

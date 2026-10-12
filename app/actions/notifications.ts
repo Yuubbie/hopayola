@@ -2,9 +2,12 @@
 
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 export async function notifyWaitlistSignup(email: string, interest: string) {
+  if (!resend) return;
   try {
     await resend.emails.send({
       from: "Hopayola Waitlist <notifications@mail.hopayola.com>",
@@ -20,7 +23,12 @@ Interest: ${interest}`,
   }
 }
 
-export async function notifySignup(fullName: string, email: string, accountType: "client" | "artisan") {
+export async function notifySignup(
+  fullName: string,
+  email: string,
+  accountType: "client" | "artisan"
+) {
+  if (!resend) return;
   try {
     await resend.emails.send({
       from: "Hopayola Sign-ups <notifications@mail.hopayola.com>",
@@ -36,7 +44,13 @@ Email: ${email}`,
   }
 }
 
-export async function notifyProjectSubmission(clientName: string, clientEmail: string, garmentType: string, occasion: string) {
+export async function notifyProjectSubmission(
+  clientName: string,
+  clientEmail: string,
+  garmentType: string,
+  occasion: string
+) {
+  if (!resend) return;
   try {
     await resend.emails.send({
       from: "Hopayola Projects <notifications@mail.hopayola.com>",
