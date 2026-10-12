@@ -3,10 +3,6 @@
 import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
 export async function submitInquiry(formData: FormData) {
   const fullName = formData.get("fullName") as string;
   const email = formData.get("email") as string;
@@ -27,8 +23,9 @@ export async function submitInquiry(formData: FormData) {
   });
 
   try {
-    if (!resend) return;
-    await resend.emails.send({
+    const key = process.env.RESEND_API_KEY;
+    if (!key) return;
+    await new Resend(key).emails.send({
       from: "Hopayola Contact Form <notifications@mail.hopayola.com>",
       to: "hopeayoolaoluwa@gmail.com",
       replyTo: email,

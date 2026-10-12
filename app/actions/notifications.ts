@@ -2,11 +2,14 @@
 
 import { Resend } from "resend";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+function mail() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  return new Resend(key);
+}
 
 export async function notifyWaitlistSignup(email: string, interest: string) {
+  const resend = mail();
   if (!resend) return;
   try {
     await resend.emails.send({
@@ -28,6 +31,7 @@ export async function notifySignup(
   email: string,
   accountType: "client" | "artisan"
 ) {
+  const resend = mail();
   if (!resend) return;
   try {
     await resend.emails.send({
@@ -50,6 +54,7 @@ export async function notifyProjectSubmission(
   garmentType: string,
   occasion: string
 ) {
+  const resend = mail();
   if (!resend) return;
   try {
     await resend.emails.send({

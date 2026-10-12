@@ -4,10 +4,6 @@ import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { scanChatMessage } from "@/lib/chat-guard";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
 export async function sendHelpEnquiry(input: {
   name: string;
   email: string;
@@ -36,8 +32,9 @@ export async function sendHelpEnquiry(input: {
   });
 
   try {
-    if (!resend) return { ok: true as const };
-    await resend.emails.send({
+    const key = process.env.RESEND_API_KEY;
+    if (!key) return { error: null };
+    await new Resend(key).emails.send({
       from: "Hopayola Help <notifications@mail.hopayola.com>",
       to: "hopeayoolaoluwa@gmail.com",
       replyTo: email,
