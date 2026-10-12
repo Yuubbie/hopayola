@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +14,24 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const code = hash.get("error_code") || q.get("error_code");
+    const desc = hash.get("error_description") || q.get("error_description");
+    if (code === "otp_expired" || (desc && desc.includes("expired"))) {
+      setError(
+        "This reset link is invalid or has expired. Request a new one — open it once, soon after it arrives."
+      );
+      return;
+    }
+    if (q.get("error") === "confirmation_failed") {
+      setError(
+        "That email link didn’t complete. Request a new reset and open the latest mail."
+      );
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
