@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { claimProject } from "./actions";
 import MilestoneSubmitForm from "@/components/milestone-submit-form";
 import ProjectChat from "@/components/ProjectChat";
@@ -34,9 +35,9 @@ export default async function ArtisanAccount() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("*")
+    .select("full_name, role")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   if (profile?.role !== "artisan") {
     redirect("/account");
@@ -46,26 +47,55 @@ export default async function ArtisanAccount() {
     .from("artisan_profiles")
     .select("*")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
-  const { data: openProjects } = await supabase
+  const service = createServiceClient();
+  const email = (user.email || profile?.email || "").toLowerCase();
+
+  const { data: emailProfiles } = email
+    ? await service.from("profiles").select("id").ilike("email", email)
+    : { data: [] as { id: string }[] };
+  const artisanIds = Array.from(
+    new Set([user.id, ...(emailProfiles || []).map((p) => p.id)])
+  );
+
+  const { data: teamRows } = await service
+    .from("project_team_members")
+    .select("project_id, artisan_id")
+    .in("artisan_id", artisanIds);
+
+  const assignedIds = Array.from(
+    new Set((teamRows || []).map((a) => a.project_id).filter(Boolean))
+  );
+
+  const { data: assignedProjects } =
+    assignedIds.length > 0
+      ? await service.from("projects").select("*").in("id", assignedIds)
+      : { data: [] as Record<string, unknown>[] };
+
+  const projectById = new Map(
+    (assignedProjects || []).map((p: { id: string }) => [p.id, p])
+  );
+  const myAssignments = assignedIds.map((project_id) => ({
+    project_id,
+    projects: projectById.get(project_id) || null,
+  }));
+
+  const { data: openProjects } = await service
     .from("projects")
     .select("*")
-    .in("status", ["submitted", "concept_selected"])
+    .in("status", ["submitted", "concepts_ready", "concept_selected"])
     .eq("region", artisanProfile?.region || "abuja")
     .order("created_at", { ascending: false });
 
-  const { data: myAssignments } = await supabase
-    .from("project_team_members")
-    .select("project_id, projects(*)")
-    .eq("artisan_id", user.id);
-
-  const assignedIds = (myAssignments || []).map((a: any) => a.project_id);
-  const { data: myMilestones } = await supabase
-    .from("project_milestones")
-    .select("*")
-    .in("project_id", assignedIds.length > 0 ? assignedIds : ["none"])
-    .order("milestone_order", { ascending: true });
+  const { data: myMilestones } =
+    assignedIds.length > 0
+      ? await service
+          .from("project_milestones")
+          .select("*")
+          .in("project_id", assignedIds)
+          .order("milestone_order", { ascending: true })
+      : { data: [] as { project_id: string }[] };
 
   const milestonesByProject = new Map<string, any[]>();
   for (const m of myMilestones || []) {
@@ -84,9 +114,14 @@ export default async function ArtisanAccount() {
       </p>
 
       <div className="space-y-6">
-        {myAssignments && myAssignments.length > 0 && (
-          <section className="border border-stone rounded-2xl p-6">
+        <section className="border border-stone rounded-2xl p-6">
             <h2 className="font-display text-lg mb-4">Your claimed projects</h2>
+            {myAssignments.length === 0 ? (
+              <p className="text-ink/50 text-sm">
+                No claimed jobs on this login yet. If Hope assigned you in
+                admin, they should appear here after a refresh.
+              </p>
+            ) : (
             <ul className="space-y-3">
               {myAssignments.map((a: any) => (
                 <li key={a.project_id} className="border border-stone rounded-xl p-4">
@@ -133,8 +168,8 @@ export default async function ArtisanAccount() {
                 </li>
               ))}
             </ul>
+            )}
           </section>
-        )}
 
         <section className="border border-stone rounded-2xl p-6">
           <h2 className="font-display text-lg mb-4">Open projects near you</h2>
