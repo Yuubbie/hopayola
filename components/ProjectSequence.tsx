@@ -34,32 +34,35 @@ type Milestone = {
 function CourierForms({
   action,
   projectId,
-  label,
+  prompt,
 }: {
   action: (formData: FormData) => Promise<void>;
   projectId: string;
-  label: string;
+  prompt: string;
 }) {
   return (
-    <div className="flex flex-wrap gap-2 mt-2">
-      {(["gig", "bolt"] as const).map((c) => (
-        <form
-          key={c}
-          action={action}
-          onSubmit={() => {
-            window.open(COURIER_LINKS[c], "_blank", "noopener,noreferrer");
-          }}
-        >
-          <input type="hidden" name="projectId" value={projectId} />
-          <input type="hidden" name="courier" value={c} />
-          <button
-            type="submit"
-            className="text-xs bg-royal text-paper rounded-full px-3 py-1.5"
+    <div className="mt-2">
+      <p className="text-xs text-ink/60 mb-2">{prompt}</p>
+      <div className="flex flex-wrap gap-2">
+        {(["gig", "bolt"] as const).map((c) => (
+          <form
+            key={c}
+            action={action}
+            onSubmit={() => {
+              window.open(COURIER_LINKS[c], "_blank", "noopener,noreferrer");
+            }}
           >
-            {label} via {c.toUpperCase()}
-          </button>
-        </form>
-      ))}
+            <input type="hidden" name="projectId" value={projectId} />
+            <input type="hidden" name="courier" value={c} />
+            <button
+              type="submit"
+              className="text-xs bg-royal text-paper rounded-full px-3 py-1.5"
+            >
+              {c === "gig" ? "GIG" : "Bolt"}
+            </button>
+          </form>
+        ))}
+      </div>
     </div>
   );
 }
@@ -155,7 +158,7 @@ export default function ProjectSequence({
         <CourierForms
           action={clientSendFabric}
           projectId={project.id}
-          label="I sent fabric"
+          prompt="Send fabric through"
         />
       )}
 
@@ -195,7 +198,7 @@ export default function ProjectSequence({
         <CourierForms
           action={artisanShipProject}
           projectId={project.id}
-          label="I sent the outfit"
+          prompt="Send outfit through"
         />
       )}
 
