@@ -195,11 +195,11 @@ export default async function Account({
                     )}
 
                     {!p.funded_at && p.status !== "cancelled" && (
-                      <form action={clientCancelProject} className="mt-2">
+                      <form action={clientCancelProject} className="mt-3">
                         <input type="hidden" name="projectId" value={p.id} />
                         <button
                           type="submit"
-                          className="text-[11px] text-ink/40 hover:text-red-700"
+                          className="text-xs border border-ink/20 rounded-full px-3 py-1.5 text-ink/70 hover:border-red-700 hover:text-red-700"
                         >
                           Delete this project
                         </button>

@@ -65,11 +65,6 @@ export default function SignIn() {
             />
 
             {error && <p className="text-sm text-red-600">{error}</p>}
-            <p className="text-sm">
-              <Link href="/forgot-password" className="text-royal hover:text-royal-deep">
-                Forgot password?
-              </Link>
-            </p>
 
             <button
               type="submit"
@@ -79,6 +74,15 @@ export default function SignIn() {
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
+
+          <p className="text-sm text-center mt-4">
+            <Link
+              href="/forgot-password"
+              className="text-royal hover:text-royal-deep underline underline-offset-2"
+            >
+              Forgot password?
+            </Link>
+          </p>
 
           <p className="text-sm text-ink/60 mt-6">
             Don&apos;t have an account?{" "}
