@@ -27,11 +27,28 @@ export default function ArtisanSignUp() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [resendNote, setResendNote] = useState<string | null>(null);
   const supabase = createClient();
 
   function toggleSpecialty(value: string) {
     setSpecialty((prev) =>
       prev.includes(value) ? prev.filter((s) => s !== value) : [...prev, value]
+    );
+  }
+
+  async function resendConfirmation() {
+    setResendNote(null);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    setResendNote(
+      error
+        ? error.message
+        : "Sent again. Open the newest email, and check spam."
     );
   }
 
@@ -89,6 +106,16 @@ export default function ArtisanSignUp() {
                 We sent a confirmation link to <strong>{email}</strong>.
                 Click it to activate your artisan profile.
               </p>
+              <button
+                type="button"
+                onClick={resendConfirmation}
+                className="mt-6 text-sm text-royal underline underline-offset-2"
+              >
+                Didn&apos;t get it? Send again
+              </button>
+              {resendNote && (
+                <p className="text-sm text-ink/60 mt-2">{resendNote}</p>
+              )}
             </div>
           ) : (
             <>

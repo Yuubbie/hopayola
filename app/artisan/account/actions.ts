@@ -1,10 +1,14 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
+
+const DASHBOARD = "/artisan/account";
 
 export async function claimProject(formData: FormData) {
-  const projectId = formData.get("projectId") as string;
+  const projectId = String(formData.get("projectId") || "");
 
   const supabase = await createClient();
   const {
@@ -12,49 +16,69 @@ export async function claimProject(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    throw new Error("Not signed in.");
+    redirect("/sign-in");
   }
 
-  const { data: artisanProfile } = await supabase
+  const service = createServiceClient();
+
+  const { data: artisanProfile } = await service
     .from("artisan_profiles")
     .select("specialty")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
-  const roleOnProject = artisanProfile?.specialty?.[0] || "general";
+  if (!artisanProfile) {
+    redirect(`${DASHBOARD}?claim=not_artisan`);
+  }
 
-  const { data: teamRow, error: teamError } = await supabase
+  const { data: project } = await service
+    .from("projects")
+    .select("id, status")
+    .eq("id", projectId)
+    .maybeSingle();
+
+  if (!project) {
+    redirect(`${DASHBOARD}?claim=missing`);
+  }
+
+  const { data: existing } = await service
+    .from("project_team_members")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("artisan_id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    revalidatePath(DASHBOARD);
+    redirect(`${DASHBOARD}?claim=already`);
+  }
+
+  const claimable = ["submitted", "concepts_ready", "concept_selected"];
+  if (!claimable.includes(project.status)) {
+    redirect(`${DASHBOARD}?claim=taken`);
+  }
+
+  const roleOnProject = artisanProfile.specialty?.[0] || "general";
+
+  const { error: teamError } = await service
     .from("project_team_members")
     .insert({
       project_id: projectId,
       artisan_id: user.id,
       role_on_project: roleOnProject,
-    })
-    .select();
+    });
 
   if (teamError) {
-    throw new Error(`Could not claim project: ${teamError.message}`);
+    redirect(`${DASHBOARD}?claim=failed`);
   }
 
-  if (!teamRow || teamRow.length === 0) {
-    throw new Error("Claim was blocked - this project may already be taken.");
-  }
-
-  const { data: statusRow, error: statusError } = await supabase
+  await service
     .from("projects")
     .update({ status: "artisan_assigned" })
-    .eq("id", projectId)
-    .select();
+    .eq("id", projectId);
 
-  if (statusError) {
-    throw new Error(`Claimed, but could not update status: ${statusError.message}`);
-  }
-
-  if (!statusRow || statusRow.length === 0) {
-    throw new Error("Status update was blocked - someone may have claimed this first.");
-  }
-
-  revalidatePath("/artisan/account");
+  revalidatePath(DASHBOARD);
   revalidatePath("/fashion");
   revalidatePath("/fashion/hire-a-talent");
+  redirect(`${DASHBOARD}?claim=ok`);
 }

@@ -12,6 +12,8 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [unconfirmed, setUnconfirmed] = useState(false);
+  const [resendNote, setResendNote] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -37,6 +39,7 @@ export default function SignIn() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setResendNote(null);
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -47,10 +50,27 @@ export default function SignIn() {
 
     if (error) {
       setError(error.message);
+      setUnconfirmed(/confirm/i.test(error.message));
       return;
     }
 
     router.push("/account");
+  }
+
+  async function resendConfirmation() {
+    setResendNote(null);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    setResendNote(
+      error
+        ? error.message
+        : "Confirmation email sent. Open the newest one, and check spam."
+    );
   }
 
   return (
@@ -83,6 +103,19 @@ export default function SignIn() {
             />
 
             {error && <p className="text-sm text-red-600">{error}</p>}
+
+            {unconfirmed && (
+              <div className="text-sm">
+                <button
+                  type="button"
+                  onClick={resendConfirmation}
+                  className="text-royal underline underline-offset-2"
+                >
+                  Resend confirmation email
+                </button>
+                {resendNote && <p className="text-ink/60 mt-2">{resendNote}</p>}
+              </div>
+            )}
 
             <button
               type="submit"

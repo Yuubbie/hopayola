@@ -22,7 +22,12 @@ function formatDate(value: string | null) {
   });
 }
 
-export default async function ArtisanAccount() {
+export default async function ArtisanAccount({
+  searchParams,
+}: {
+  searchParams: Promise<{ claim?: string }>;
+}) {
+  const { claim } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -111,6 +116,24 @@ export default async function ArtisanAccount() {
       <p className="text-ink/60 mb-12">
         Your jobs, payout status, and open projects in your area.
       </p>
+
+      {claim && (
+        <p
+          className={`mb-8 text-sm border rounded-2xl px-4 py-3 ${
+            claim === "ok"
+              ? "border-green-300 text-green-800 bg-green-50"
+              : "border-stone text-ink/70"
+          }`}
+        >
+          {claim === "ok" && "Project claimed. It is now under your claimed projects."}
+          {claim === "already" && "You have already claimed this project."}
+          {claim === "taken" && "Another artisan has already claimed this one."}
+          {claim === "not_artisan" &&
+            "Only artisan accounts can claim. Finish your artisan sign-up first."}
+          {claim === "missing" && "That project no longer exists."}
+          {claim === "failed" && "Could not claim just now. Please try again."}
+        </p>
+      )}
 
       <div className="space-y-6">
         <section className="border border-stone rounded-2xl p-6">
