@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -21,12 +21,79 @@ type Props = {
   concepts: Concept[];
 };
 
+const PLACEHOLDER = "/images/concept-placeholder.svg";
+
+function needsImage(c: Concept) {
+  return !c.image_url || c.image_url.includes("concept-placeholder");
+}
+
+type Phase = "pending" | "generating" | "ready" | "failed";
+
 export default function ConceptSelectionForm({ projectId, concepts }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const [phase, setPhase] = useState<Record<string, Phase>>(() =>
+    Object.fromEntries(
+      concepts.map((c) => [c.id, needsImage(c) ? "pending" : "ready"])
+    )
+  );
+
+  const started = useRef(false);
+
+  function setOne(id: string, p: Phase) {
+    setPhase((prev) => ({ ...prev, [id]: p }));
+  }
+
+  async function generateOne(conceptId: string) {
+    setOne(conceptId, "generating");
+    try {
+      const res = await fetch("/api/concepts/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conceptId }),
+      });
+      const json = await res.json();
+      if (!res.ok || json?.error) {
+        setOne(conceptId, "failed");
+        return { error: String(json?.error || "Could not generate.") };
+      }
+      setUrls((prev) => ({ ...prev, [conceptId]: json.url }));
+      setOne(conceptId, "ready");
+      return { ok: true };
+    } catch {
+      setOne(conceptId, "failed");
+      return { error: "Could not reach the image service." };
+    }
+  }
+
+  async function generateAll() {
+    const queue = concepts.filter(needsImage);
+    if (queue.length === 0) return;
+
+    for (let i = 0; i < queue.length; i++) {
+      const concept = queue[i];
+      setNote(`Drawing concept ${i + 1} of ${queue.length}...`);
+      const result = await generateOne(concept.id);
+      if (result?.error) {
+        setNote(result.error);
+        if (/not configured/i.test(result.error)) return;
+      }
+    }
+    setNote(null);
+  }
+
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    void generateAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleSelect(conceptId: string) {
     setError(null);
@@ -66,6 +133,8 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
     }
   }
 
+  const readyCount = concepts.filter((c) => phase[c.id] === "ready").length;
+
   return (
     <div>
       {error && (
@@ -74,40 +143,87 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
         </p>
       )}
 
+      {(note || readyCount < concepts.length) && (
+        <p className="text-sm text-ink/60 mb-6">
+          {note ||
+            `${readyCount} of ${concepts.length} concepts ready. This can take a moment.`}
+        </p>
+      )}
+
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-        {concepts.map((c) => (
-          <div
-            key={c.id}
-            className="border border-stone rounded-2xl overflow-hidden flex flex-col"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={c.image_url || "/images/concept-placeholder.svg"}
-              alt={`Concept ${c.concept_number}`}
-              className="w-full aspect-[4/5] object-cover"
-            />
+        {concepts.map((c) => {
+          const p = phase[c.id];
+          const image = urls[c.id] || c.image_url || PLACEHOLDER;
+          return (
+            <div
+              key={c.id}
+              className="border border-stone rounded-2xl overflow-hidden flex flex-col"
+            >
+              <div className="relative aspect-[4/5] bg-stone/20">
+                {p === "ready" ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={image}
+                    alt={`Concept ${c.concept_number}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-center px-4">
+                    <span
+                      className={`h-6 w-6 rounded-full border-2 border-royal/30 border-t-royal ${
+                        p === "generating" ? "animate-spin" : "opacity-40"
+                      }`}
+                    />
+                    <p className="text-xs text-ink/50">
+                      {p === "generating"
+                        ? "Drawing this concept..."
+                        : p === "failed"
+                          ? "Could not be drawn"
+                          : "Waiting to be drawn"}
+                    </p>
+                    {p === "failed" && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setNote("Trying again...");
+                          const r = await generateOne(c.id);
+                          setNote(r?.error || null);
+                        }}
+                        className="text-xs text-royal underline underline-offset-2"
+                      >
+                        Try again
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
 
-            <div className="p-4 flex-1 flex flex-col">
-              <p className="text-sm font-medium mb-1">
-                Concept {c.concept_number}
-              </p>
-              <p className="text-xs text-ink/50 mb-1">{c.persona}</p>
-              <p className="text-xs text-ink/50 mb-4">
-                {c.silhouette}
-                {c.neckline ? ` | ${c.neckline}` : ""}
-                {c.sleeve_style ? ` | ${c.sleeve_style}` : ""}
-              </p>
+              <div className="p-4 flex-1 flex flex-col">
+                <p className="text-sm font-medium mb-1">
+                  Concept {c.concept_number}
+                </p>
+                <p className="text-xs text-ink/50 mb-1">{c.persona}</p>
+                <p className="text-xs text-ink/50 mb-4">
+                  {c.silhouette}
+                  {c.neckline ? ` | ${c.neckline}` : ""}
+                  {c.sleeve_style ? ` | ${c.sleeve_style}` : ""}
+                </p>
 
-              <button
-                onClick={() => handleSelect(c.id)}
-                disabled={saving !== null}
-                className="mt-auto w-full bg-royal text-paper rounded-lg py-2 text-sm hover:bg-royal-deep transition-colors disabled:opacity-50"
-              >
-                {saving === c.id ? "Selecting..." : "Choose this concept"}
-              </button>
+                <button
+                  onClick={() => handleSelect(c.id)}
+                  disabled={saving !== null || p !== "ready"}
+                  className="mt-auto w-full bg-royal text-paper rounded-lg py-2 text-sm hover:bg-royal-deep transition-colors disabled:opacity-50"
+                >
+                  {saving === c.id
+                    ? "Selecting..."
+                    : p === "ready"
+                      ? "Choose this concept"
+                      : "Please wait..."}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

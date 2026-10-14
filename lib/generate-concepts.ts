@@ -1,6 +1,5 @@
 import { createServiceClient } from "@/lib/supabase/service";
 
-const PLACEHOLDER_IMAGE = "/images/concept-placeholder.svg";
 const PERSONAS = [
   "Modern Minimalist",
   "Classic Elegance",
@@ -14,6 +13,10 @@ const SILHOUETTES = ["Fitted", "A-line", "Draped", "Structured", "Flowing"];
 const NECKLINES = ["V-neck", "Round neck", "Off-shoulder", "High neck", "Sweetheart"];
 const SLEEVES = ["Sleeveless", "Cap sleeve", "Long sleeve", "Puff sleeve", "Three-quarter"];
 
+/**
+ * Creates the concept rows for a project. Images are generated later, on
+ * demand, from the concepts page — so this stays fast and costs nothing.
+ */
 export async function generateConceptsForProject(
   projectId: string,
   tier: string
@@ -35,7 +38,7 @@ export async function generateConceptsForProject(
     embellishment: i % 3 === 0 ? "Beaded detail" : "Minimal",
     sleeve_style: SLEEVES[i % SLEEVES.length],
     neckline: NECKLINES[i % NECKLINES.length],
-    image_url: PLACEHOLDER_IMAGE,
+    image_url: null,
     is_selected: false,
   }));
 
