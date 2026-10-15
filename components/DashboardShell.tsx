@@ -6,7 +6,33 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-const LINKS = [
+function PremiumPromo() {
+  return (
+    <div className="rounded-2xl overflow-hidden border border-paper/15">
+      <Image
+        src="/images/marquee-4.jpg"
+        alt=""
+        width={400}
+        height={220}
+        className="w-full h-28 object-cover"
+      />
+      <div className="p-4 bg-paper/10">
+        <p className="font-display text-sm mb-1">Premium concepts</p>
+        <p className="text-[11px] text-paper/70 leading-relaxed mb-3">
+          Seven drawn looks instead of three, for bigger occasions.
+        </p>
+        <Link
+          href="/projects/new?tier=premium"
+          className="block text-center text-xs bg-paper text-royal rounded-full px-3 py-2 font-medium"
+        >
+          Choose Premium
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+const CLIENT_LINKS = [
   { href: "/account", label: "Dashboard", exact: true },
   { href: "/account#projects", label: "My projects" },
   { href: "/projects/new", label: "New project" },
@@ -18,11 +44,24 @@ const LINKS = [
   { href: "/account/settings", label: "Settings" },
 ];
 
+type NavLink = {
+  href: string;
+  label: string;
+  exact?: boolean;
+  external?: boolean;
+};
+
 export default function DashboardShell({
   userName,
+  roleLabel = "Client",
+  links = CLIENT_LINKS,
+  promo = <PremiumPromo />,
   children,
 }: {
   userName: string;
+  roleLabel?: string;
+  links?: NavLink[];
+  promo?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -48,7 +87,7 @@ export default function DashboardShell({
 
   const nav = (
     <nav className="space-y-1">
-      {LINKS.map((link) =>
+      {links.map((link) =>
         link.external ? (
           <a
             key={link.href}
@@ -89,27 +128,7 @@ export default function DashboardShell({
         </Link>
         {nav}
         <div className="mt-auto pt-8">
-          <div className="rounded-2xl overflow-hidden border border-paper/15">
-            <Image
-              src="/images/marquee-4.jpg"
-              alt=""
-              width={400}
-              height={220}
-              className="w-full h-28 object-cover"
-            />
-            <div className="p-4 bg-paper/10">
-              <p className="font-display text-sm mb-1">Premium concepts</p>
-              <p className="text-[11px] text-paper/70 leading-relaxed mb-3">
-                Seven drawn looks instead of three, for bigger occasions.
-              </p>
-              <Link
-                href="/projects/new?tier=premium"
-                className="block text-center text-xs bg-paper text-royal rounded-full px-3 py-2 font-medium"
-              >
-                Choose Premium
-              </Link>
-            </div>
-          </div>
+          {promo !== null && promo}
           <button
             type="button"
             onClick={handleSignOut}
@@ -163,7 +182,7 @@ export default function DashboardShell({
                 </span>
                 <span className="hidden lg:block text-sm">
                   <span className="block leading-tight">{userName || "Client"}</span>
-                  <span className="block text-[11px] text-ink/40">Client</span>
+                  <span className="block text-[11px] text-ink/40">{roleLabel}</span>
                 </span>
               </span>
             </div>

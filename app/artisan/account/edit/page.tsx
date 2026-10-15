@@ -30,7 +30,7 @@ export default async function EditArtisanProfile() {
     .single();
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-24">
+    <div className="max-w-2xl">
       <h1 className="font-display text-3xl mb-2">Edit your profile</h1>
       <p className="text-ink/60 mb-12">
         Update your details so clients and the matching system have the
@@ -55,6 +55,6 @@ export default async function EditArtisanProfile() {
           initialAccountName={artisanProfile?.bank_account_name || null}
         />
       </div>
-    </main>
+        </div>
   );
 }
