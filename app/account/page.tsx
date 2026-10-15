@@ -35,6 +35,7 @@ type ProjectRow = {
   fabric_sent_at: string | null;
   fabric_received_at: string | null;
   funded_at: string | null;
+  client_marked_paid_at: string | null;
   shipped_at: string | null;
   client_received_at: string | null;
   budget_min: number | null;
@@ -210,7 +211,9 @@ export default async function Account({
     }
     if (p.fabric_received_at && !p.funded_at) {
       todo.push({
-        label: "Set up the held payment",
+        label: p.client_marked_paid_at
+          ? "Payment with Hopayola for confirmation"
+          : "Set up the held payment",
         href: `/account/projects/${p.id}`,
         project: p,
       });

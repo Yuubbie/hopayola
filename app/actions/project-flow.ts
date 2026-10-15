@@ -5,9 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import { runMilestonePayout } from "@/lib/run-milestone-payout";
 
 function revalidate(projectId: string) {
-  revalidatePath("/account");
-  revalidatePath("/artisan/account");
-  revalidatePath("/admin/projects");
+  // "layout" also clears every page nested under the dashboards, so a stage
+  // submitted on one side shows up on the other without a hard refresh.
+  revalidatePath("/account", "layout");
+  revalidatePath("/artisan/account", "layout");
+  revalidatePath("/admin", "layout");
   revalidatePath(`/admin/projects/${projectId}`);
 }
 
@@ -90,6 +92,85 @@ export async function artisanConfirmFabric(formData: FormData) {
     })
     .eq("id", projectId);
   if (error) throw new Error(error.message);
+  revalidate(projectId);
+}
+
+export async function clientMarkPaid(formData: FormData) {
+  const projectId = String(formData.get("projectId") || "");
+  const note = String(formData.get("note") || "")
+    .trim()
+    .slice(0, 300);
+  const { supabase, user } = await load();
+
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id, funded_at, fabric_received_at")
+    .eq("id", projectId)
+    .eq("client_id", user.id)
+    .maybeSingle();
+
+  if (!project) throw new Error("Project not found.");
+  if (project.funded_at) return;
+  if (!project.fabric_received_at) {
+    throw new Error("Wait until your fabric has reached the artisan.");
+  }
+
+  const { error } = await supabase
+    .from("projects")
+    .update({
+      client_marked_paid_at: new Date().toISOString(),
+      client_marked_paid_note: note || null,
+    })
+    .eq("id", projectId)
+    .eq("client_id", user.id);
+
+  if (error) throw new Error(error.message);
+  revalidate(projectId);
+}
+
+/**
+ * Hopayola confirming money actually arrived. This is the only manual path that
+ * sets funded_at, because funded_at is what unlocks artisan payouts.
+ */
+export async function adminConfirmPayment(formData: FormData) {
+  const projectId = String(formData.get("projectId") || "");
+  const { user, role } = await load();
+  if (role !== "admin") throw new Error("Not allowed.");
+
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
+
+  const { data: project } = await service
+    .from("projects")
+    .select("id, funded_at, budget_min, budget_max")
+    .eq("id", projectId)
+    .maybeSingle();
+
+  if (!project) throw new Error("Project not found.");
+  if (project.funded_at) return;
+
+  const now = new Date().toISOString();
+  const subtotal = Number(project.budget_max || project.budget_min || 0);
+
+  const { error } = await service
+    .from("projects")
+    .update({
+      funded_at: now,
+      funded_subtotal: subtotal || null,
+      payment_confirmed_at: now,
+      payment_confirmed_by: user.id,
+    })
+    .eq("id", projectId)
+    .is("funded_at", null);
+  if (error) throw new Error(error.message);
+
+  const { error: msError } = await service
+    .from("project_milestones")
+    .update({ funded_at: now })
+    .eq("project_id", projectId)
+    .is("funded_at", null);
+  if (msError) throw new Error(msError.message);
+
   revalidate(projectId);
 }
 

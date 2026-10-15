@@ -103,6 +103,14 @@ export default async function AdminProjects() {
                   </span>
                 </div>
 
+                {p.client_marked_paid_at && !p.funded_at && (
+                  <p className="text-xs text-royal-deep bg-royal/10 border border-royal/20 rounded-lg px-3 py-2 mb-3">
+                    Client marked this as paid on{" "}
+                    {new Date(p.client_marked_paid_at).toLocaleDateString("en-GB")} —
+                    open the project to confirm it.
+                  </p>
+                )}
+
                 <p className="text-ink/50 text-xs mb-3">
                   Client: {p.client?.full_name || "Unknown"}
                   {p.client?.phone ? ` | ${p.client.phone}` : ""}

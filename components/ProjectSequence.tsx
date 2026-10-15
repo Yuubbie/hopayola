@@ -4,6 +4,7 @@ import {
   artisanConfirmFabric,
   artisanShipProject,
   clientMarkReceived,
+  clientMarkPaid,
   clientSendFabric,
 } from "@/app/actions/project-flow";
 import { COURIER_LINKS } from "@/lib/couriers";
@@ -18,6 +19,7 @@ type Project = {
   fabric_received_at?: string | null;
   shipped_at?: string | null;
   client_received_at?: string | null;
+  client_marked_paid_at?: string | null;
   status?: string | null;
 };
 
@@ -110,7 +112,10 @@ export default function ProjectSequence({
         <li>✓ Start / claim</li>
         <li>{project.fabric_sent_at ? "✓" : "○"} Fabric sent</li>
         <li>{project.fabric_received_at ? "✓" : "○"} Fabric received</li>
-        <li>{project.funded_at ? "✓" : "○"} Payment held</li>
+        <li>
+          {project.funded_at ? "✓" : project.client_marked_paid_at ? "◐" : "○"}{" "}
+          Payment held
+        </li>
         {ordered.map((m, i) => (
           <li key={m.id}>
             {m.confirmed_at ? "✓" : m.submitted_at ? "◐" : "○"} Milestone {i + 1}
@@ -160,7 +165,42 @@ export default function ProjectSequence({
 
       {role === "client" &&
         project.fabric_received_at &&
-        !project.funded_at && <PayProjectButton projectId={project.id} />}
+        !project.funded_at && (
+          <div>
+            <PayProjectButton projectId={project.id} />
+            {project.client_marked_paid_at ? (
+              <p className="text-xs text-royal-deep mt-3">
+                You marked this as paid. Hopayola is checking it, then your
+                artisan can start.
+              </p>
+            ) : (
+              <form
+                action={clientMarkPaid}
+                className="mt-3 pt-3 border-t border-stone"
+              >
+                <input type="hidden" name="projectId" value={project.id} />
+                <p className="text-xs text-ink/55 mb-2">
+                  Paid another way, like bank transfer or cash? Tell us here and
+                  Hopayola will confirm it.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <input
+                    name="note"
+                    type="text"
+                    placeholder="How you paid"
+                    className="flex-1 min-w-[150px] border border-stone rounded-lg px-3 py-1.5 text-xs"
+                  />
+                  <button
+                    type="submit"
+                    className="text-xs border border-royal text-royal rounded-full px-3 py-1.5 hover:bg-royal hover:text-paper transition-colors"
+                  >
+                    I have paid
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
 
       {workStarted && (role === "client" || role === "artisan") && (
         <ul className="space-y-3 mb-3 mt-3">
@@ -211,7 +251,9 @@ export default function ProjectSequence({
         project.fabric_received_at &&
         !project.funded_at && (
           <p className="text-xs text-ink/50 mt-2">
-            Waiting for the client to pay. Then you can send milestone photos.
+            {project.client_marked_paid_at
+              ? "The client says they have paid. Hopayola is confirming it - photos unlock once it is in."
+              : "Waiting for the client to pay. Then you can send milestone photos."}
           </p>
         )}
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { claimProject } from "./actions";
+import { artisanConfirmFabric } from "@/app/actions/project-flow";
 
 const STATUS_LABELS: Record<string, string> = {
   submitted: "New brief",
@@ -39,6 +40,20 @@ function greeting() {
   if (hour < 12) return "Good morning";
   if (hour < 17) return "Good afternoon";
   return "Good evening";
+}
+
+function FabricConfirm({ projectId }: { projectId: string }) {
+  return (
+    <form action={artisanConfirmFabric} className="mt-3">
+      <input type="hidden" name="projectId" value={projectId} />
+      <button
+        type="submit"
+        className="w-full bg-royal text-paper rounded-lg py-2 text-xs font-medium hover:bg-royal-deep transition-colors"
+      >
+        Fabric has arrived
+      </button>
+    </form>
+  );
 }
 
 export const dynamic = "force-dynamic";
@@ -150,7 +165,7 @@ export default async function ArtisanAccount({
     }
   }
 
-  const fabricWaiting = jobs.filter(
+  const fabricToConfirm = jobs.filter(
     (p) => p.fabric_sent_at && !p.fabric_received_at
   );
   const unpaid = jobs.filter((p) => p.fabric_received_at && !p.funded_at);
@@ -331,12 +346,18 @@ export default async function ArtisanAccount({
                           : !p.fabric_received_at
                             ? "Fabric is on the way - confirm when it arrives"
                             : !p.funded_at
-                              ? "Waiting for the client to set up payment"
+                              ? p.client_marked_paid_at
+                                ? "Client says payment is made - Hopayola is confirming"
+                                : "Waiting for the client to set up payment"
                               : nextStage
                                 ? `Next: ${nextStage.milestone_name || `Milestone ${nextStage.milestone_order}`}`
                                 : "All stages approved"}
                         {started ? "" : " · not started"}
                       </p>
+
+                      {p.fabric_sent_at && !p.fabric_received_at && (
+                        <FabricConfirm projectId={p.id} />
+                      )}
 
                       <Link
                         href={`/artisan/account/jobs/${p.id}`}
@@ -424,14 +445,31 @@ export default async function ArtisanAccount({
 
         <aside className="space-y-6">
           <section className="border border-stone rounded-2xl p-5">
-            <h2 className="font-display text-lg mb-4">Send your next photo</h2>
-            {toShoot.length === 0 ? (
+            <h2 className="font-display text-lg mb-4">Needs your action</h2>
+            {toShoot.length === 0 && fabricToConfirm.length === 0 ? (
               <p className="text-sm text-ink/50">
-                Nothing to submit. We&apos;ll list each stage here when the work
-                has started.
+                Nothing waiting on you. Fabric confirmations and stage photos
+                will appear here.
               </p>
             ) : (
               <ul className="space-y-3">
+                {fabricToConfirm.map((p) => (
+                  <li
+                    key={`fabric-${p.id}`}
+                    className="rounded-xl border border-stone p-3"
+                  >
+                    <Link
+                      href={`/artisan/account/jobs/${p.id}`}
+                      className="block text-sm text-ink/80 hover:text-royal"
+                    >
+                      Confirm fabric for {p.garment_type || "Project"}
+                    </Link>
+                    <span className="block text-[11px] text-ink/45 mt-0.5 mb-1">
+                      The rider has it - confirm when it is in your hands.
+                    </span>
+                    <FabricConfirm projectId={p.id} />
+                  </li>
+                ))}
                 {toShoot.slice(0, 4).map(({ milestone, project }) => (
                   <li key={milestone.id}>
                     <Link
@@ -455,18 +493,15 @@ export default async function ArtisanAccount({
 
           <section className="border border-stone rounded-2xl p-5">
             <h2 className="font-display text-lg mb-4">Waiting on the client</h2>
-            {withClient.length === 0 && fabricWaiting.length === 0 && unpaid.length === 0 ? (
+            {withClient.length === 0 && unpaid.length === 0 ? (
               <p className="text-sm text-ink/50">Nothing held up on their side.</p>
             ) : (
               <ul className="space-y-3 text-sm">
-                {fabricWaiting.map((p) => (
-                  <li key={`fabric-${p.id}`} className="text-ink/70">
-                    Fabric on the way - {p.garment_type || "Project"}
-                  </li>
-                ))}
                 {unpaid.map((p) => (
                   <li key={`pay-${p.id}`} className="text-ink/70">
-                    Payment not set up - {p.garment_type || "Project"}
+                    {p.client_marked_paid_at
+                      ? `Client says paid, Hopayola confirming - ${p.garment_type || "Project"}`
+                      : `Payment not set up - ${p.garment_type || "Project"}`}
                   </li>
                 ))}
                 {withClient.slice(0, 4).map(({ milestone, project }) => (

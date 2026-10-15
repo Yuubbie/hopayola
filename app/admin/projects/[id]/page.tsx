@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { addMilestone, updateMilestoneStatus } from "./actions";
 import PayProjectButton from "@/components/pay-project-button";
+import { adminConfirmPayment } from "@/app/actions/project-flow";
 import AdminPayoutButton from "@/components/admin-payout-button";
 import { milestonePayoutLabel } from "@/lib/payments";
 import ProjectChat from "@/components/ProjectChat";
@@ -98,6 +99,34 @@ export default async function AdminProjectDetail({
           <p className="text-sm text-ink/60 mb-2">
             Client has not paid yet. Checkout total is milestone amounts + 5%.
           </p>
+
+          {project.client_marked_paid_at && (
+            <div className="border border-royal/30 bg-royal/5 rounded-xl p-4 mb-4">
+              <p className="text-sm text-royal-deep">
+                The client marked this as paid on{" "}
+                {new Date(project.client_marked_paid_at).toLocaleString("en-GB")}.
+              </p>
+              {project.client_marked_paid_note && (
+                <p className="text-xs text-ink/60 mt-1">
+                  They said: {project.client_marked_paid_note}
+                </p>
+              )}
+              <form action={adminConfirmPayment} className="mt-3">
+                <input type="hidden" name="projectId" value={id} />
+                <button
+                  type="submit"
+                  className="bg-royal text-paper rounded-lg px-4 py-1.5 text-sm hover:bg-royal-deep transition-colors"
+                >
+                  Payment received - unlock the work
+                </button>
+              </form>
+              <p className="text-[11px] text-ink/50 mt-2">
+                Only after you have seen the money. This starts the milestone
+                clock and makes artisan payouts possible.
+              </p>
+            </div>
+          )}
+
           <PayProjectButton projectId={id} />
         </div>
       )}
