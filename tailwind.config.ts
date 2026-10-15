@@ -13,6 +13,7 @@ const config: Config = {
         royal: "#5B2A86",
         "royal-deep": "#3D1D5C",
         plum: "#2E1B4D",
+        lilac: "#D8C2F0",
         stone: "#E8E5DE",
       },
       fontFamily: {

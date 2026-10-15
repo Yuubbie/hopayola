@@ -10,9 +10,9 @@ const steps = [
 
 export default function ProcessStrip() {
   return (
-    <section className="bg-ink text-paper py-20">
+    <section className="bg-plum text-paper py-20">
       <div className="mx-auto max-w-6xl px-6">
-        <p className="text-royal text-sm mb-3">The path</p>
+        <p className="text-paper/60 text-sm mb-3">The path</p>
         <h2 className="font-display text-3xl md:text-4xl mb-12 max-w-2xl">
           Every project moves through the same clear stages
         </h2>
@@ -22,7 +22,7 @@ export default function ProcessStrip() {
               key={step}
               className="rounded-2xl border border-paper/10 bg-paper/5 px-3 py-4 text-center"
             >
-              <div className="font-display italic text-2xl text-royal mb-1">
+              <div className="font-display italic text-2xl text-paper/80 mb-1">
                 {i + 1}
               </div>
               <div className="text-paper/85 text-sm">{step}</div>

@@ -92,7 +92,7 @@ export default function DashboardShell({
           <a
             key={link.href}
             href={link.href}
-            className="block rounded-xl px-4 py-2.5 text-sm text-paper/70 hover:bg-paper/10 hover:text-paper transition-colors"
+            className="block rounded-xl px-4 py-2.5 text-sm text-paper/70 hover:bg-royal hover:text-paper transition-colors"
           >
             {link.label}
           </a>
@@ -103,8 +103,8 @@ export default function DashboardShell({
             onClick={() => setOpen(false)}
             className={`block rounded-xl px-4 py-2.5 text-sm transition-colors ${
               isActive(link.href, link.exact)
-                ? "bg-paper/15 text-paper font-medium"
-                : "text-paper/70 hover:bg-paper/10 hover:text-paper"
+                ? "bg-royal text-paper font-medium"
+                : "text-paper/70 hover:bg-royal hover:text-paper"
             }`}
           >
             {link.label}
@@ -132,7 +132,7 @@ export default function DashboardShell({
           <button
             type="button"
             onClick={handleSignOut}
-            className="mt-4 w-full text-left rounded-xl px-4 py-2.5 text-sm text-paper/70 hover:bg-paper/10 hover:text-paper transition-colors"
+            className="mt-4 w-full text-left rounded-xl px-4 py-2.5 text-sm text-paper/70 hover:bg-royal hover:text-paper transition-colors"
           >
             Sign out
           </button>
@@ -205,7 +205,7 @@ export default function DashboardShell({
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="mt-6 w-full text-left rounded-xl px-4 py-2.5 text-sm text-paper/70"
+                className="mt-6 w-full text-left rounded-xl px-4 py-2.5 text-sm text-paper/70 hover:bg-royal hover:text-paper transition-colors"
               >
                 Sign out
               </button>

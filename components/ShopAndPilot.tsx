@@ -21,7 +21,7 @@ export default function ShopAndPilot() {
         </Link>
       </div>
 
-      <div className="bg-royal text-paper rounded-3xl p-10 flex flex-col justify-between">
+      <div className="bg-plum text-paper rounded-3xl p-10 flex flex-col justify-between">
         <div>
           <h3 className="font-display text-2xl mb-3">
             Currently piloting in Abuja
@@ -33,7 +33,7 @@ export default function ShopAndPilot() {
         </div>
         <Link
           href="/about"
-          className="text-paper underline underline-offset-4 hover:text-paper/70 transition-colors font-medium"
+          className="text-paper underline underline-offset-4 hover:text-lilac transition-colors font-medium"
         >
           Learn about the pilot
         </Link>

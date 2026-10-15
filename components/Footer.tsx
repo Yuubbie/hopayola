@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="bg-ink text-paper mt-32">
+    <footer className="bg-plum text-paper mt-32">
       <div className="mx-auto max-w-6xl px-6 py-16 grid gap-10 md:grid-cols-3">
         <div>
           <p className="font-display text-2xl mb-3">Hopayola</p>
@@ -9,19 +9,19 @@ export default function Footer() {
         <div>
           <p className="text-xs tracking-widest uppercase text-paper/40 mb-3">Explore</p>
           <ul className="space-y-2 text-sm text-paper/80">
-            <li><a href="/about" className="hover:text-royal transition-colors">About</a></li>
-            <li><a href="/fashion" className="hover:text-royal transition-colors">Fashion</a></li>
-            <li><a href="/lifestyle" className="hover:text-royal transition-colors">Lifestyle</a></li>
-            <li><a href="https://shop.hopayola.com" className="hover:text-royal transition-colors">Shop</a></li>
+            <li><a href="/about" className="hover:text-lilac transition-colors">About</a></li>
+            <li><a href="/fashion" className="hover:text-lilac transition-colors">Fashion</a></li>
+            <li><a href="/lifestyle" className="hover:text-lilac transition-colors">Lifestyle</a></li>
+            <li><a href="https://shop.hopayola.com" className="hover:text-lilac transition-colors">Shop</a></li>
           </ul>
         </div>
         <div>
           <p className="text-xs tracking-widest uppercase text-paper/40 mb-3">Account</p>
           <ul className="space-y-2 text-sm text-paper/80">
-            <li><a href="/sign-up" className="hover:text-royal transition-colors">Sign up</a></li>
-            <li><a href="/sign-in" className="hover:text-royal transition-colors">Sign in</a></li>
-            <li><a href="/artisan/sign-up" className="hover:text-royal transition-colors">Artisans, join us</a></li>
-            <li><a href="/terms" className="hover:text-royal transition-colors">Terms &amp; Conditions</a></li>
+            <li><a href="/sign-up" className="hover:text-lilac transition-colors">Sign up</a></li>
+            <li><a href="/sign-in" className="hover:text-lilac transition-colors">Sign in</a></li>
+            <li><a href="/artisan/sign-up" className="hover:text-lilac transition-colors">Artisans, join us</a></li>
+            <li><a href="/terms" className="hover:text-lilac transition-colors">Terms &amp; Conditions</a></li>
           </ul>
         </div>
       </div>
