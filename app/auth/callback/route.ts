@@ -59,7 +59,7 @@ async function finish(
       bio: metadata.artisan_bio || null,
     });
 
-    return NextResponse.redirect(`${origin}/account?welcome=artisan`);
+    return NextResponse.redirect(`${origin}/artisan/account?welcome=1`);
   }
 
   return NextResponse.redirect(`${origin}${next}`);
