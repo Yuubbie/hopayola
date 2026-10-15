@@ -116,7 +116,7 @@ export default function DashboardShell({
 
   return (
     <div className="min-h-screen md:grid md:grid-cols-[260px_1fr] bg-paper">
-      <aside className="hidden md:flex md:flex-col bg-royal text-paper p-6 sticky top-0 h-screen overflow-y-auto">
+      <aside className="hidden md:flex md:flex-col bg-plum text-paper p-6 sticky top-0 h-screen overflow-y-auto">
         <Link href="/" className="block mb-10">
           <Image
             src="/images/logo-wordmark.png"
@@ -191,7 +191,7 @@ export default function DashboardShell({
 
         {open && (
           <div className="md:hidden fixed inset-0 z-50 flex">
-            <div className="w-64 bg-royal text-paper p-6 overflow-y-auto">
+            <div className="w-64 bg-plum text-paper p-6 overflow-y-auto">
               <Link href="/" className="block mb-8">
                 <Image
                   src="/images/logo-wordmark.png"

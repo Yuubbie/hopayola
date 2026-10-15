@@ -12,6 +12,7 @@ const config: Config = {
         paper: "#FAFAF8",
         royal: "#5B2A86",
         "royal-deep": "#3D1D5C",
+        plum: "#2E1B4D",
         stone: "#E8E5DE",
       },
       fontFamily: {
