@@ -118,13 +118,9 @@ export default function DashboardShell({
     <div className="min-h-screen md:grid md:grid-cols-[260px_1fr] bg-paper">
       <aside className="hidden md:flex md:flex-col bg-plum text-paper p-6 sticky top-0 h-screen overflow-y-auto">
         <Link href="/" className="block mb-10">
-          <Image
-            src="/images/logo-wordmark.png"
-            alt="Hopayola"
-            width={140}
-            height={40}
-            className="h-9 w-auto brightness-0 invert"
-          />
+          <span className="font-body font-semibold text-lg uppercase tracking-[0.28em] text-paper">
+            Hopayola
+          </span>
         </Link>
         {nav}
         <div className="mt-auto pt-8">
@@ -193,13 +189,9 @@ export default function DashboardShell({
           <div className="md:hidden fixed inset-0 z-50 flex">
             <div className="w-64 bg-plum text-paper p-6 overflow-y-auto">
               <Link href="/" className="block mb-8">
-                <Image
-                  src="/images/logo-wordmark.png"
-                  alt="Hopayola"
-                  width={140}
-                  height={40}
-                  className="h-9 w-auto brightness-0 invert"
-                />
+                <span className="font-body font-semibold text-lg uppercase tracking-[0.28em] text-paper">
+                  Hopayola
+                </span>
               </Link>
               {nav}
               <button
