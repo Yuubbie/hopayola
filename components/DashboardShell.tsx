@@ -56,12 +56,16 @@ export default function DashboardShell({
   roleLabel = "Client",
   links = CLIENT_LINKS,
   promo = <PremiumPromo />,
+  headerAction = { href: "/projects/new", label: "Start a project" },
+  messagesHref = "/account/messages",
   children,
 }: {
   userName: string;
   roleLabel?: string;
   links?: NavLink[];
   promo?: React.ReactNode;
+  headerAction?: { href: string; label: string } | null;
+  messagesHref?: string | null;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -157,21 +161,25 @@ export default function DashboardShell({
             </div>
 
             <div className="flex items-center gap-3">
-              <Link
-                href="/projects/new"
-                className="hidden sm:inline-block bg-royal text-paper text-sm px-4 py-2 rounded-full hover:bg-royal-deep transition-colors"
-              >
-                Start a project
-              </Link>
-              <Link
-                href="/account/messages"
-                aria-label="Messages"
-                className="p-2 text-ink/50 hover:text-royal"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <path d="M21 12a8 8 0 0 1-8 8H7l-4 3v-4.5A8 8 0 0 1 11 4h2a8 8 0 0 1 8 8z" />
-                </svg>
-              </Link>
+              {headerAction && (
+                <Link
+                  href={headerAction.href}
+                  className="hidden sm:inline-block bg-royal text-paper text-sm px-4 py-2 rounded-full hover:bg-royal-deep transition-colors"
+                >
+                  {headerAction.label}
+                </Link>
+              )}
+              {messagesHref && (
+                <Link
+                  href={messagesHref}
+                  aria-label="Messages"
+                  className="p-2 text-ink/50 hover:text-royal"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M21 12a8 8 0 0 1-8 8H7l-4 3v-4.5A8 8 0 0 1 11 4h2a8 8 0 0 1 8 8z" />
+                  </svg>
+                </Link>
+              )}
               <span className="flex items-center gap-2">
                 <span className="h-9 w-9 rounded-full bg-royal text-paper flex items-center justify-center text-sm font-medium">
                   {initial}

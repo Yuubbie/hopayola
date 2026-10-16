@@ -43,6 +43,7 @@ export default async function ArtisanAccountLayout({
       roleLabel="Artisan"
       links={ARTISAN_LINKS}
       promo={null}
+      messagesHref="/artisan/account/messages"
     >
       {children}
     </DashboardShell>

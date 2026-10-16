@@ -70,7 +70,7 @@ export default async function AdminProjectDetail({
     .order("milestone_order", { ascending: true });
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-24">
+    <div className="max-w-3xl">
       <Link
         href="/admin/projects"
         className="text-sm text-royal hover:text-royal-deep mb-6 inline-block"
@@ -279,6 +279,6 @@ export default async function AdminProjectDetail({
         <h2 className="font-display text-lg mb-2">Coordinated chat</h2>
         <ProjectChat projectId={id} viewerRole="admin" />
       </section>
-    </main>
+    </div>
   );
 }

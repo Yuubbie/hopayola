@@ -28,7 +28,7 @@ export default async function AccountLayout({
     redirect("/artisan/account");
   }
   if (profile?.role === "admin") {
-    redirect("/admin/projects");
+    redirect("/admin");
   }
 
   return (

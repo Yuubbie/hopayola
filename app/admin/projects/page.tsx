@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateProjectStatus, generateConcepts } from "./actions";
-import AdminNav from "@/components/AdminNav";
+// Navigation lives in the admin shell layout.
 
 const STATUS_OPTIONS = [
   "draft",
@@ -65,10 +65,10 @@ export default async function AdminProjects() {
   );
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-24">
-      <AdminNav />
+    <div className="max-w-4xl">
+      
 
-      <h1 className="font-display text-3xl mb-2">Admin - Projects</h1>
+      <h1 className="font-display text-3xl mb-2">Projects</h1>
       <p className="text-ink/60 mb-12">
         Review submitted projects and move them through the pipeline
         manually.
@@ -174,6 +174,6 @@ export default async function AdminProjects() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }
