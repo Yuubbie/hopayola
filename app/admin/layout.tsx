@@ -6,6 +6,7 @@ const ADMIN_LINKS = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/projects", label: "All projects" },
   { href: "/admin/artisans", label: "Artisans" },
+  { href: "/admin/messages", label: "Messages" },
   { href: "/admin#confirm", label: "Payments to confirm" },
   { href: "/admin#verify", label: "Artisans to verify" },
 ];

@@ -1,20 +1,32 @@
-import DashboardPlaceholder from "@/components/DashboardPlaceholder";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { loadInbox } from "@/lib/inbox";
+import MessageInbox from "@/components/MessageInbox";
 
 export const metadata = { title: "Messages — Hopayola" };
+export const dynamic = "force-dynamic";
 
-export default function ArtisanMessagesPage() {
+export default async function ArtisanMessagesPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const rows = await loadInbox({
+    viewerId: user.id,
+    role: "artisan",
+    email: user.email,
+  });
+
   return (
-    <DashboardPlaceholder
-      title="Messages"
-      description="One inbox for every job, instead of opening each one to check for updates."
-      points={[
-        "For now, your conversation with the client and coordinator sits inside each job, under Messages and updates.",
-        "This inbox will gather all of those threads with unread counts.",
-        "Anything urgent about fabric or payment will also be emailed to you.",
-      ]}
-      backHref="/artisan/account"
-      backLabel="Back to my jobs"
-      secondary={null}
+    <MessageInbox
+      rows={rows}
+      role="artisan"
+      emptyHint="Claim a job and your conversation with the client and coordinator lands here."
     />
   );
 }

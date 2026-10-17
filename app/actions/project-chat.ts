@@ -57,6 +57,30 @@ export async function listProjectMessages(projectId: string) {
   return { error: null, messages: data || [] };
 }
 
+/**
+ * Stamps this viewer's place in the thread, which is what clears the unread
+ * count in the Messages inbox. Opening a thread is enough to count as read.
+ */
+export async function markProjectRead(projectId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Sign in first." };
+
+  const { error } = await supabase.from("project_message_reads").upsert(
+    {
+      project_id: projectId,
+      user_id: user.id,
+      last_read_at: new Date().toISOString(),
+    },
+    { onConflict: "project_id,user_id" }
+  );
+
+  if (error) return { error: error.message };
+  return { error: null };
+}
+
 export async function sendProjectMessage(projectId: string, body: string) {
   const supabase = await createClient();
   const {

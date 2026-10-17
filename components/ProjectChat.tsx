@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   listProjectMessages,
+  markProjectRead,
   sendProjectMessage,
 } from "@/app/actions/project-chat";
 import {
@@ -31,11 +32,21 @@ export default function ProjectChat({
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const lastSeenId = useRef<string | null>(null);
 
   async function refresh() {
     const res = await listProjectMessages(projectId);
     if (res.error && !res.messages.length) setError(res.error);
     setMessages((res.messages || []) as Msg[]);
+
+    // Clear the unread count in the inbox once the thread has been seen, and
+    // again whenever something newer arrives while it is open.
+    const next = (res.messages || []) as Msg[];
+    const newest = next.length > 0 ? next[next.length - 1].id : null;
+    if (newest && newest !== lastSeenId.current) {
+      lastSeenId.current = newest;
+      markProjectRead(projectId);
+    }
   }
 
   useEffect(() => {
