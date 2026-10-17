@@ -97,8 +97,8 @@ export default async function AdminProjectDetail({
       ) : (
         <div className="mb-12">
           <p className="text-sm text-ink/60 mb-2">
-            Client has not paid yet. The client pays the stage amounts plus a 5%
-            service fee; the artisan receives each stage minus Hopayola&apos;s{" "}
+            Client has not paid yet. The client pays the stage amounts
+            exactly; the artisan receives each stage minus Hopayola&apos;s{" "}
             {Math.round(ARTISAN_COMMISSION_RATE * 100)}%.
           </p>
 

@@ -52,7 +52,7 @@ const CLIENT: Frame[] = [
   {
     kicker: "Client · 7 of 9",
     title: "Pay once",
-    body: "After fabric is in: one Paystack payment (your budget + 5%). Hopayola holds it.",
+    body: "After fabric is in: one Paystack payment for the stage amounts. Hopayola holds it.",
     scene: "pay",
   },
   {
@@ -109,7 +109,7 @@ const ARTISAN: Frame[] = [
   {
     kicker: "Artisan · 7 of 7",
     title: "Get paid once",
-    body: "When the client marks the outfit received, Hopayola pays you (budget minus 5%) to your bank.",
+    body: "When the client approves each stage, Hopayola pays you that stage minus 10% to your bank.",
     scene: "paid",
   },
 ];
@@ -192,8 +192,7 @@ function Scene({ id }: { id: string }) {
           <>
             <p className="text-royal text-xs mb-2">One payment</p>
             <Row k="Project" v="NGN 20,000" />
-            <Row k="Service 5%" v="NGN 1,000" />
-            <Row k="Held by Hopayola" v="NGN 21,000" />
+            <Row k="Held by Hopayola" v="NGN 20,000" />
             <FakeBtn>Pay with Paystack</FakeBtn>
           </>
         )}
@@ -272,7 +271,7 @@ function Scene({ id }: { id: string }) {
           <>
             <p className="text-sm font-medium">Client marked received</p>
             <Row k="Held payment" v="NGN 20,000" />
-            <Row k="You receive (95%)" v="NGN 19,000" />
+            <Row k="You receive (90%)" v="NGN 18,000" />
             <p className="text-green-700 text-xs mt-3">One payout · Ecobank</p>
           </>
         )}

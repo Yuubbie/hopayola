@@ -110,13 +110,13 @@ export default function Terms() {
             </li>
             <li>
               <strong>Commission &amp; Maintenance Fee:</strong> The Company
-              charges a client service fee at checkout (currently 5% of
-              milestone totals) and applies a platform commission (currently
-              5%) deducted from each artisan work-order amount. These fees
-              cover payment processing, platform hosting, AI render
-              pipelines, marketing, customer support, and dispute
-              arbitration. On Premium team projects, commission is
-              calculated on each team member&apos;s own milestone amount.
+              charges no service fee to clients at checkout: the client pays
+              exactly the milestone amounts. The Company applies a platform
+              commission (currently 10%) deducted from each artisan work-order
+              amount. These fees cover payment processing, platform hosting, AI
+              render pipelines, marketing, customer support, and dispute
+              arbitration. On Premium team projects, commission is calculated
+              on each team member&apos;s own milestone amount.
             </li>
             <li>
               <strong>Conditional milestone disbursements:</strong>{" "}

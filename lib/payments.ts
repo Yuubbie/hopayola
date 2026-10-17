@@ -1,4 +1,6 @@
-export const CLIENT_SERVICE_FEE_RATE = 0.05;
+// Hopayola's cut comes only from the artisan side (ARTISAN_COMMISSION_RATE).
+// The client pays exactly the stage amounts, nothing added on top.
+export const CLIENT_SERVICE_FEE_RATE = 0;
 export const ARTISAN_COMMISSION_RATE = 0.1;
 
 export function clientCheckoutTotal(milestoneSubtotalNgn: number) {
