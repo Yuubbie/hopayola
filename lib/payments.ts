@@ -1,5 +1,5 @@
 export const CLIENT_SERVICE_FEE_RATE = 0.05;
-export const ARTISAN_COMMISSION_RATE = 0.05;
+export const ARTISAN_COMMISSION_RATE = 0.1;
 
 export function clientCheckoutTotal(milestoneSubtotalNgn: number) {
   return milestoneSubtotalNgn * (1 + CLIENT_SERVICE_FEE_RATE);
@@ -7,6 +7,13 @@ export function clientCheckoutTotal(milestoneSubtotalNgn: number) {
 
 export function artisanPayoutNgn(milestoneAmountNgn: number) {
   return milestoneAmountNgn * (1 - ARTISAN_COMMISSION_RATE);
+}
+
+/** The numbers an artisan should see before and after a payout clears. */
+export function payoutBreakdown(milestoneAmountNgn: number) {
+  const gross = Number(milestoneAmountNgn) || 0;
+  const commission = gross * ARTISAN_COMMISSION_RATE;
+  return { gross, commission, net: gross - commission };
 }
 
 export function toKobo(ngn: number) {

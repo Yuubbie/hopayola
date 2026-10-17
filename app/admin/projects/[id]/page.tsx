@@ -5,7 +5,7 @@ import { addMilestone, updateMilestoneStatus } from "./actions";
 import PayProjectButton from "@/components/pay-project-button";
 import { adminConfirmPayment } from "@/app/actions/project-flow";
 import AdminPayoutButton from "@/components/admin-payout-button";
-import { milestonePayoutLabel } from "@/lib/payments";
+import { milestonePayoutLabel, payoutBreakdown, ARTISAN_COMMISSION_RATE } from "@/lib/payments";
 import ProjectChat from "@/components/ProjectChat";
 import ProjectSequence from "@/components/ProjectSequence";
 
@@ -97,7 +97,9 @@ export default async function AdminProjectDetail({
       ) : (
         <div className="mb-12">
           <p className="text-sm text-ink/60 mb-2">
-            Client has not paid yet. Checkout total is milestone amounts + 5%.
+            Client has not paid yet. The client pays the stage amounts plus a 5%
+            service fee; the artisan receives each stage minus Hopayola&apos;s{" "}
+            {Math.round(ARTISAN_COMMISSION_RATE * 100)}%.
           </p>
 
           {project.client_marked_paid_at && (
@@ -160,7 +162,12 @@ export default async function AdminProjectDetail({
                     </span>
                     {m.amount && (
                       <span className="text-ink/50 text-xs block">
-                        NGN {Number(m.amount).toLocaleString()}
+                        Stage NGN {Number(m.amount).toLocaleString()}
+                        {" · "}
+                        Hopayola {Math.round(ARTISAN_COMMISSION_RATE * 100)}% -
+                        NGN {Math.round(payoutBreakdown(Number(m.amount)).commission).toLocaleString()}
+                        {" · "}
+                        artisan gets NGN {Math.round(payoutBreakdown(Number(m.amount)).net).toLocaleString()}
                       </span>
                     )}
                   </div>
@@ -196,6 +203,11 @@ export default async function AdminProjectDetail({
                 </form>
                 {m.status !== "paid" && m.status !== "paid_out" && (
                   <AdminPayoutButton milestoneId={m.id} projectId={id} />
+                )}
+                {m.paystack_transfer_reference && (
+                  <p className="text-[11px] text-ink/40 mt-2 break-all">
+                    Transfer reference: {m.paystack_transfer_reference}
+                  </p>
                 )}
               </li>
             ))}
