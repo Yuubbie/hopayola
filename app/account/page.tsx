@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import DeleteProjectButton from "@/components/delete-project-button";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -464,6 +465,12 @@ export default async function Account({
                         >
                           View project
                         </Link>
+                        {!p.funded_at && p.status !== "cancelled" && (
+                          <DeleteProjectButton
+                            projectId={p.id}
+                            className="w-full text-[11px] text-ink/45 hover:text-red-700 py-1.5"
+                          />
+                        )}
                       </div>
                     </article>
                   );

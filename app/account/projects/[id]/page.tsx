@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import ProjectChat from "@/components/ProjectChat";
 import ProjectSequence from "@/components/ProjectSequence";
 import { withProofUrls } from "@/lib/milestone-proofs";
-import { clientCancelProject } from "@/app/actions/project-flow";
+import DeleteProjectButton from "@/components/delete-project-button";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -207,15 +207,10 @@ export default async function ProjectDetail({
             You can only do this before the work is funded. Once money is held,
             talk to your coordinator instead.
           </p>
-          <form action={clientCancelProject}>
-            <input type="hidden" name="projectId" value={project.id} />
-            <button
-              type="submit"
-              className="text-xs border border-ink/20 rounded-full px-4 py-2 text-ink/70 hover:border-red-700 hover:text-red-700 transition-colors"
-            >
-              Delete this project
-            </button>
-          </form>
+          <DeleteProjectButton
+            projectId={project.id}
+            className="text-xs border border-ink/20 rounded-full px-4 py-2 text-ink/70 hover:border-red-700 hover:text-red-700 transition-colors"
+          />
         </section>
       )}
     </div>
