@@ -22,7 +22,7 @@ const pathways = [
     href: "/artisan/sign-up",
     title: "Join as artisan",
     description:
-      "Tailors, designers, and specialists: join Hopayola, get matched to projects, and get paid by milestone.",
+      "Tailors, designers, and specialists: join Hopayola, get matched to projects, and get paid when the client receives the finished outfit.",
     image: "/images/design-my-outfit.jpg",
   },
 ];

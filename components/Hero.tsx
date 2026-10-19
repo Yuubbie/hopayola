@@ -22,14 +22,16 @@ export default function Hero() {
         }`}
       >
         <HeroTopStrip />
-        <p className="text-royal text-sm mb-4">Trending styles from top artisans</p>
+        <p className="text-royal text-sm mb-4">
+          AI-assisted briefs · women artisans in Abuja · money held until delivery
+        </p>
         <h1 className="font-display text-5xl md:text-6xl leading-[1.05] mb-6">
           Your fashion idea, planned and coordinated from start to finish.
         </h1>
         <p className="text-ink/70 max-w-prose text-lg leading-relaxed mb-8">
-          Hopayola connects you with tailors, designers and artisans, then
-          coordinates the entire project so you&apos;re not managing five people
-          on your own.
+          Hopayola is a studio, not a shop. AI turns your occasion and fabric
+          into concepts; verified artisans make the garment; you and they each
+          get a dashboard so nobody is chasing anyone on WhatsApp.
         </p>
         <div className="flex flex-wrap gap-4">
           <Link
