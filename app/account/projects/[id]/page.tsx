@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ProjectChat from "@/components/ProjectChat";
 import ProjectSequence from "@/components/ProjectSequence";
+import { withProofUrls } from "@/lib/milestone-proofs";
 import { clientCancelProject } from "@/app/actions/project-flow";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -79,7 +80,7 @@ export default async function ProjectDetail({
     .eq("project_id", id)
     .order("milestone_order", { ascending: true });
 
-  const milestoneList = milestones || [];
+  const milestoneList = await withProofUrls((milestones || []) as any[]);
   const budget = formatBudget(project.budget_min, project.budget_max);
   const deadline = formatDate(project.delivery_deadline);
 
@@ -131,6 +132,7 @@ export default async function ProjectDetail({
             submitted_at: m.submitted_at,
             confirmed_at: m.confirmed_at,
             artisan_id: m.artisan_id,
+            proof_href: m.proof_href,
           }))}
         />
 

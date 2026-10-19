@@ -3,11 +3,11 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { addMilestone, updateMilestoneStatus } from "./actions";
 import PayProjectButton from "@/components/pay-project-button";
-import { adminConfirmPayment } from "@/app/actions/project-flow";
-import AdminPayoutButton from "@/components/admin-payout-button";
-import { milestonePayoutLabel, payoutBreakdown, ARTISAN_COMMISSION_RATE } from "@/lib/payments";
+import { adminConfirmPayment, adminSendPayout } from "@/app/actions/project-flow";
 import ProjectChat from "@/components/ProjectChat";
+import { payoutBreakdown, ARTISAN_COMMISSION_RATE } from "@/lib/payments";
 import ProjectSequence from "@/components/ProjectSequence";
+import { withProofUrls } from "@/lib/milestone-proofs";
 
 const MILESTONE_STATUS_OPTIONS = [
   "pending",
@@ -63,11 +63,21 @@ export default async function AdminProjectDetail({
     .select("artisan_id, role_on_project, profiles(full_name)")
     .eq("project_id", id);
 
-  const { data: milestones } = await supabase
+  const { data: rawMilestones } = await supabase
     .from("project_milestones")
     .select("*")
     .eq("project_id", id)
     .order("milestone_order", { ascending: true });
+
+  const milestones = await withProofUrls((rawMilestones || []) as any[]);
+
+  const projectTotal = Number(
+    project.funded_subtotal || project.budget_max || project.budget_min || 0
+  );
+  const paidMilestone = (milestones || []).find(
+    (m: any) => m.status === "paid" || m.status === "paid_out"
+  );
+  const split = payoutBreakdown(projectTotal);
 
   return (
     <div className="max-w-3xl">
@@ -146,6 +156,68 @@ export default async function AdminProjectDetail({
         </section>
       )}
 
+      <section className="border border-stone rounded-2xl p-6 mb-8">
+        <h2 className="font-display text-lg mb-1">Artisan payout</h2>
+        <p className="text-xs text-ink/50 mb-4">
+          One payment, released only after the client confirms the finished
+          outfit. Nothing is paid per stage.
+        </p>
+
+        <div className="grid grid-cols-3 gap-3 text-sm mb-4">
+          <div>
+            <p className="text-[11px] text-ink/45">Project total</p>
+            <p>NGN {Math.round(split.gross).toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-[11px] text-ink/45">
+              Hopayola {Math.round(ARTISAN_COMMISSION_RATE * 100)}%
+            </p>
+            <p>-NGN {Math.round(split.commission).toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-[11px] text-ink/45">Artisan receives</p>
+            <p className="font-medium">
+              NGN {Math.round(split.net).toLocaleString()}
+            </p>
+          </div>
+        </div>
+
+        {paidMilestone ? (
+          <p className="text-sm text-green-700">
+            Paid to the artisan
+            {paidMilestone.released_at
+              ? ` on ${new Date(paidMilestone.released_at).toLocaleDateString("en-GB")}`
+              : ""}
+            {paidMilestone.paystack_transfer_reference
+              ? ` · ${paidMilestone.paystack_transfer_reference}`
+              : ""}
+          </p>
+        ) : !project.funded_at ? (
+          <p className="text-sm text-ink/60">
+            Waiting for the client&apos;s payment first.
+          </p>
+        ) : !project.client_received_at ? (
+          <p className="text-sm text-ink/60">
+            Held by Hopayola until the client marks the outfit received.
+          </p>
+        ) : (
+          <>
+            <p className="text-sm text-ink/70 mb-3">
+              The client has the outfit. Send the artisan their money.
+            </p>
+            <form action={adminSendPayout}>
+              <input type="hidden" name="projectId" value={id} />
+              <button
+                type="submit"
+                className="bg-royal text-paper rounded-lg px-4 py-2 text-sm hover:bg-royal-deep transition-colors"
+              >
+                Send payout to artisan
+              </button>
+            </form>
+          </>
+        )}
+      </section>
+
       <section className="border border-stone rounded-2xl p-6">
         <h2 className="font-display text-lg mb-4">Milestones</h2>
 
@@ -160,19 +232,13 @@ export default async function AdminProjectDetail({
                     <span className="font-medium text-sm">
                       {m.milestone_name}
                     </span>
-                    {m.amount && (
-                      <span className="text-ink/50 text-xs block">
-                        Stage NGN {Number(m.amount).toLocaleString()}
-                        {" · "}
-                        Hopayola {Math.round(ARTISAN_COMMISSION_RATE * 100)}% -
-                        NGN {Math.round(payoutBreakdown(Number(m.amount)).commission).toLocaleString()}
-                        {" · "}
-                        artisan gets NGN {Math.round(payoutBreakdown(Number(m.amount)).net).toLocaleString()}
-                      </span>
-                    )}
                   </div>
                   <span className="shrink-0 text-xs border border-stone rounded-full px-2 py-1 text-ink/60">
-                    {milestonePayoutLabel(m)}
+                    {m.status === "paid" || m.status === "paid_out"
+                      ? "Paid to artisan"
+                      : m.payout_state === "pending" || m.payout_state === "claimed"
+                        ? "Payout in progress"
+                        : String(m.status || "").replace(/_/g, " ")}
                   </span>
                 </div>
 
@@ -201,12 +267,14 @@ export default async function AdminProjectDetail({
                     Update
                   </button>
                 </form>
-                {m.status !== "paid" && m.status !== "paid_out" && (
-                  <AdminPayoutButton milestoneId={m.id} projectId={id} />
-                )}
                 {m.paystack_transfer_reference && (
                   <p className="text-[11px] text-ink/40 mt-2 break-all">
                     Transfer reference: {m.paystack_transfer_reference}
+                  </p>
+                )}
+                {m.payout_error && m.status !== "paid" && (
+                  <p className="text-[11px] text-amber-800 mt-2">
+                    Last payout attempt: {m.payout_error}
                   </p>
                 )}
               </li>
@@ -237,7 +305,11 @@ export default async function AdminProjectDetail({
           </div>
           <div>
             <label className="block text-sm text-ink/50 mb-1" htmlFor="amount">
-              Amount (NGN) <span className="text-ink/30">(optional)</span>
+              This artisan&apos;s share (NGN){" "}
+              <span className="text-ink/30">
+                — only for team projects; a single artisan is paid the project
+                budget
+              </span>
             </label>
             <input
               id="amount"

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import ProjectChat from "@/components/ProjectChat";
 import ProjectSequence from "@/components/ProjectSequence";
+import { withProofUrls } from "@/lib/milestone-proofs";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -81,7 +82,7 @@ export default async function ArtisanJobDetail({
     .eq("project_id", id)
     .order("milestone_order", { ascending: true });
 
-  const milestoneList = milestones || [];
+  const milestoneList = await withProofUrls((milestones || []) as any[]);
 
   return (
     <div className="max-w-3xl">

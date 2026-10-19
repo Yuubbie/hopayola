@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { payoutBreakdown, ARTISAN_COMMISSION_RATE } from "@/lib/payments";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -63,12 +64,22 @@ export default async function AdminOverview() {
     .is("confirmed_at", null)
     .order("submitted_at", { ascending: true });
 
-  const { data: readyToPay } = await supabase
+  const { data: paidMilestones } = await supabase
     .from("project_milestones")
-    .select("id, project_id, milestone_name, milestone_order, confirmed_at, amount")
-    .not("confirmed_at", "is", null)
-    .not("status", "in", "(paid,paid_out)")
-    .order("confirmed_at", { ascending: true });
+    .select("project_id, status")
+    .in("status", ["paid", "paid_out"]);
+  const paidProjectIds = new Set(
+    (paidMilestones || []).map((m: any) => m.project_id)
+  );
+
+  // One payout per project, and only after the client confirms delivery.
+  const readyToPay = projects.filter(
+    (p) =>
+      p.funded_at &&
+      p.client_received_at &&
+      p.status !== "cancelled" &&
+      !paidProjectIds.has(p.id)
+  );
 
   const { data: unverified } = await supabase
     .from("artisan_profiles")
@@ -111,7 +122,7 @@ export default async function AdminOverview() {
   const nothingToDo =
     paymentsToConfirm.length === 0 &&
     conceptsToGenerate.length === 0 &&
-    (readyToPay || []).length === 0;
+    readyToPay.length === 0;
 
   return (
     <div className="max-w-6xl">
@@ -220,35 +231,37 @@ export default async function AdminOverview() {
               </div>
             )}
 
-            {(readyToPay || []).length > 0 && (
+            {readyToPay.length > 0 && (
               <div className="border border-stone rounded-2xl p-5">
                 <p className="font-display text-lg mb-1">Ready to pay out</p>
                 <p className="text-[11px] text-ink/50 mb-3">
-                  The client approved these stages. The artisan has not been
+                  The client has the finished outfit. The artisan has not been
                   paid yet.
                 </p>
                 <ul className="space-y-3">
-                  {(readyToPay || []).map((m: any) => {
-                    const project = projectById.get(m.project_id);
+                  {readyToPay.map((p) => {
+                    const gross = Number(
+                      p.funded_subtotal || p.budget_max || p.budget_min || 0
+                    );
+                    const split = payoutBreakdown(gross);
                     return (
                       <li
-                        key={m.id}
+                        key={p.id}
                         className="flex flex-wrap items-center justify-between gap-3"
                       >
                         <div className="min-w-0">
-                          <p className="text-sm">
-                            {m.milestone_name ||
-                              `Milestone ${m.milestone_order}`}
-                          </p>
+                          <p className="text-sm">{projectLabel(p)}</p>
                           <p className="text-[11px] text-ink/50">
-                            {project ? projectLabel(project) : "Project"}
-                            {m.amount
-                              ? ` · NGN ${Number(m.amount).toLocaleString()}`
-                              : ""}
+                            {clientMap.get(p.client_id) || "Client"}
+                            {" · "}
+                            artisan receives NGN {" "}
+                            {Math.round(split.net).toLocaleString()}
+                            {" ("}
+                            {Math.round(ARTISAN_COMMISSION_RATE * 100)}% kept)
                           </p>
                         </div>
                         <Link
-                          href={`/admin/projects/${m.project_id}`}
+                          href={`/admin/projects/${p.id}`}
                           className="bg-royal text-paper rounded-full px-4 py-1.5 text-xs hover:bg-royal-deep transition-colors"
                         >
                           Pay the artisan

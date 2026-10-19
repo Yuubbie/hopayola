@@ -119,16 +119,16 @@ export default function Terms() {
               on each team member&apos;s own milestone amount.
             </li>
             <li>
-              <strong>Conditional milestone disbursements:</strong>{" "}
-              Subcontractor compensation is paid on a completed-phase basis
-              after verification (for example Intake/Cutting, Assembly,
-              Final Quality Check/Fitting). Disbursements are made to the
-              artisan&apos;s verified bank account via the Company&apos;s
-              designated payout mechanisms (Paystack Transfers). Payout
-              requires: (i) the client (or deemed acceptance after the
-              stated review window) confirming the milestone, or Company
-              verification; (ii) no open dispute on that phase; and (iii) a
-              verified payout account on file.
+              <strong>Single project disbursement:</strong>{" "}
+              Subcontractor compensation is paid once per project, after the
+              client confirms they have received and verified the finished
+              outfit. Stage photos are for review only and do not release
+              money. Disbursements are made to the artisan&apos;s verified
+              bank account via the Company&apos;s designated payout
+              mechanisms (Paystack Transfers). Payout requires: (i) the
+              client confirming delivery of the completed garment, or
+              Company verification; (ii) no open dispute on the project;
+              and (iii) a verified payout account on file.
             </li>
             <li>
               <strong>Chargebacks &amp; Rework Deductions:</strong> If a

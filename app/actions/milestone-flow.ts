@@ -41,8 +41,9 @@ function isLocked(m: { status: string | null; payout_state: string | null }) {
 }
 
 function refresh(projectId: string) {
-  revalidatePath("/account");
-  revalidatePath("/artisan/account");
+  revalidatePath("/account", "layout");
+  revalidatePath("/artisan/account", "layout");
+  revalidatePath("/admin", "layout");
   revalidatePath("/admin/projects/" + projectId);
 }
 

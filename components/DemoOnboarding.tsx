@@ -109,7 +109,7 @@ const ARTISAN: Frame[] = [
   {
     kicker: "Artisan · 7 of 7",
     title: "Get paid once",
-    body: "When the client approves each stage, Hopayola pays you that stage minus 10% to your bank.",
+    body: "When the client confirms the finished outfit, Hopayola pays you the project minus 10% to your bank.",
     scene: "paid",
   },
 ];

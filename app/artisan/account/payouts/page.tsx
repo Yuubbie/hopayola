@@ -59,67 +59,81 @@ export default async function ArtisanPayoutsPage() {
   const { data: projects } = projectIds.length
     ? await service
         .from("projects")
-        .select("id, garment_type, occasion")
+        .select(
+          "id, garment_type, occasion, status, funded_at, funded_subtotal, budget_min, budget_max, client_received_at"
+        )
         .in("id", projectIds)
     : { data: [] as any[] };
 
   const { data: milestones } = projectIds.length
     ? await service
         .from("project_milestones")
-        .select("*")
+        .select(
+          "id, project_id, artisan_id, amount, status, payout_state, payout_amount, released_at, paystack_transfer_reference"
+        )
         .in("project_id", projectIds)
-        .order("milestone_order", { ascending: true })
     : { data: [] as any[] };
 
-  const projectMap = new Map((projects || []).map((p: any) => [p.id, p]));
+  const all = (milestones || []) as any[];
 
-  const mine = ((milestones || []) as any[]).filter(
-    (m) => !m.artisan_id || artisanIds.includes(m.artisan_id)
-  );
+  const rows = ((projects || []) as any[])
+    .map((p) => {
+      const mine = all.filter(
+        (m) => m.project_id === p.id && (!m.artisan_id || artisanIds.includes(m.artisan_id))
+      );
+      const paid = mine.find(
+        (m) =>
+          m.status === "paid" ||
+          m.status === "paid_out" ||
+          m.payout_state === "success"
+      );
+      const share = mine.reduce((sum, m) => sum + Number(m.amount || 0), 0);
+      const total = Number(
+        p.funded_subtotal || p.budget_max || p.budget_min || 0
+      );
+      const gross = paid
+        ? Number(paid.payout_amount) > 0
+          ? Number(paid.payout_amount) / (1 - ARTISAN_COMMISSION_RATE)
+          : Number(paid.amount || total)
+        : share > 0
+          ? share
+          : total;
 
-  const paid = mine.filter(
-    (m) => m.status === "paid" || m.status === "paid_out" || m.payout_state === "success"
-  );
-  const inFlight = mine.filter(
-    (m) =>
-      m.payout_state === "pending" || m.payout_state === "claimed"
-  );
-  const awaitingClient = mine.filter(
-    (m) => m.submitted_at && !m.confirmed_at
-  );
-  const approvedUnpaid = mine.filter(
-    (m) =>
-      m.confirmed_at &&
-      !paid.includes(m) &&
-      !inFlight.includes(m)
-  );
+      const net = paid
+        ? Number(paid.payout_amount) > 0
+          ? Number(paid.payout_amount)
+          : payoutBreakdown(gross).net
+        : payoutBreakdown(gross).net;
 
-  const netOf = (m: any) =>
-    Number(m.payout_amount) > 0
-      ? Number(m.payout_amount)
-      : payoutBreakdown(Number(m.amount || 0)).net;
+      const state = paid
+        ? "paid"
+        : !p.funded_at
+          ? "unfunded"
+          : p.client_received_at
+            ? "ready"
+            : "held";
 
-  const paidTotal = paid.reduce((sum, m) => sum + netOf(m), 0);
-  const pendingTotal = [...approvedUnpaid, ...inFlight].reduce(
-    (sum, m) => sum + netOf(m),
-    0
-  );
+      return { project: p, paid, gross, net, state };
+    })
+    .sort((a, b) => {
+      const rank: Record<string, number> = { paid: 0, ready: 1, held: 2, unfunded: 3 };
+      const diff = rank[a.state] - rank[b.state];
+      if (diff !== 0) return diff;
+      return (
+        new Date(b.paid?.released_at || b.project.created_at || 0).getTime() -
+        new Date(a.paid?.released_at || a.project.created_at || 0).getTime()
+      );
+    });
 
-  const rows = [...mine].sort((a, b) => {
-    const rank = (m: any) => {
-      if (paid.includes(m)) return 0;
-      if (inFlight.includes(m)) return 1;
-      if (approvedUnpaid.includes(m)) return 2;
-      if (awaitingClient.includes(m)) return 3;
-      return 4;
-    };
-    const diff = rank(a) - rank(b);
-    if (diff !== 0) return diff;
-    return (
-      new Date(b.released_at || b.confirmed_at || b.submitted_at || 0).getTime() -
-      new Date(a.released_at || a.confirmed_at || a.submitted_at || 0).getTime()
-    );
-  });
+  const paidTotal = rows
+    .filter((r) => r.state === "paid")
+    .reduce((sum, r) => sum + r.net, 0);
+  const readyTotal = rows
+    .filter((r) => r.state === "ready")
+    .reduce((sum, r) => sum + r.net, 0);
+  const heldTotal = rows
+    .filter((r) => r.state === "held")
+    .reduce((sum, r) => sum + r.net, 0);
 
   const commissionPercent = Math.round(ARTISAN_COMMISSION_RATE * 100);
 
@@ -128,7 +142,8 @@ export default async function ArtisanPayoutsPage() {
       <header className="mb-8">
         <h1 className="font-display text-3xl md:text-4xl mb-1">Payouts</h1>
         <p className="text-sm text-ink/55">
-          You are paid per stage, once the client approves the photo you send.
+          You are paid once per project, after the client confirms they have the
+          finished outfit.
         </p>
       </header>
 
@@ -139,7 +154,7 @@ export default async function ArtisanPayoutsPage() {
           </p>
           <p className="text-sm text-amber-900/80 mb-3">
             Money cannot reach you until your bank details are saved and
-            verified. Payouts will fail even after a client approves a stage.
+            verified. Payouts will fail even after a client confirms delivery.
           </p>
           <Link
             href="/artisan/account/edit"
@@ -155,95 +170,87 @@ export default async function ArtisanPayoutsPage() {
           <p className="text-xs text-ink/50 mb-2">Paid to you</p>
           <p className="font-display text-2xl">{ngn(paidTotal)}</p>
           <p className="text-[11px] text-ink/40">
-            {paid.length} stage{paid.length === 1 ? "" : "s"}
+            {rows.filter((r) => r.state === "paid").length} project
+            {rows.filter((r) => r.state === "paid").length === 1 ? "" : "s"}
           </p>
         </div>
         <div className="border border-stone rounded-2xl p-5">
-          <p className="text-xs text-ink/50 mb-2">On the way</p>
-          <p className="font-display text-2xl">{ngn(pendingTotal)}</p>
+          <p className="text-xs text-ink/50 mb-2">Ready to be sent</p>
+          <p className="font-display text-2xl">{ngn(readyTotal)}</p>
           <p className="text-[11px] text-ink/40">
-            {approvedUnpaid.length + inFlight.length} approved stage
-            {approvedUnpaid.length + inFlight.length === 1 ? "" : "s"}
+            client has confirmed delivery
           </p>
         </div>
         <div className="border border-stone rounded-2xl p-5">
-          <p className="text-xs text-ink/50 mb-2">Hopayola fee</p>
-          <p className="font-display text-2xl">{commissionPercent}%</p>
-          <p className="text-[11px] text-ink/40">
-            of each stage, kept by Hopayola
-          </p>
+          <p className="text-xs text-ink/50 mb-2">Held by Hopayola</p>
+          <p className="font-display text-2xl">{ngn(heldTotal)}</p>
+          <p className="text-[11px] text-ink/40">until delivery is confirmed</p>
         </div>
       </div>
 
       <section className="border border-stone rounded-2xl p-5 mb-8 bg-stone/30">
         <h2 className="font-display text-lg mb-2">How the money works</h2>
         <ol className="text-sm text-ink/70 space-y-1.5">
+          <li>1. The client pays the full project amount before work starts.</li>
+          <li>2. Hopayola holds it — not you, and not the client.</li>
           <li>
-            1. The client pays Hopayola before the work starts. Hopayola holds
-            the money.
+            3. You work through the stages. Each stage photo is for review only;
+            it does not release money.
           </li>
-          <li>2. You send the photo for a stage.</li>
-          <li>3. The client approves it.</li>
           <li>
-            4. Hopayola sends you {100 - commissionPercent}% of that stage into
-            your bank account, and keeps {commissionPercent}%.
+            4. The client receives the outfit and confirms it. Then Hopayola
+            sends you {100 - commissionPercent}% of the project and keeps{" "}
+            {commissionPercent}%.
           </li>
         </ol>
         <p className="text-xs text-ink/50 mt-3">
-          Payouts go to the bank account on your profile, not to your Paystack
-          account. If that account is wrong, the transfer fails — update it
-          under My profile.
+          Payouts go to the bank account on your profile. If that account is
+          wrong, the transfer fails — update it under My profile.
         </p>
       </section>
 
       <section>
-        <h2 className="font-display text-xl mb-1">Stage by stage</h2>
+        <h2 className="font-display text-xl mb-1">By project</h2>
         <p className="text-xs text-ink/50 mb-5">
-          Every stage, what it was worth, and what you actually received.
+          One payment per project. What it was worth, and what you received.
         </p>
 
         {rows.length === 0 ? (
           <p className="text-sm text-ink/50 border border-stone rounded-2xl p-8 text-center">
-            No stages yet. Once you claim a job and it is set up, your stages
-            appear here with the amount you will be paid.
+            No jobs yet. Once you claim a project, it appears here with what you
+            will be paid.
           </p>
         ) : (
           <ul className="space-y-3">
-            {rows.map((m: any) => {
-              const project = projectMap.get(m.project_id);
-              const breakdown = payoutBreakdown(Number(m.amount || 0));
-              const isPaid = paid.includes(m);
-              const isInFlight = inFlight.includes(m);
-              const isApproved = approvedUnpaid.includes(m);
-              const isAwaiting = awaitingClient.includes(m);
-              const date =
-                m.released_at || m.confirmed_at || m.submitted_at || null;
-
-              const stateLabel = isPaid
-                ? "Paid"
-                : isInFlight
-                  ? "Transfer in progress"
-                  : isApproved
-                    ? "Approved · payout pending"
-                    : isAwaiting
-                      ? "With client for review"
-                      : "Not started";
+            {rows.map((row) => {
+              const p = row.project;
+              const isPaid = row.state === "paid";
+              const stateLabel =
+                row.state === "paid"
+                  ? "Paid"
+                  : row.state === "ready"
+                    ? "Delivery confirmed · payout pending"
+                    : row.state === "held"
+                      ? "Held by Hopayola"
+                      : "Client has not paid yet";
 
               return (
                 <li
-                  key={m.id}
+                  key={p.id}
                   className="border border-stone rounded-2xl p-5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                     <div className="min-w-0">
                       <p className="font-medium text-sm">
-                        {m.milestone_name || `Milestone ${m.milestone_order}`}
+                        {p.garment_type || "Project"}
+                        {p.occasion ? ` — ${p.occasion}` : ""}
                       </p>
                       <p className="text-[11px] text-ink/50">
-                        {project
-                          ? `${project.garment_type || "Project"}${project.occasion ? ` - ${project.occasion}` : ""}`
-                          : "Project"}
-                        {date ? ` · ${formatDate(date)}` : ""}
+                        {isPaid && row.paid?.released_at
+                          ? `Paid ${formatDate(row.paid.released_at)}`
+                          : isPaid
+                            ? "Paid"
+                            : "Not paid yet"}
                       </p>
                     </div>
                     <span
@@ -257,43 +264,28 @@ export default async function ArtisanPayoutsPage() {
                     </span>
                   </div>
 
-                  {Number(m.amount) > 0 ? (
-                    <>
-                      <div className="grid grid-cols-3 gap-3 text-xs border-t border-stone pt-3">
-                        <div>
-                          <p className="text-ink/45 mb-0.5">Stage</p>
-                          <p className="text-ink/80">{ngn(breakdown.gross)}</p>
-                        </div>
-                        <div>
-                          <p className="text-ink/45 mb-0.5">
-                            Hopayola {commissionPercent}%
-                          </p>
-                          <p className="text-ink/80">
-                            -{ngn(breakdown.commission)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-ink/45 mb-0.5">You receive</p>
-                          <p className="font-medium text-ink">
-                            {ngn(isPaid ? netOf(m) : breakdown.net)}
-                          </p>
-                        </div>
-                      </div>
+                  <div className="grid grid-cols-3 gap-3 text-xs border-t border-stone pt-3">
+                    <div>
+                      <p className="text-ink/45 mb-0.5">Project</p>
+                      <p className="text-ink/80">{ngn(row.gross)}</p>
+                    </div>
+                    <div>
+                      <p className="text-ink/45 mb-0.5">
+                        Hopayola {commissionPercent}%
+                      </p>
+                      <p className="text-ink/80">
+                        -{ngn(row.gross - row.net)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-ink/45 mb-0.5">You receive</p>
+                      <p className="font-medium text-ink">{ngn(row.net)}</p>
+                    </div>
+                  </div>
 
-                      {isPaid && m.paystack_transfer_reference && (
-                        <p className="text-[11px] text-ink/40 mt-3 break-all">
-                          Receipt reference: {m.paystack_transfer_reference}
-                        </p>
-                      )}
-                      {m.payout_error && !isPaid && (
-                        <p className="text-[11px] text-amber-800 mt-3">
-                          {m.payout_error}
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <p className="text-xs text-ink/50 border-t border-stone pt-3">
-                      No amount set for this stage yet.
+                  {isPaid && row.paid?.paystack_transfer_reference && (
+                    <p className="text-[11px] text-ink/40 mt-3 break-all">
+                      Receipt reference: {row.paid.paystack_transfer_reference}
                     </p>
                   )}
                 </li>

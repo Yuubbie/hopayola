@@ -31,6 +31,8 @@ type Milestone = {
   submitted_at?: string | null;
   confirmed_at?: string | null;
   artisan_id?: string | null;
+  proof_url?: string | null;
+  proof_href?: string | null;
 };
 
 function CourierOpen({ prompt }: { prompt: string }) {
@@ -213,6 +215,30 @@ export default function ProjectSequence({
                   Milestone {i + 1}
                   {m.milestone_name ? ` — ${m.milestone_name}` : ""}
                 </p>
+                {m.proof_href && (
+                  <a
+                    href={m.proof_href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 block"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={m.proof_href}
+                      alt={`Stage ${i + 1} photo from the artisan`}
+                      className="w-40 h-40 object-cover rounded-lg border border-stone"
+                    />
+                    <span className="block text-[11px] text-royal mt-1">
+                      Open the full photo
+                    </span>
+                  </a>
+                )}
+                {role === "client" && m.submitted_at && !m.proof_href && (
+                  <p className="text-[11px] text-ink/50 mt-1">
+                    The artisan sent this stage, but no photo came through. Ask
+                    them to send it again before you approve.
+                  </p>
+                )}
                 {role === "artisan" &&
                   mine &&
                   !m.submitted_at &&
