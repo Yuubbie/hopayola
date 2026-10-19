@@ -4,10 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { addMilestone, updateMilestoneStatus } from "./actions";
 import PayProjectButton from "@/components/pay-project-button";
 import { adminConfirmPayment, adminSendPayout } from "@/app/actions/project-flow";
+import AdminManualPayoutForm from "@/components/admin-manual-payout-form";
 import ProjectChat from "@/components/ProjectChat";
 import { payoutBreakdown, ARTISAN_COMMISSION_RATE } from "@/lib/payments";
 import ProjectSequence from "@/components/ProjectSequence";
-import { withProofUrls } from "@/lib/milestone-proofs";
+import { signedProofUrl, withProofUrls } from "@/lib/milestone-proofs";
 
 const MILESTONE_STATUS_OPTIONS = [
   "pending",
@@ -70,6 +71,7 @@ export default async function AdminProjectDetail({
     .order("milestone_order", { ascending: true });
 
   const milestones = await withProofUrls((rawMilestones || []) as any[]);
+  const payoutProofHref = await signedProofUrl(project.payout_proof_path);
 
   const projectTotal = Number(
     project.funded_subtotal || project.budget_max || project.budget_min || 0
@@ -182,15 +184,18 @@ export default async function AdminProjectDetail({
           </div>
         </div>
 
-        {paidMilestone ? (
+        {paidMilestone || project.payout_confirmed_at ? (
           <p className="text-sm text-green-700">
             Paid to the artisan
-            {paidMilestone.released_at
+            {paidMilestone?.released_at
               ? ` on ${new Date(paidMilestone.released_at).toLocaleDateString("en-GB")}`
-              : ""}
-            {paidMilestone.paystack_transfer_reference
+              : project.payout_confirmed_at
+                ? ` on ${new Date(project.payout_confirmed_at).toLocaleDateString("en-GB")}`
+                : ""}
+            {paidMilestone?.paystack_transfer_reference
               ? ` · ${paidMilestone.paystack_transfer_reference}`
               : ""}
+            {project.payout_confirmed_at ? " · artisan confirmed" : ""}
           </p>
         ) : !project.funded_at ? (
           <p className="text-sm text-ink/60">
@@ -203,7 +208,9 @@ export default async function AdminProjectDetail({
         ) : (
           <>
             <p className="text-sm text-ink/70 mb-3">
-              The client has the outfit. Send the artisan their money.
+              The client has the outfit. If the money is still in Paystack, send
+              it from here. If it has already settled to OPay, pay from OPay and
+              upload the receipt.
             </p>
             <form action={adminSendPayout}>
               <input type="hidden" name="projectId" value={id} />
@@ -211,9 +218,31 @@ export default async function AdminProjectDetail({
                 type="submit"
                 className="bg-royal text-paper rounded-lg px-4 py-2 text-sm hover:bg-royal-deep transition-colors"
               >
-                Send payout to artisan
+                Send from Paystack
               </button>
             </form>
+            {project.payout_proof_at && !project.payout_confirmed_at && (
+              <div className="text-xs text-royal-deep mt-3">
+                <p>
+                  Receipt uploaded
+                  {project.payout_proof_note
+                    ? ` · ${project.payout_proof_note}`
+                    : ""}
+                  . Waiting for the artisan to confirm they received it.
+                </p>
+                {payoutProofHref && (
+                  <a
+                    href={payoutProofHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    Open receipt
+                  </a>
+                )}
+              </div>
+            )}
+            <AdminManualPayoutForm projectId={id} />
           </>
         )}
       </section>

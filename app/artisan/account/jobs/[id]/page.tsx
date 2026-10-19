@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import ProjectChat from "@/components/ProjectChat";
 import ProjectSequence from "@/components/ProjectSequence";
-import { withProofUrls } from "@/lib/milestone-proofs";
+import { signedProofUrl, withProofUrls } from "@/lib/milestone-proofs";
+import { artisanConfirmManualPayout } from "@/app/actions/project-flow";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -83,6 +84,7 @@ export default async function ArtisanJobDetail({
     .order("milestone_order", { ascending: true });
 
   const milestoneList = await withProofUrls((milestones || []) as any[]);
+  const payoutProofHref = await signedProofUrl(project.payout_proof_path);
 
   return (
     <div className="max-w-3xl">
@@ -120,6 +122,48 @@ export default async function ArtisanJobDetail({
           milestones={milestoneList}
         />
       </section>
+
+      {project.payout_proof_at && !project.payout_confirmed_at && (
+        <section className="border border-royal/30 bg-royal/5 rounded-2xl p-6 mb-6">
+          <h2 className="font-display text-lg mb-2">Hopayola sent your payout</h2>
+          <p className="text-sm text-ink/70 mb-3">
+            They paid from OPay because the money had already left Paystack.
+            Check your bank, then confirm it here.
+          </p>
+          {project.payout_proof_note && (
+            <p className="text-xs text-ink/55 mb-3">
+              Their note: {project.payout_proof_note}
+            </p>
+          )}
+          {payoutProofHref && (
+            <a
+              href={payoutProofHref}
+              target="_blank"
+              rel="noreferrer"
+              className="block mb-3"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={payoutProofHref}
+                alt="Payout receipt from Hopayola"
+                className="w-40 h-40 object-cover rounded-lg border border-stone"
+              />
+              <span className="block text-[11px] text-royal mt-1">
+                Open the receipt
+              </span>
+            </a>
+          )}
+          <form action={artisanConfirmManualPayout}>
+            <input type="hidden" name="projectId" value={id} />
+            <button
+              type="submit"
+              className="bg-royal text-paper rounded-full px-5 py-2 text-sm hover:bg-royal-deep transition-colors"
+            >
+              I have received the money
+            </button>
+          </form>
+        </section>
+      )}
 
       <section className="border border-stone rounded-2xl p-6">
         <h2 className="font-display text-lg mb-4">Messages and updates</h2>

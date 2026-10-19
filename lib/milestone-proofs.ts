@@ -24,3 +24,13 @@ export async function withProofUrls<
     })
   );
 }
+
+export async function signedProofUrl(path: string | null | undefined) {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  const service = createServiceClient();
+  const { data } = await service.storage
+    .from("project-fabrics")
+    .createSignedUrl(path, 60 * 60);
+  return data?.signedUrl ?? null;
+}

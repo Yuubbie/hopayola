@@ -329,13 +329,125 @@ async function payProjectOnce(projectId: string) {
   }
 }
 
-/** Hopayola retrying the payout from the project page. */
+/** Hopayola retrying the Paystack transfer from the project page. */
 export async function adminSendPayout(formData: FormData) {
   const projectId = String(formData.get("projectId") || "");
   const { role } = await load();
   if (role !== "admin") throw new Error("Not allowed.");
 
   await payProjectOnce(projectId);
+  revalidate(projectId);
+}
+
+/**
+ * Money already left Paystack for OPay, so Transfers cannot fire. Hopayola
+ * sends from OPay by hand, then records the receipt here. The artisan still
+ * has to confirm they received it before the project is marked paid.
+ */
+export async function adminRecordManualPayout(formData: FormData) {
+  const projectId = String(formData.get("projectId") || "");
+  const note = String(formData.get("note") || "")
+    .trim()
+    .slice(0, 400);
+  const proofPath = String(formData.get("proofPath") || "").trim();
+  const { user, role } = await load();
+  if (role !== "admin") throw new Error("Not allowed.");
+  if (!proofPath && !note) {
+    throw new Error("Upload a receipt or write a note about how you paid.");
+  }
+
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
+
+  const { data: project } = await service
+    .from("projects")
+    .select("id, funded_at, client_received_at")
+    .eq("id", projectId)
+    .maybeSingle();
+
+  if (!project) throw new Error("Project not found.");
+  if (!project.funded_at) throw new Error("The client has not paid yet.");
+  if (!project.client_received_at) {
+    throw new Error("Wait until the client confirms the finished outfit.");
+  }
+
+  const { error } = await service
+    .from("projects")
+    .update({
+      payout_proof_path: proofPath || null,
+      payout_proof_note: note || null,
+      payout_proof_at: new Date().toISOString(),
+      payout_proof_by: user.id,
+    })
+    .eq("id", projectId);
+
+  if (error) throw new Error(error.message);
+  revalidate(projectId);
+}
+
+export async function artisanConfirmManualPayout(formData: FormData) {
+  const projectId = String(formData.get("projectId") || "");
+  const { user, role } = await load();
+  if (role !== "artisan" && role !== "admin") throw new Error("Not allowed.");
+
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
+
+  if (role === "artisan") {
+    const { data: team } = await service
+      .from("project_team_members")
+      .select("id")
+      .eq("project_id", projectId)
+      .eq("artisan_id", user.id)
+      .maybeSingle();
+    if (!team) throw new Error("This is not your job.");
+  }
+
+  const { data: project } = await service
+    .from("projects")
+    .select("id, payout_proof_at, payout_confirmed_at")
+    .eq("id", projectId)
+    .maybeSingle();
+
+  if (!project) throw new Error("Project not found.");
+  if (!project.payout_proof_at) {
+    throw new Error("Hopayola has not sent a receipt yet.");
+  }
+  if (project.payout_confirmed_at) return;
+
+  const now = new Date().toISOString();
+  const { error } = await service
+    .from("projects")
+    .update({ payout_confirmed_at: now })
+    .eq("id", projectId);
+  if (error) throw new Error(error.message);
+
+  const { data: milestones } = await service
+    .from("project_milestones")
+    .select("id, status, payout_state")
+    .eq("project_id", projectId)
+    .order("milestone_order", { ascending: true });
+
+  const alreadyPaid = (milestones || []).some(
+    (m) =>
+      m.status === "paid" ||
+      m.status === "paid_out" ||
+      m.payout_state === "success"
+  );
+
+  if (!alreadyPaid && milestones && milestones.length > 0) {
+    await service
+      .from("project_milestones")
+      .update({
+        status: "paid",
+        payout_state: "success",
+        released_at: now,
+        payout_error: null,
+        paystack_transfer_reference: "manual-opay",
+      })
+      .eq("id", milestones[0].id);
+  }
+
   revalidate(projectId);
 }
 
