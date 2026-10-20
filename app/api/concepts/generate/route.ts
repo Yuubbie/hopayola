@@ -2,17 +2,19 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { buildConceptPrompt } from "@/lib/concept-prompt";
+import {
+  generateFashionImage,
+  imageGenMissingMessage,
+  imageGenReady,
+} from "@/lib/image-gen";
 
 export const maxDuration = 60;
 
 const PLACEHOLDER = "concept-placeholder";
 
 export async function POST(request: Request) {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) {
-    return NextResponse.json({
-      error: "Image generation is not configured yet.",
-    });
+  if (!imageGenReady()) {
+    return NextResponse.json({ error: imageGenMissingMessage() });
   }
 
   let conceptId = "";
@@ -68,36 +70,16 @@ export async function POST(request: Request) {
     .eq("id", conceptId);
 
   try {
-    const res = await fetch("https://api.openai.com/v1/images/generations", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${key}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-image-1",
-        prompt,
-        n: 1,
-        size: "1024x1536",
-        quality: "medium",
-      }),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Image service error (${res.status}): ${text.slice(0, 200)}`);
-    }
-
-    const json = await res.json();
-    const b64 = json?.data?.[0]?.b64_json;
-    if (!b64) throw new Error("The image service returned no image.");
-
-    const bytes = Buffer.from(b64, "base64");
-    const path = `${concept.project_id}/${conceptId}.png`;
+    const image = await generateFashionImage(prompt);
+    const ext = image.contentType.includes("jpeg") ? "jpg" : "png";
+    const path = `${concept.project_id}/${conceptId}.${ext}`;
 
     const { error: uploadError } = await service.storage
       .from("concept-images")
-      .upload(path, bytes, { contentType: "image/png", upsert: true });
+      .upload(path, image.bytes, {
+        contentType: image.contentType,
+        upsert: true,
+      });
 
     if (uploadError) {
       throw new Error(
