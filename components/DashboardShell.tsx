@@ -35,6 +35,7 @@ function PremiumPromo() {
 const CLIENT_LINKS = [
   { href: "/account", label: "Dashboard", exact: true },
   { href: "/account#projects", label: "My projects" },
+  { href: "/account/studio", label: "Design studio" },
   { href: "/projects/new", label: "New project" },
   { href: "/lifestyle", label: "Wardrobe" },
   { href: "/account/messages", label: "Messages" },
