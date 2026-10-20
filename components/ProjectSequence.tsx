@@ -283,6 +283,13 @@ export default function ProjectSequence({
           </p>
         )}
 
+      {role === "client" && !project.shipped_at && (
+        <p className="text-[11px] text-ink/50 mt-2 leading-relaxed">
+          When it ships, it comes in a Hopayola box. The artisan may use their
+          own wrap inside.
+        </p>
+      )}
+
       {role === "client" &&
         project.shipped_at &&
         !project.client_received_at && (

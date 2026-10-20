@@ -119,6 +119,11 @@ export default async function ProjectDetail({
         )}
       </header>
 
+      <p className="text-xs text-ink/55 border border-stone rounded-xl px-4 py-3 mb-6 leading-relaxed">
+        Delivery: your outfit ships in a Hopayola box (like Amazon). The
+        artisan may wrap it in their own branding inside that box.
+      </p>
+
       <section className="border border-stone rounded-2xl p-6 mb-6">
         <h2 className="font-display text-lg mb-4">Project sequence</h2>
 
