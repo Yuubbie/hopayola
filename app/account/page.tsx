@@ -338,6 +338,10 @@ export default async function Account({
             ? "No projects running right now"
             : `${active.length} project${active.length === 1 ? "" : "s"} in progress`}
         </p>
+        <p className="text-xs text-ink/50 mt-3 max-w-xl leading-relaxed">
+          Finished outfits arrive in a Hopayola box (like Amazon). Your artisan
+          may wrap the garment in their own branding inside that box.
+        </p>
       </header>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">

@@ -257,6 +257,10 @@ export default async function ArtisanAccount({
             ? "No jobs on your bench right now"
             : `${inProgress.length} job${inProgress.length === 1 ? "" : "s"} on your bench`}
         </p>
+        <p className="text-xs text-ink/50 mt-3 max-w-xl leading-relaxed">
+          Hopayola sends shipping boxes. Use your own branded wrap inside if
+          you want — the outer box must be Hopayola&apos;s, like Amazon.
+        </p>
       </header>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
