@@ -14,55 +14,61 @@ type Frame = {
 
 const CLIENT: Frame[] = [
   {
-    kicker: "Client · 1 of 9",
+    kicker: "Client · 1 of 10",
     title: "Create a client account",
-    body: "hopayola.com/sign-up — not the artisan form.",
+    body: "hopayola.com/sign-up. Confirm the email, then you land on your dashboard.",
     scene: "clientsignup",
   },
   {
-    kicker: "Client · 2 of 9",
+    kicker: "Client · 2 of 10",
+    title: "Your client dashboard",
+    body: "Purple sidebar: projects, design studio, measurements, settings. This is home after sign-in.",
+    scene: "clientdash",
+  },
+  {
+    kicker: "Client · 3 of 10",
     title: "Lifestyle first",
     body: "Free measurement guide. Shop pieces can be added to your wardrobe later.",
     scene: "resources",
   },
   {
-    kicker: "Client · 3 of 9",
+    kicker: "Client · 4 of 10",
     title: "Start a project",
     body: "Occasion and garment required. Optional photos, budget, deadline.",
     scene: "project",
   },
   {
-    kicker: "Client · 4 of 9",
+    kicker: "Client · 5 of 10",
     title: "Pick a look",
     body: "Standard: 3 concepts. Premium: 7. Choose one before making starts.",
     scene: "concepts",
   },
   {
-    kicker: "Client · 5 of 9",
+    kicker: "Client · 6 of 10",
     title: "An artisan claims you",
     body: "They claim from Fashion or their account. Their name appears on your card.",
     scene: "assigned",
   },
   {
-    kicker: "Client · 6 of 9",
+    kicker: "Client · 7 of 10",
     title: "Send fabric",
     body: "GIG or Bolt. Work and payment wait until the artisan marks fabric received.",
     scene: "fabric",
   },
   {
-    kicker: "Client · 7 of 9",
+    kicker: "Client · 8 of 10",
     title: "Pay once",
-    body: "After fabric is in: one Paystack payment for the stage amounts. Hopayola holds it.",
+    body: "After fabric is in: one Paystack payment for the project. Hopayola holds it.",
     scene: "pay",
   },
   {
-    kicker: "Client · 8 of 9",
+    kicker: "Client · 9 of 10",
     title: "Review the work",
     body: "Milestones 1–3 are reviews only — approve or request changes. Not three payments.",
     scene: "confirm",
   },
   {
-    kicker: "Client · 9 of 9",
+    kicker: "Client · 10 of 10",
     title: "Mark it received",
     body: "Artisan ships (GIG/Bolt). You tap received. Then the artisan is paid. You get points; the piece is in your wardrobe.",
     scene: "done",
@@ -71,43 +77,49 @@ const CLIENT: Frame[] = [
 
 const ARTISAN: Frame[] = [
   {
-    kicker: "Artisan · 1 of 7",
+    kicker: "Artisan · 1 of 8",
     title: "Join as artisan",
-    body: "hopayola.com/artisan/sign-up — specialty, region, skills.",
+    body: "hopayola.com/artisan/sign-up. Confirm the email, then you land on your artisan dashboard.",
     scene: "signup",
   },
   {
-    kicker: "Artisan · 2 of 7",
+    kicker: "Artisan · 2 of 8",
+    title: "Your artisan dashboard",
+    body: "Purple sidebar: jobs, open jobs, payouts, messages. This is home after sign-in.",
+    scene: "artisandash",
+  },
+  {
+    kicker: "Artisan · 3 of 8",
     title: "Save payout details",
     body: "Bank, 10-digit account, verify name. Paid only when the client marks received.",
     scene: "bank",
   },
   {
-    kicker: "Artisan · 3 of 7",
+    kicker: "Artisan · 4 of 8",
     title: "Claim a project",
     body: "Fashion list or your account. Open jobs in your city.",
     scene: "claim",
   },
   {
-    kicker: "Artisan · 4 of 7",
+    kicker: "Artisan · 5 of 8",
     title: "Confirm fabric",
     body: "Client sends via GIG or Bolt. You confirm it arrived. Then they can pay.",
     scene: "confirmfabric",
   },
   {
-    kicker: "Artisan · 5 of 7",
+    kicker: "Artisan · 6 of 8",
     title: "Ask for review",
     body: "Submit milestone 1, 2, then 3 with optional proof. Client approves or asks for changes.",
     scene: "submit",
   },
   {
-    kicker: "Artisan · 6 of 7",
+    kicker: "Artisan · 7 of 8",
     title: "Ship the outfit",
     body: "When the last review is approved, send with GIG or Bolt.",
     scene: "ship",
   },
   {
-    kicker: "Artisan · 7 of 7",
+    kicker: "Artisan · 8 of 8",
     title: "Get paid once",
     body: "When the client confirms the finished outfit, Hopayola pays you the project minus 10% to your bank.",
     scene: "paid",
@@ -127,6 +139,15 @@ function Scene({ id }: { id: string }) {
             <Row k="Email" v="you@email.com" />
             <p className="text-ink/50 text-xs mt-2">Terms &amp; Conditions</p>
             <FakeBtn>Sign up as a client</FakeBtn>
+          </>
+        )}
+        {id === "clientdash" && (
+          <>
+            <p className="text-royal text-xs mb-2">Client dashboard</p>
+            <p className="font-display text-lg mb-2">Good morning, Ada</p>
+            <Row k="In progress" v="1" />
+            <Row k="Needs you" v="1" />
+            <Row k="Design studio" v="Open" />
           </>
         )}
         {id === "resources" && (
@@ -226,6 +247,15 @@ function Scene({ id }: { id: string }) {
             <Row k="Specialty" v="Tailoring" />
             <Row k="Region" v="Abuja" />
             <FakeBtn>Create artisan account</FakeBtn>
+          </>
+        )}
+        {id === "artisandash" && (
+          <>
+            <p className="text-royal text-xs mb-2">Artisan dashboard</p>
+            <p className="font-display text-lg mb-2">Good morning, Miriam</p>
+            <Row k="On your bench" v="2" />
+            <Row k="Open jobs" v="Claim" />
+            <Row k="Payouts" v="Once, on delivery" />
           </>
         )}
         {id === "bank" && (
@@ -444,11 +474,13 @@ export default function DemoOnboarding({
                 </button>
                 {last && (
                   <Link
-                    href={role === "artisan" ? "/artisan/sign-up" : "/projects/new"}
+                    href={role === "artisan" ? "/artisan/sign-up" : "/sign-up"}
                     onClick={close}
                     className="ml-auto bg-royal text-paper text-sm px-4 py-2 rounded-full hover:bg-royal-deep"
                   >
-                    {role === "artisan" ? "Join as artisan" : "Start a project"}
+                    {role === "artisan"
+                      ? "Join as artisan"
+                      : "Create a client account"}
                   </Link>
                 )}
               </div>

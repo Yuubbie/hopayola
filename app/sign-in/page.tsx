@@ -54,7 +54,20 @@ export default function SignIn() {
       return;
     }
 
-    router.push("/account");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    let dest = "/account";
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (profile?.role === "artisan") dest = "/artisan/account";
+      if (profile?.role === "admin") dest = "/admin";
+    }
+    router.push(dest);
   }
 
   async function resendConfirmation() {
