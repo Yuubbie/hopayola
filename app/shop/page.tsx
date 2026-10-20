@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Shop — Hopayola",
+  title: "Shop - Hopayola",
   description:
     "Ready-made guides and goods from Hopayola. Custom outfits still go through the design studio.",
 };
@@ -13,7 +13,7 @@ const goods = [
   {
     label: "Free here",
     title: "Measurement guide",
-    body: "Bust, waist, hip, height — before you brief an artisan.",
+    body: "Bust, waist, hip, height. Use this before you brief an artisan.",
     href: "/resources/measurement-guide.pdf",
     cta: "Download PDF",
     paid: false,
@@ -46,9 +46,8 @@ export default function ShopPage() {
             Ready-made from Hopayola. Custom still lives in the studio.
           </h1>
           <p className="text-paper/70 max-w-prose mx-auto leading-relaxed">
-            The store is for guides and goods you can buy today. A sewn outfit
-            — fabric, artisan, held payment — starts as a project, not a
-            product listing.
+            Buy guides and goods here. If you want something sewn, start a
+            project in the studio.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-10">
             <a
