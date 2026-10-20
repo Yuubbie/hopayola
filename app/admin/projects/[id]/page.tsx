@@ -113,9 +113,9 @@ export default async function AdminProjectDetail({
       ) : (
         <div className="mb-12">
           <p className="text-sm text-ink/60 mb-2">
-            Client has not paid yet. The client pays the stage amounts
-            exactly; the artisan receives each stage minus Hopayola&apos;s{" "}
-            {Math.round(ARTISAN_COMMISSION_RATE * 100)}%.
+            Client has not paid yet. They pay the project amount once. The
+            artisan is paid {100 - Math.round(ARTISAN_COMMISSION_RATE * 100)}%
+            after the client confirms the finished outfit — not per stage.
           </p>
 
           {project.client_marked_paid_at && (

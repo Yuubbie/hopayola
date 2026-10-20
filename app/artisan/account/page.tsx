@@ -524,10 +524,12 @@ export default async function ArtisanAccount({
             <h2 className="font-display text-lg mb-4">Payouts</h2>
             <p className="font-display text-3xl mb-1">{paidStages.length}</p>
             <p className="text-[11px] text-ink/45 mb-4">
-              stage{paidStages.length === 1 ? "" : "s"} paid out
+              payout{paidStages.length === 1 ? "" : "s"} recorded
             </p>
             <p className="text-sm text-ink/55">
-              You are paid per stage, once the client approves your photo.
+              You are paid once per project — after the client confirms they
+              have the finished outfit. Stage photos are for review only; they
+              do not trigger a payout.
             </p>
             <Link
               href="/artisan/account/payouts"
