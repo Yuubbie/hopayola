@@ -305,6 +305,10 @@ export default function ProjectSequence({
             projectId={project.id}
             prompt="I have sent the outfit through"
           />
+          <p className="text-[11px] text-ink/50 leading-relaxed">
+            Put the garment in the Hopayola shipping box before GIG/Bolt. Your
+            own branded packaging can sit inside that box.
+          </p>
         </>
       )}
 
