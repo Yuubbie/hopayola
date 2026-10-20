@@ -339,8 +339,8 @@ export default async function Account({
             : `${active.length} project${active.length === 1 ? "" : "s"} in progress`}
         </p>
         <p className="text-xs text-ink/50 mt-3 max-w-xl leading-relaxed">
-          Finished outfits arrive in a Hopayola box (like Amazon). Your artisan
-          may wrap the garment in their own branding inside that box.
+          Finished outfits arrive in a Hopayola box. Your artisan may wrap the
+          garment in their own branding inside that box.
         </p>
       </header>
 

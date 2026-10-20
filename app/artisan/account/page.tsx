@@ -259,7 +259,7 @@ export default async function ArtisanAccount({
         </p>
         <p className="text-xs text-ink/50 mt-3 max-w-xl leading-relaxed">
           Hopayola sends shipping boxes. Use your own branded wrap inside if
-          you want — the outer box must be Hopayola&apos;s, like Amazon.
+          you want — the outer box must be Hopayola&apos;s.
         </p>
       </header>
 

@@ -123,8 +123,8 @@ export default async function ArtisanJobDetail({
       <p className="text-xs text-ink/55 border border-stone rounded-xl px-4 py-3 mb-6 leading-relaxed">
         Packaging: Hopayola will send you branded shipping boxes. You may use
         your own branded wrap inside, but the finished outfit must go out in
-        the Hopayola box — same idea as Amazon: the outer box is ours, so the
-        client knows it came through the studio.
+        the Hopayola box. The outer box is ours, so the client knows it came
+        through the studio.
       </p>
 
       <section className="border border-stone rounded-2xl p-6 mb-6">
