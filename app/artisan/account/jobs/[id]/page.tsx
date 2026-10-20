@@ -111,6 +111,13 @@ export default async function ArtisanJobDetail({
             ? ` | Due ${formatDate(project.delivery_deadline)}`
             : ""}
         </p>
+        {project.status === "cancelled" && (
+          <p className="text-sm text-red-800 mt-3 border border-red-200 bg-red-50 rounded-xl px-4 py-3">
+            Hopayola cancelled this job
+            {project.cancelled_note ? `: ${project.cancelled_note}` : "."} Stop
+            work. You will not be paid for a cancelled project.
+          </p>
+        )}
       </header>
 
       <section className="border border-stone rounded-2xl p-6 mb-6">

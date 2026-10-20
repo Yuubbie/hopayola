@@ -3,7 +3,11 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { addMilestone, updateMilestoneStatus } from "./actions";
 import PayProjectButton from "@/components/pay-project-button";
-import { adminConfirmPayment, adminSendPayout } from "@/app/actions/project-flow";
+import {
+  adminCancelProject,
+  adminConfirmPayment,
+  adminSendPayout,
+} from "@/app/actions/project-flow";
 import AdminManualPayoutForm from "@/components/admin-manual-payout-form";
 import ProjectChat from "@/components/ProjectChat";
 import { payoutBreakdown, ARTISAN_COMMISSION_RATE } from "@/lib/payments";
@@ -392,6 +396,55 @@ export default async function AdminProjectDetail({
         <h2 className="font-display text-lg mb-2">Coordinated chat</h2>
         <ProjectChat projectId={id} viewerRole="admin" />
       </section>
+
+      {project.status !== "cancelled" && !project.client_received_at && (
+        <section className="border border-red-200 rounded-2xl p-6 mt-8">
+          <h2 className="font-display text-lg mb-2">Cancel this project</h2>
+          {project.funded_at ? (
+            <p className="text-sm text-ink/60 mb-4">
+              The client has already paid. Cancelling here stops the job for
+              everyone. Refund the money in Paystack yourself, then write how
+              you handled it.
+            </p>
+          ) : (
+            <p className="text-sm text-ink/60 mb-4">
+              No money is held yet. Cancelling just closes the brief.
+            </p>
+          )}
+          <form action={adminCancelProject} className="space-y-3">
+            <input type="hidden" name="projectId" value={id} />
+            <textarea
+              name="note"
+              required
+              rows={3}
+              placeholder={
+                project.funded_at
+                  ? "Why, and how the refund will be sent (Paystack refund, bank, etc.)"
+                  : "Why this brief is closing"
+              }
+              className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
+            />
+            <button
+              type="submit"
+              className="text-sm border border-red-700 text-red-700 rounded-full px-4 py-2 hover:bg-red-700 hover:text-paper transition-colors"
+            >
+              Cancel project
+            </button>
+          </form>
+        </section>
+      )}
+
+      {project.status === "cancelled" && (
+        <section className="border border-stone rounded-2xl p-6 mt-8">
+          <h2 className="font-display text-lg mb-2">Cancelled</h2>
+          <p className="text-sm text-ink/65">
+            {project.cancelled_note || "This project is cancelled."}
+            {project.cancelled_at
+              ? ` · ${new Date(project.cancelled_at).toLocaleDateString("en-GB")}`
+              : ""}
+          </p>
+        </section>
+      )}
     </div>
   );
 }

@@ -69,6 +69,55 @@ export async function clientCancelProject(formData: FormData) {
   revalidatePath("/lifestyle");
 }
 
+/**
+ * Coordinator stopping a job after money is already held. Paystack refunds
+ * are still done in the Paystack dashboard — this records why, stops work,
+ * and tells the client and artisan the project is cancelled.
+ */
+export async function adminCancelProject(formData: FormData) {
+  const projectId = String(formData.get("projectId") || "");
+  const note = String(formData.get("note") || "")
+    .trim()
+    .slice(0, 500);
+  const { user, role } = await load();
+  if (role !== "admin") throw new Error("Not allowed.");
+  if (!note) {
+    throw new Error("Write why this is cancelled, and how the refund will be handled.");
+  }
+
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
+  const now = new Date().toISOString();
+
+  const { data: project } = await service
+    .from("projects")
+    .select("id, status, client_received_at")
+    .eq("id", projectId)
+    .maybeSingle();
+
+  if (!project) throw new Error("Project not found.");
+  if (project.status === "cancelled") return;
+  if (project.client_received_at) {
+    throw new Error(
+      "The client already confirmed delivery. Do not cancel — handle a dispute instead."
+    );
+  }
+
+  const { error } = await service
+    .from("projects")
+    .update({
+      status: "cancelled",
+      cancelled_at: now,
+      cancelled_by: user.id,
+      cancelled_note: note,
+    })
+    .eq("id", projectId);
+
+  if (error) throw new Error(error.message);
+  revalidate(projectId);
+  revalidatePath("/lifestyle");
+}
+
 export async function artisanConfirmFabric(formData: FormData) {
   const projectId = String(formData.get("projectId") || "");
   const { user, role } = await load();

@@ -108,6 +108,15 @@ export default async function ProjectDetail({
           {deadline ? ` | Expected completion ${deadline}` : ""}
           {budget ? ` | ${budget}` : ""}
         </p>
+        {project.status === "cancelled" && (
+          <p className="text-sm text-red-800 mt-3 border border-red-200 bg-red-50 rounded-xl px-4 py-3">
+            Hopayola cancelled this project
+            {project.cancelled_note ? `: ${project.cancelled_note}` : "."}
+            {project.funded_at
+              ? " If you paid, the coordinator is handling the refund."
+              : ""}
+          </p>
+        )}
       </header>
 
       <section className="border border-stone rounded-2xl p-6 mb-6">
