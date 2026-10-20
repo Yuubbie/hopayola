@@ -12,7 +12,7 @@ export default function Footer() {
             <li><a href="/about" className="hover:text-lilac transition-colors">About</a></li>
             <li><a href="/fashion" className="hover:text-lilac transition-colors">Fashion</a></li>
             <li><a href="/lifestyle" className="hover:text-lilac transition-colors">Lifestyle</a></li>
-            <li><a href="https://shop.hopayola.com" className="hover:text-lilac transition-colors">Shop</a></li>
+            <li><a href="/shop" className="hover:text-lilac transition-colors">Shop</a></li>
           </ul>
         </div>
         <div>

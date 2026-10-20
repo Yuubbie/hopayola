@@ -41,7 +41,7 @@ const CLIENT_LINKS = [
   { href: "/account/messages", label: "Messages" },
   { href: "/account/measurements", label: "Measurements" },
   { href: "/account/saved", label: "Saved items" },
-  { href: "https://shop.hopayola.com", label: "Shop", external: true },
+  { href: "/shop", label: "Shop" },
   { href: "/account/settings", label: "Settings" },
 ];
 
