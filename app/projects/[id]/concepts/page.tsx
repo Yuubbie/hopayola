@@ -1,4 +1,5 @@
 import { redirect, notFound } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ConceptSelectionForm from "@/components/concept-selection-form";
 
@@ -37,7 +38,13 @@ export default async function ProjectConcepts({
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-24">
-      <p className="text-royal text-sm mb-2">Design studio</p>
+      <Link
+        href="/account/studio"
+        className="text-xs text-ink/50 hover:text-royal"
+      >
+        &larr; Back to design studio
+      </Link>
+      <p className="text-royal text-sm mt-4 mb-2">Design studio</p>
       <h1 className="font-display text-3xl mb-2">Your design concepts</h1>
       <p className="text-ink/60 mb-12">
         {project.garment_type || "Project"}
