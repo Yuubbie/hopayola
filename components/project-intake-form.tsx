@@ -66,6 +66,57 @@ const PERSONA_OPTIONS = [
   "Traditional Royalty",
 ];
 
+const START_MODES = [
+  {
+    id: "explore",
+    title: "Explore Hopayola designs",
+    body: "Start from a curated Hopayola look.",
+  },
+  {
+    id: "own",
+    title: "Build from my own idea",
+    body: "Upload a sketch, fabric, or inspiration photo.",
+  },
+  {
+    id: "combine",
+    title: "Combine both",
+    body: "Pick a Hopayola look and add your own references.",
+  },
+] as const;
+
+const HOPAYOLA_LOOKS = [
+  {
+    id: "wedding-gown",
+    title: "Ceremony gown",
+    image: "/images/occasion-wedding.jpg",
+  },
+  {
+    id: "owambe",
+    title: "Owambe",
+    image: "/images/occasion-owambe.jpg",
+  },
+  {
+    id: "naming",
+    title: "Naming / aso-oke",
+    image: "/images/occasion-naming.jpg",
+  },
+  {
+    id: "corporate",
+    title: "Work / corporate",
+    image: "/images/occasion-corporate.jpg",
+  },
+  {
+    id: "everyday",
+    title: "Everyday",
+    image: "/images/occasion-everyday.jpg",
+  },
+  {
+    id: "cultural",
+    title: "Cultural / festival",
+    image: "/images/occasion-cultural.jpg",
+  },
+];
+
 export default function ProjectIntakeForm({
   userId,
   clientName,
@@ -87,6 +138,10 @@ export default function ProjectIntakeForm({
   );
   const [styles, setStyles] = useState<string[]>([]);
   const [persona, setPersona] = useState("");
+  const [startMode, setStartMode] = useState<(typeof START_MODES)[number]["id"]>(
+    "combine"
+  );
+  const [curatedId, setCuratedId] = useState("");
   const [styleDirection, setStyleDirection] = useState("");
   const [garmentType, setGarmentType] = useState("");
   const [tier, setTier] = useState<"standard" | "premium">(
@@ -135,8 +190,29 @@ export default function ProjectIntakeForm({
       setError("Pick an occasion and say what you are making.");
       return;
     }
+    const curated = HOPAYOLA_LOOKS.find((l) => l.id === curatedId);
+    if (
+      (startMode === "explore" || startMode === "combine") &&
+      !curated
+    ) {
+      setError("Pick a Hopayola design to start from.");
+      return;
+    }
+    if (
+      (startMode === "own" || startMode === "combine") &&
+      fabricFiles.length === 0
+    ) {
+      setError("Upload a sketch, fabric, or inspiration photo.");
+      return;
+    }
     const styleBrief = [
       designKind,
+      startMode === "explore"
+        ? "Explore Hopayola designs"
+        : startMode === "own"
+          ? "Build from my own idea"
+          : "Combine Hopayola design and my references",
+      curated ? `Hopayola start: ${curated.title}` : "",
       persona,
       styles.join(", "),
       styleDirection.trim(),
@@ -240,6 +316,57 @@ export default function ProjectIntakeForm({
           </div>
 
           <div>
+            <p className="text-sm text-ink/50 mb-2">How do you want to start?</p>
+            <div className="grid gap-2">
+              {START_MODES.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setStartMode(m.id)}
+                  className={`text-left rounded-xl border px-4 py-3 transition-colors ${
+                    startMode === m.id
+                      ? "border-royal bg-royal/5"
+                      : "border-stone hover:border-royal"
+                  }`}
+                >
+                  <span className="block text-sm font-medium">{m.title}</span>
+                  <span className="block text-xs text-ink/50 mt-0.5">
+                    {m.body}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {(startMode === "explore" || startMode === "combine") && (
+            <div>
+              <p className="text-sm text-ink/50 mb-2">Hopayola designs</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {HOPAYOLA_LOOKS.map((look) => (
+                  <button
+                    key={look.id}
+                    type="button"
+                    onClick={() => setCuratedId(look.id)}
+                    className={`rounded-xl overflow-hidden border text-left ${
+                      curatedId === look.id
+                        ? "border-royal ring-1 ring-royal"
+                        : "border-stone"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={look.image}
+                      alt=""
+                      className="w-full h-24 object-cover"
+                    />
+                    <span className="block text-xs px-2 py-2">{look.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
             <p className="text-sm text-ink/50 mb-2">Occasion</p>
             <div className="flex flex-wrap gap-2">
               {OCCASION_OPTIONS.map((o) => (
@@ -322,11 +449,17 @@ export default function ProjectIntakeForm({
 
       <section className="border border-stone rounded-2xl p-6">
         <h2 className="font-display text-lg mb-4">
-          Fabric or reference photos{" "}
-          <span className="text-ink/40 text-sm font-normal">(optional)</span>
+          {startMode === "explore"
+            ? "Extra photos"
+            : "Your sketch, fabric, or inspiration"}{" "}
+          <span className="text-ink/40 text-sm font-normal">
+            {startMode === "explore" ? "(optional)" : ""}
+          </span>
         </h2>
         <p className="text-ink/50 text-sm mb-4">
-          Skip this if you do not have fabric or a picture yet - describe the idea in the notes. Up to {MAX_PHOTOS} photos if you do.
+          {startMode === "explore"
+            ? "Optional. Up to " + MAX_PHOTOS + " photos."
+            : "Required for this path. Up to " + MAX_PHOTOS + " photos."}
         </p>
 
         <input
