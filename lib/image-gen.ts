@@ -9,6 +9,7 @@ export type ImageBytes = { bytes: Buffer; contentType: string };
 function configuredProvider(): string {
   const named = (process.env.IMAGE_GEN_PROVIDER || "").trim().toLowerCase();
   if (named) return named;
+  if (process.env.STABILITY_API_KEY) return "stability";
   if (process.env.OPENAI_API_KEY) return "openai";
   if (process.env.REPLICATE_API_TOKEN) return "replicate";
   if (process.env.FAL_KEY) return "fal";
@@ -21,7 +22,7 @@ export function imageGenReady(): boolean {
 }
 
 export function imageGenMissingMessage(): string {
-  return "Image generation is not configured yet. Add any one of: OPENAI_API_KEY, REPLICATE_API_TOKEN, FAL_KEY, or IMAGE_GEN_URL + IMAGE_GEN_API_KEY. Optional: IMAGE_GEN_PROVIDER=openai|replicate|fal|custom.";
+  return "Image generation is not configured yet. Add any one of: STABILITY_API_KEY, OPENAI_API_KEY, REPLICATE_API_TOKEN, FAL_KEY, or IMAGE_GEN_URL + IMAGE_GEN_API_KEY. Optional: IMAGE_GEN_PROVIDER=stability|openai|replicate|fal|custom.";
 }
 
 async function fromUrl(url: string): Promise<ImageBytes> {
@@ -30,6 +31,35 @@ async function fromUrl(url: string): Promise<ImageBytes> {
   const buf = Buffer.from(await res.arrayBuffer());
   const type = res.headers.get("content-type") || "image/png";
   return { bytes: buf, contentType: type.startsWith("image/") ? type : "image/png" };
+}
+
+async function stability(prompt: string): Promise<ImageBytes> {
+  const key = process.env.STABILITY_API_KEY;
+  if (!key) throw new Error("STABILITY_API_KEY is missing.");
+  const endpoint =
+    process.env.STABILITY_IMAGE_URL ||
+    "https://api.stability.ai/v2beta/stable-image/generate/core";
+  const form = new FormData();
+  form.append("prompt", prompt);
+  form.append("output_format", "png");
+  form.append("aspect_ratio", "2:3");
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + key,
+      Accept: "image/*",
+    },
+    body: form,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Stability error (${res.status}): ${text.slice(0, 200)}`);
+  }
+  const type = res.headers.get("content-type") || "image/png";
+  return {
+    bytes: Buffer.from(await res.arrayBuffer()),
+    contentType: type.startsWith("image/") ? type : "image/png",
+  };
 }
 
 async function openai(prompt: string): Promise<ImageBytes> {
@@ -148,11 +178,12 @@ async function custom(prompt: string): Promise<ImageBytes> {
 export async function generateFashionImage(prompt: string): Promise<ImageBytes> {
   const provider = configuredProvider();
   if (!provider) throw new Error(imageGenMissingMessage());
+  if (provider === "stability") return stability(prompt);
   if (provider === "openai") return openai(prompt);
   if (provider === "replicate") return replicate(prompt);
   if (provider === "fal") return fal(prompt);
   if (provider === "custom") return custom(prompt);
   throw new Error(
-    `Unknown IMAGE_GEN_PROVIDER "${provider}". Use openai, replicate, fal, or custom.`
+    `Unknown IMAGE_GEN_PROVIDER "${provider}". Use stability, openai, replicate, fal, or custom.`
   );
 }

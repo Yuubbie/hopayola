@@ -14,6 +14,7 @@ type Concept = {
   sleeve_style: string | null;
   neckline: string | null;
   image_url: string | null;
+  image_3d_url?: string | null;
 };
 
 type Props = {
@@ -64,6 +65,9 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
         return { error: String(json?.error || "Could not generate.") };
       }
       setUrls((prev) => ({ ...prev, [conceptId]: json.url }));
+      if (json.url3d) {
+        setUrls((prev) => ({ ...prev, [conceptId + "-3d"]: json.url3d }));
+      }
       setOne(conceptId, "ready");
       return { ok: true };
     } catch {
@@ -154,6 +158,7 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
         {concepts.map((c) => {
           const p = phase[c.id];
           const image = urls[c.id] || c.image_url || PLACEHOLDER;
+          const image3d = urls[c.id + "-3d"] || c.image_3d_url;
           return (
             <div
               key={c.id}
@@ -197,6 +202,19 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
                   </div>
                 )}
               </div>
+              {image3d && p === "ready" && (
+                <div className="border-t border-stone">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={image3d}
+                    alt={`Concept ${c.concept_number} 3D-style view`}
+                    className="w-full aspect-[4/5] object-cover"
+                  />
+                  <p className="text-[10px] text-ink/45 px-3 py-1">
+                    Premium 3D-style mockup. Not a true fitted 3D garment.
+                  </p>
+                </div>
+              )}
 
               <div className="p-4 flex-1 flex flex-col">
                 <p className="text-sm font-medium mb-1">

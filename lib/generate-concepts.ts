@@ -1,13 +1,13 @@
 import { createServiceClient } from "@/lib/supabase/service";
 
 const PERSONAS = [
-  "Modern Minimalist",
-  "Classic Elegance",
-  "Bold Statement",
-  "Romantic Feminine",
-  "Contemporary Chic",
-  "Cultural Fusion",
-  "Avant Garde",
+  "Rich Aunty",
+  "Pastor's Wife",
+  "Executive Woman",
+  "Young and Sophisticated",
+  "Abuja Luxury",
+  "Lagos Glam",
+  "Traditional Royalty",
 ];
 const SILHOUETTES = ["Fitted", "A-line", "Draped", "Structured", "Flowing"];
 const NECKLINES = ["V-neck", "Round neck", "Off-shoulder", "High neck", "Sweetheart"];

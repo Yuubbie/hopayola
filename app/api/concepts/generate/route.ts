@@ -96,7 +96,36 @@ export async function POST(request: Request) {
       .update({ image_url: pub.publicUrl, status: "ready", error: null })
       .eq("id", conceptId);
 
-    return NextResponse.json({ ok: true, url: pub.publicUrl });
+    let url3d: string | null = null;
+    if (String(project.tier || "") === "premium") {
+      const turnPrompt =
+        prompt +
+        " Same garment as a 3D-style fashion mockup on a mannequin, three-quarter turnaround view. Visual guide only, not a true fitted 3D garment.";
+      const turn = await generateFashionImage(turnPrompt);
+      const turnPath = `${concept.project_id}/${conceptId}-3d.${ext}`;
+      const { error: turnErr } = await service.storage
+        .from("concept-images")
+        .upload(turnPath, turn.bytes, {
+          contentType: turn.contentType,
+          upsert: true,
+        });
+      if (!turnErr) {
+        const { data: turnPub } = service.storage
+          .from("concept-images")
+          .getPublicUrl(turnPath);
+        url3d = turnPub.publicUrl;
+        await service
+          .from("ai_design_concepts")
+          .update({ image_3d_url: url3d })
+          .eq("id", conceptId);
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      url: pub.publicUrl,
+      url3d,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Generation failed.";
     await service

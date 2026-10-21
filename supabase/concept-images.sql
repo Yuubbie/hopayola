@@ -4,7 +4,8 @@
 alter table public.ai_design_concepts
   add column if not exists prompt text,
   add column if not exists status text default 'pending',
-  add column if not exists error text;
+  add column if not exists error text,
+  add column if not exists image_3d_url text;
 
 -- Public bucket so generated concept images can be shown directly.
 insert into storage.buckets (id, name, public)
