@@ -45,7 +45,7 @@ export function buildConceptPrompt(
     .join(", ");
 
   return [
-    `Original fashion design illustration of a ${project?.garment_type || "garment"} for ${project?.occasion || "a special occasion"}, in a contemporary Nigerian fashion context.`,
+    `Original fashion design of a ${project?.garment_type || "garment"} for ${project?.occasion || "a special occasion"}, contemporary Nigerian fashion. Use a full-length figure that matches the brief (menswear or womenswear as stated).`,
     direction ? `Design direction: ${direction}.` : null,
     proportions ? `Figure proportions to respect: ${proportions}.` : null,
     project?.style_direction

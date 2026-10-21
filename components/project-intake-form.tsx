@@ -6,6 +6,14 @@ import { createClient } from "@/lib/supabase/client";
 import { notifyProjectSubmission } from "@/app/actions/notifications";
 import { seedDefaultMilestones } from "@/app/actions/seed-milestones";
 import { generateConceptsAction } from "@/app/actions/generate-concepts";
+import {
+  FEMALE_GARMENTS,
+  FEMALE_LOOKS,
+  MALE_GARMENTS,
+  MALE_LOOKS,
+  PERSONA_MEN,
+  PERSONA_WOMEN,
+} from "@/lib/studio-looks";
 
 type SavedMeasurements = {
   bust?: string;
@@ -76,17 +84,6 @@ const STYLE_OPTIONS = [
   "Contemporary African",
 ];
 
-const PERSONA_OPTIONS = [
-  "Pastor's Wife",
-  "Rich Aunty",
-  "Senator's Wife",
-  "Executive Woman",
-  "Young and Sophisticated",
-  "Abuja Luxury",
-  "Lagos Glam",
-  "Traditional Royalty",
-];
-
 const START_MODES = [
   {
     id: "explore",
@@ -149,6 +146,8 @@ export default function ProjectIntakeForm({
   const router = useRouter();
   const supabase = createClient();
 
+  const [wearer, setWearer] = useState<"women" | "men">("women");
+  const [lookId, setLookId] = useState("");
   const [designKind, setDesignKind] = useState<(typeof DESIGN_KINDS)[number]>(
     "Clothing"
   );
@@ -250,8 +249,12 @@ export default function ProjectIntakeForm({
         return;
       }
     }
+    const looks = wearer === "men" ? MALE_LOOKS : FEMALE_LOOKS;
+    const pickedLook = looks.find((l) => l.id === lookId);
     const styleBrief = [
+      wearer === "men" ? "Menswear" : "Womenswear",
       designKind,
+      pickedLook ? `${pickedLook.title}. ${pickedLook.prompt}` : "",
       startMode === "explore"
         ? "Explore Hopayola designs"
         : startMode === "own"
@@ -376,6 +379,60 @@ export default function ProjectIntakeForm({
           </div>
 
           <div>
+            <p className="text-sm text-ink/50 mb-2">Who is this for?</p>
+            <div className="flex flex-wrap gap-2">
+              <Chip
+                label="Women"
+                selected={wearer === "women"}
+                onClick={() => {
+                  setWearer("women");
+                  setLookId("");
+                  setPersona("");
+                }}
+              />
+              <Chip
+                label="Men"
+                selected={wearer === "men"}
+                onClick={() => {
+                  setWearer("men");
+                  setLookId("");
+                  setPersona("");
+                }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-ink/50 mb-2">
+              {wearer === "men" ? "Men's starting look" : "Women's starting look"}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(wearer === "men" ? MALE_LOOKS : FEMALE_LOOKS).map((look) => (
+                <Chip
+                  key={look.id}
+                  label={look.title}
+                  selected={lookId === look.id}
+                  onClick={() => setLookId(lookId === look.id ? "" : look.id)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-ink/50 mb-2">Garment</p>
+            <div className="flex flex-wrap gap-2">
+              {(wearer === "men" ? MALE_GARMENTS : FEMALE_GARMENTS).map((g) => (
+                <Chip
+                  key={g}
+                  label={g}
+                  selected={garmentType === g}
+                  onClick={() => setGarmentType(garmentType === g ? "" : g)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
             <p className="text-sm text-ink/50 mb-2">How do you want to start?</p>
             <div className="grid gap-2">
               {START_MODES.map((m) => (
@@ -463,7 +520,7 @@ export default function ProjectIntakeForm({
           <div>
             <p className="text-sm text-ink/50 mb-2">Persona</p>
             <div className="flex flex-wrap gap-2">
-              {PERSONA_OPTIONS.map((p) => (
+              {(wearer === "men" ? PERSONA_MEN : PERSONA_WOMEN).map((p) => (
                 <Chip
                   key={p}
                   label={p}
