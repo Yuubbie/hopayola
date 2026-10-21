@@ -227,6 +227,17 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
                   {c.sleeve_style ? ` | ${c.sleeve_style}` : ""}
                 </p>
 
+                {p === "ready" && image && !String(image).includes("placeholder") && (
+                  <a
+                    href={image}
+                    download={`hopayola-concept-${c.concept_number}.png`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mb-2 text-center text-xs text-royal underline underline-offset-2"
+                  >
+                    Download this look
+                  </a>
+                )}
                 <button
                   onClick={() => handleSelect(c.id)}
                   disabled={saving !== null || p !== "ready"}

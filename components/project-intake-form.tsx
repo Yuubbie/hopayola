@@ -27,6 +27,15 @@ const MAX_PHOTOS = 5;
 
 const DESIGN_KINDS = ["Clothing", "Jewelry", "Complete look"] as const;
 
+const JEWELRY_OPTIONS = [
+  "Necklace",
+  "Earrings",
+  "Bracelet",
+  "Beaded set",
+  "Coral",
+  "Matching set",
+];
+
 const OCCASION_OPTIONS = [
   "Wedding",
   "Church",
@@ -144,6 +153,7 @@ export default function ProjectIntakeForm({
   const [curatedId, setCuratedId] = useState("");
   const [styleDirection, setStyleDirection] = useState("");
   const [garmentType, setGarmentType] = useState("");
+  const [jewelry, setJewelry] = useState<string[]>([]);
   const [tier, setTier] = useState<"standard" | "premium">(
     initialTier === "premium" ? "premium" : "standard"
   );
@@ -182,12 +192,13 @@ export default function ProjectIntakeForm({
     e.preventDefault();
     setError(null);
 
+    const jewelryLabel = jewelry.join(", ");
     const kindGarment =
       garmentType.trim() ||
       (designKind === "Jewelry"
-        ? "Jewelry"
+        ? jewelryLabel || "Jewelry"
         : designKind === "Complete look"
-          ? "Outfit and jewelry"
+          ? ["Outfit", jewelryLabel].filter(Boolean).join(" and ")
           : "");
     if (!occasion.trim() || !kindGarment) {
       setError("Pick an occasion and say what you are making.");
@@ -229,6 +240,7 @@ export default function ProjectIntakeForm({
           : "Combine Hopayola design and my references",
       curated ? `Hopayola start: ${curated.title}` : "",
       persona,
+      jewelryLabel ? `Jewelry: ${jewelryLabel}` : "",
       styles.join(", "),
       showOn === "photo"
         ? "Client consented to a personal photo for a visual mockup only. Not a fit or identity guarantee."
@@ -442,6 +454,28 @@ export default function ProjectIntakeForm({
               ))}
             </div>
           </div>
+
+          {(designKind === "Jewelry" || designKind === "Complete look") && (
+            <div>
+              <p className="text-sm text-ink/50 mb-2">Jewelry</p>
+              <div className="flex flex-wrap gap-2">
+                {JEWELRY_OPTIONS.map((j) => (
+                  <Chip
+                    key={j}
+                    label={j}
+                    selected={jewelry.includes(j)}
+                    onClick={() =>
+                      setJewelry((prev) =>
+                        prev.includes(j)
+                          ? prev.filter((x) => x !== j)
+                          : [...prev, j]
+                      )
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm text-ink/50 mb-1" htmlFor="garment-type">
