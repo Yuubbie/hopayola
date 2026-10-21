@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { saveLook } from "@/app/actions/saved-looks";
 
 type Concept = {
   id: string;
@@ -228,15 +229,29 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
                 </p>
 
                 {p === "ready" && image && !String(image).includes("placeholder") && (
-                  <a
-                    href={image}
-                    download={`hopayola-concept-${c.concept_number}.png`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mb-2 text-center text-xs text-royal underline underline-offset-2"
-                  >
-                    Download this look
-                  </a>
+                  <div className="mb-2 flex flex-col items-center gap-1">
+                    <a
+                      href={image}
+                      download={`hopayola-concept-${c.concept_number}.png`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-royal underline underline-offset-2"
+                    >
+                      Download this look
+                    </a>
+                    <form action={saveLook}>
+                      <input type="hidden" name="title" value={`Concept ${c.concept_number}${c.persona ? ` · ${c.persona}` : ""}`} />
+                      <input type="hidden" name="imageUrl" value={image} />
+                      <input type="hidden" name="projectId" value={projectId} />
+                      <input type="hidden" name="conceptId" value={c.id} />
+                      <button
+                        type="submit"
+                        className="text-xs text-ink/50 hover:text-royal"
+                      >
+                        Save to my items
+                      </button>
+                    </form>
+                  </div>
                 )}
                 <button
                   onClick={() => handleSelect(c.id)}
