@@ -158,6 +158,9 @@ export default function ProjectIntakeForm({
   const [measurementNotes, setMeasurementNotes] = useState("");
 
   const [fabricFiles, setFabricFiles] = useState<File[]>([]);
+  const [portraitFile, setPortraitFile] = useState<File | null>(null);
+  const [portraitConsent, setPortraitConsent] = useState(false);
+  const [showOn, setShowOn] = useState<"mannequin" | "photo">("mannequin");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -205,6 +208,18 @@ export default function ProjectIntakeForm({
       setError("Upload a sketch, fabric, or inspiration photo.");
       return;
     }
+    if (showOn === "photo") {
+      if (!portraitFile) {
+        setError("Add a photo of you, or switch to mannequin.");
+        return;
+      }
+      if (!portraitConsent) {
+        setError(
+          "Tick consent if we should use your photo. The mockup is not a fit guarantee."
+        );
+        return;
+      }
+    }
     const styleBrief = [
       designKind,
       startMode === "explore"
@@ -215,6 +230,9 @@ export default function ProjectIntakeForm({
       curated ? `Hopayola start: ${curated.title}` : "",
       persona,
       styles.join(", "),
+      showOn === "photo"
+        ? "Client consented to a personal photo for a visual mockup only. Not a fit or identity guarantee."
+        : "Show on a mannequin or fashion figure, not a real person.",
       styleDirection.trim(),
     ]
       .filter(Boolean)
@@ -233,6 +251,17 @@ export default function ProjectIntakeForm({
 
         if (uploadError) {
           throw new Error(`Fabric photo upload failed: ${uploadError.message}`);
+        }
+        uploadedPaths.push(path);
+      }
+      if (showOn === "photo" && portraitFile) {
+        const ext = portraitFile.name.split(".").pop();
+        const path = `${userId}/portrait-${crypto.randomUUID()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from("project-fabrics")
+          .upload(path, portraitFile);
+        if (uploadError) {
+          throw new Error(`Portrait upload failed: ${uploadError.message}`);
         }
         uploadedPaths.push(path);
       }
@@ -488,6 +517,68 @@ export default function ProjectIntakeForm({
               </li>
             ))}
           </ul>
+        )}
+      </section>
+
+      <section className="border border-stone rounded-2xl p-6">
+        <h2 className="font-display text-lg mb-2">Who should the look be on?</h2>
+        <p className="text-sm text-ink/50 mb-4">
+          A generated image cannot guarantee fit. Measurements are for the
+          artisan, not the picture.
+        </p>
+        <div className="grid gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setShowOn("mannequin")}
+            className={`text-left rounded-xl border px-4 py-3 ${
+              showOn === "mannequin"
+                ? "border-royal bg-royal/5"
+                : "border-stone"
+            }`}
+          >
+            <span className="block text-sm font-medium">Mannequin / figure</span>
+            <span className="block text-xs text-ink/50 mt-0.5">
+              Default. No photo of you.
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowOn("photo")}
+            className={`text-left rounded-xl border px-4 py-3 ${
+              showOn === "photo" ? "border-royal bg-royal/5" : "border-stone"
+            }`}
+          >
+            <span className="block text-sm font-medium">Optional photo of me</span>
+            <span className="block text-xs text-ink/50 mt-0.5">
+              Visual only. Not body measurements.
+            </span>
+          </button>
+        </div>
+        {showOn === "photo" && (
+          <div className="space-y-3">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setPortraitFile(e.target.files?.[0] || null)}
+              className="text-sm"
+            />
+            {portraitFile && (
+              <p className="text-xs text-ink/50">{portraitFile.name}</p>
+            )}
+            <label className="flex items-start gap-2 text-sm text-ink/70">
+              <input
+                type="checkbox"
+                checked={portraitConsent}
+                onChange={(e) => setPortraitConsent(e.target.checked)}
+                className="mt-1"
+              />
+              <span>
+                I consent to Hopayola using this photo only to mock up this
+                design. I understand it is not a true likeness or fit
+                prediction.
+              </span>
+            </label>
+          </div>
         )}
       </section>
 
