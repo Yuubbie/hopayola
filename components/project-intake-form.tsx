@@ -25,13 +25,45 @@ type Props = {
 
 const MAX_PHOTOS = 5;
 
+const DESIGN_KINDS = ["Clothing", "Jewelry", "Complete look"] as const;
+
 const OCCASION_OPTIONS = [
   "Wedding",
-  "Owambe / Party",
+  "Church",
+  "Birthday",
+  "Dinner",
+  "Traditional event",
+  "Work",
+  "Red carpet",
+  "Casual",
   "Naming Ceremony",
-  "Corporate / Work",
-  "Everyday Wear",
-  "Cultural / Festival",
+  "Owambe / Party",
+  "Other",
+];
+
+const STYLE_OPTIONS = [
+  "Elegant",
+  "Classic",
+  "Modern",
+  "Dramatic",
+  "Minimalist",
+  "Regal",
+  "Feminine",
+  "Bold",
+  "Modest",
+  "Traditional",
+  "Contemporary African",
+];
+
+const PERSONA_OPTIONS = [
+  "Pastor's Wife",
+  "Rich Aunty",
+  "Senator's Wife",
+  "Executive Woman",
+  "Young and Sophisticated",
+  "Abuja Luxury",
+  "Lagos Glam",
+  "Traditional Royalty",
 ];
 
 export default function ProjectIntakeForm({
@@ -45,11 +77,16 @@ export default function ProjectIntakeForm({
   const router = useRouter();
   const supabase = createClient();
 
+  const [designKind, setDesignKind] = useState<(typeof DESIGN_KINDS)[number]>(
+    "Clothing"
+  );
   const [occasion, setOccasion] = useState(
     initialOccasion && OCCASION_OPTIONS.includes(initialOccasion)
       ? initialOccasion
       : ""
   );
+  const [styles, setStyles] = useState<string[]>([]);
+  const [persona, setPersona] = useState("");
   const [styleDirection, setStyleDirection] = useState("");
   const [garmentType, setGarmentType] = useState("");
   const [tier, setTier] = useState<"standard" | "premium">(
@@ -87,10 +124,25 @@ export default function ProjectIntakeForm({
     e.preventDefault();
     setError(null);
 
-    if (!occasion.trim() || !garmentType.trim()) {
-      setError("Occasion and garment type are required.");
+    const kindGarment =
+      garmentType.trim() ||
+      (designKind === "Jewelry"
+        ? "Jewelry"
+        : designKind === "Complete look"
+          ? "Outfit and jewelry"
+          : "");
+    if (!occasion.trim() || !kindGarment) {
+      setError("Pick an occasion and say what you are making.");
       return;
     }
+    const styleBrief = [
+      designKind,
+      persona,
+      styles.join(", "),
+      styleDirection.trim(),
+    ]
+      .filter(Boolean)
+      .join(". ");
     setSubmitting(true);
 
     try {
@@ -124,8 +176,8 @@ export default function ProjectIntakeForm({
           tier,
           status: "submitted",
           occasion: occasion.trim(),
-          style_direction: styleDirection.trim() || null,
-          garment_type: garmentType.trim(),
+          style_direction: styleBrief || null,
+          garment_type: kindGarment,
           measurements,
           delivery_deadline: deliveryDeadline || null,
           budget_min: budgetMin ? Number(budgetMin) : null,
@@ -167,55 +219,101 @@ export default function ProjectIntakeForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <section className="border border-stone rounded-2xl p-6">
-        <h2 className="font-display text-lg mb-4">The basics</h2>
+        <h2 className="font-display text-lg mb-1">Design studio brief</h2>
+        <p className="text-sm text-ink/50 mb-5">
+          Tap what you want. You can still type extra notes.
+        </p>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
-            <label className="block text-sm text-ink/50 mb-1" htmlFor="occasion">
-              Occasion
-            </label>
-            <select
-              id="occasion"
-              value={occasion}
-              onChange={(e) => setOccasion(e.target.value)}
-              className="w-full border border-stone rounded-lg px-3 py-2 text-sm bg-paper"
-              required
-            >
-              <option value="" disabled>
-                Select an occasion
-              </option>
-              {OCCASION_OPTIONS.map((o) => (
-                <option key={o} value={o}>
-                  {o}
-                </option>
+            <p className="text-sm text-ink/50 mb-2">What are we designing?</p>
+            <div className="flex flex-wrap gap-2">
+              {DESIGN_KINDS.map((k) => (
+                <Chip
+                  key={k}
+                  label={k}
+                  selected={designKind === k}
+                  onClick={() => setDesignKind(k)}
+                />
               ))}
-            </select>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-ink/50 mb-2">Occasion</p>
+            <div className="flex flex-wrap gap-2">
+              {OCCASION_OPTIONS.map((o) => (
+                <Chip
+                  key={o}
+                  label={o}
+                  selected={occasion === o}
+                  onClick={() => setOccasion(o)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-ink/50 mb-2">Style direction</p>
+            <div className="flex flex-wrap gap-2">
+              {STYLE_OPTIONS.map((s) => (
+                <Chip
+                  key={s}
+                  label={s}
+                  selected={styles.includes(s)}
+                  onClick={() =>
+                    setStyles((prev) =>
+                      prev.includes(s)
+                        ? prev.filter((x) => x !== s)
+                        : [...prev, s]
+                    )
+                  }
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-ink/50 mb-2">Persona</p>
+            <div className="flex flex-wrap gap-2">
+              {PERSONA_OPTIONS.map((p) => (
+                <Chip
+                  key={p}
+                  label={p}
+                  selected={persona === p}
+                  onClick={() => setPersona(persona === p ? "" : p)}
+                />
+              ))}
+            </div>
           </div>
 
           <div>
             <label className="block text-sm text-ink/50 mb-1" htmlFor="garment-type">
-              Garment type
+              {designKind === "Jewelry" ? "Jewelry type" : "Garment type"}
             </label>
             <input
               id="garment-type"
               type="text"
               value={garmentType}
               onChange={(e) => setGarmentType(e.target.value)}
-              placeholder="Gown, two-piece, agbada..."
+              placeholder={
+                designKind === "Jewelry"
+                  ? "Necklace, earrings, set..."
+                  : "Gown, two-piece, agbada..."
+              }
               className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
-              required
             />
           </div>
 
           <div>
             <label className="block text-sm text-ink/50 mb-1" htmlFor="style-direction">
-              Style direction <span className="text-ink/30">(optional)</span>
+              Extra notes <span className="text-ink/30">(optional)</span>
             </label>
             <textarea
               id="style-direction"
               value={styleDirection}
               onChange={(e) => setStyleDirection(e.target.value)}
-              placeholder="Anything you already have in mind - silhouette, mood, references..."
+              placeholder="Rich Aunty vibes but not too loud. Sunday thanksgiving..."
               className="w-full border border-stone rounded-lg px-3 py-2 text-sm min-h-[80px]"
             />
           </div>
@@ -365,7 +463,8 @@ export default function ProjectIntakeForm({
             <span>
               <span className="block text-sm font-medium">Premium</span>
               <span className="block text-ink/50 text-sm">
-                7 AI design concepts to choose from
+                7 looks, plus a 3D-style mockup. Visual guide only, not a true
+                fitted 3D garment.
               </span>
             </span>
           </label>
@@ -434,5 +533,29 @@ export default function ProjectIntakeForm({
         {submitting ? "Submitting..." : "Submit project"}
       </button>
     </form>
+  );
+}
+
+function Chip({
+  label,
+  selected,
+  onClick,
+}: {
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-xs rounded-full px-3 py-1.5 border transition-colors ${
+        selected
+          ? "bg-royal text-paper border-royal"
+          : "border-stone text-ink/70 hover:border-royal"
+      }`}
+    >
+      {label}
+    </button>
   );
 }

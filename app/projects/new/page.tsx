@@ -26,10 +26,11 @@ export default async function NewProject({
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-24">
+      <p className="text-royal text-sm mb-2">Design studio</p>
       <h1 className="font-display text-3xl mb-2">Start a project</h1>
       <p className="text-ink/60 mb-12">
-        Tell us what you are making. We will match you and generate design
-        concepts ({tier === "premium" ? "7" : "3"} on this package).
+        Choose the look, then we draw concepts ({tier === "premium" ? "7" : "3"}{" "}
+        on this package).
       </p>
 
       <ProjectIntakeForm
