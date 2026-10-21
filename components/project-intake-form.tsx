@@ -24,6 +24,18 @@ type Props = {
 };
 
 const MAX_PHOTOS = 5;
+const MAX_FILE_MB = 8;
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic"];
+
+function fileOk(file: File): string | null {
+  if (!ALLOWED_TYPES.includes(file.type) && !file.type.startsWith("image/")) {
+    return "Use a photo file (jpg, png, or webp).";
+  }
+  if (file.size > MAX_FILE_MB * 1024 * 1024) {
+    return `Each photo must be under ${MAX_FILE_MB} MB.`;
+  }
+  return null;
+}
 
 const DESIGN_KINDS = ["Clothing", "Jewelry", "Complete look"] as const;
 
@@ -179,6 +191,13 @@ export default function ProjectIntakeForm({
     if (chosen.length + fabricFiles.length > MAX_PHOTOS) {
       setError(`You can upload up to ${MAX_PHOTOS} fabric photos.`);
       return;
+    }
+    for (const file of chosen) {
+      const bad = fileOk(file);
+      if (bad) {
+        setError(bad);
+        return;
+      }
     }
     setError(null);
     setFabricFiles((prev) => [...prev, ...chosen]);
@@ -593,7 +612,19 @@ export default function ProjectIntakeForm({
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setPortraitFile(e.target.files?.[0] || null)}
+              onChange={(e) => {
+                const f = e.target.files?.[0] || null;
+                if (f) {
+                  const bad = fileOk(f);
+                  if (bad) {
+                    setError(bad);
+                    setPortraitFile(null);
+                    return;
+                  }
+                }
+                setError(null);
+                setPortraitFile(f);
+              }}
               className="text-sm"
             />
             {portraitFile && (
@@ -722,8 +753,14 @@ export default function ProjectIntakeForm({
               <span className="block text-sm font-medium">Premium</span>
               <span className="block text-ink/50 text-sm">
                 7 looks, plus a 3D-style mockup. Visual guide only, not a true
-                fitted 3D garment.
+                fitted 3D garment. One design session, not unlimited redraws.
               </span>
+              <a
+                href="/contact"
+                className="inline-block mt-2 text-xs text-royal underline underline-offset-2"
+              >
+                Book a Premium consult
+              </a>
             </span>
           </label>
         </div>
