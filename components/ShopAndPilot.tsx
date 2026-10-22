@@ -24,7 +24,7 @@ export default function ShopAndPilot() {
       <div className="bg-plum text-paper rounded-3xl p-10 flex flex-col justify-between">
         <div>
           <h3 className="font-display text-2xl mb-3">
-            Currently piloting in Abuja
+            Currently piloting in Nigeria
           </h3>
           <p className="text-paper/80 leading-relaxed mb-6">
             We&apos;re starting local, learning what works, and building toward

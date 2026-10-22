@@ -62,7 +62,7 @@ export default function WaitlistSignup() {
               Join the waitlist.
             </h2>
             <p className="text-paper/70 leading-relaxed mb-8">
-              Be the first to know as Hopayola grows beyond our Abuja pilot.
+              Be the first to know as Hopayola grows across Nigeria.
             </p>
 
             <form

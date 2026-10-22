@@ -57,6 +57,9 @@ async function finish(
         ? Number(metadata.artisan_years_experience)
         : null,
       bio: metadata.artisan_bio || null,
+      shop_address: metadata.artisan_shop_address || null,
+      guarantor_phone: metadata.artisan_guarantor_phone || null,
+      legal_name: metadata.artisan_legal_name || null,
     });
 
     return NextResponse.redirect(`${origin}/artisan/account?welcome=1`);

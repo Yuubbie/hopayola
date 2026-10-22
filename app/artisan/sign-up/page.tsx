@@ -17,6 +17,9 @@ const SPECIALTY_OPTIONS = [
 
 export default function ArtisanSignUp() {
   const [fullName, setFullName] = useState("");
+  const [legalName, setLegalName] = useState("");
+  const [shopAddress, setShopAddress] = useState("");
+  const [guarantorPhone, setGuarantorPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [specialty, setSpecialty] = useState<string[]>([]);
@@ -60,6 +63,10 @@ export default function ArtisanSignUp() {
       setError("Pick at least one specialty.");
       return;
     }
+    if (!shopAddress.trim() || !guarantorPhone.trim()) {
+      setError("Shop address and a guarantor phone number are required.");
+      return;
+    }
 
     setLoading(true);
 
@@ -70,7 +77,7 @@ export default function ArtisanSignUp() {
         data: {
           full_name: fullName,
           intended_role: "artisan",
-          artisan_region: "abuja",
+          artisan_region: "nigeria",
           artisan_specialty: specialty.join(","),
           artisan_skills: skills
             .split(",")
@@ -79,6 +86,9 @@ export default function ArtisanSignUp() {
             .join(","),
           artisan_years_experience: yearsExperience || null,
           artisan_bio: bio || null,
+          artisan_legal_name: legalName || null,
+          artisan_shop_address: shopAddress.trim(),
+          artisan_guarantor_phone: guarantorPhone.trim(),
         },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
@@ -123,21 +133,39 @@ export default function ArtisanSignUp() {
                 Join as an artisan
               </h1>
               <p className="text-ink/60 mb-8">
-                Hopayola is launching in Abuja first. Set up your profile and
-                start getting matched with projects.
+                Use your <strong>brand name</strong> as the name on this form.
+                That is how clients will see you. We also need your shop
+                address and a guarantor&apos;s number.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm mb-1" htmlFor="fullName">
-                    Full name
+                    Brand name
                   </label>
+                  <p className="text-[11px] text-ink/45 mb-1">
+                    Not a personal nickname. The name of your fashion house.
+                  </p>
                   <input
                     id="fullName"
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
+                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm mb-1" htmlFor="legalName">
+                    Full legal name
+                  </label>
+                  <input
+                    id="legalName"
+                    type="text"
+                    required
+                    value={legalName}
+                    onChange={(e) => setLegalName(e.target.value)}
                     className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
                   />
                 </div>
@@ -167,7 +195,7 @@ export default function ArtisanSignUp() {
                 <div>
                   <p className="text-sm mb-1">Region</p>
                   <p className="text-sm text-ink/50 border border-stone rounded-lg px-4 py-2.5">
-                    Abuja (pilot)
+                    Nigeria
                   </p>
                 </div>
 
@@ -219,6 +247,34 @@ export default function ArtisanSignUp() {
                     min="0"
                     value={yearsExperience}
                     onChange={(e) => setYearsExperience(e.target.value)}
+                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm mb-1" htmlFor="shopAddress">
+                    Shop address
+                  </label>
+                  <textarea
+                    id="shopAddress"
+                    required
+                    value={shopAddress}
+                    onChange={(e) => setShopAddress(e.target.value)}
+                    placeholder="Street, area, city"
+                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none min-h-[72px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm mb-1" htmlFor="guarantorPhone">
+                    Guarantor phone number
+                  </label>
+                  <input
+                    id="guarantorPhone"
+                    type="tel"
+                    required
+                    value={guarantorPhone}
+                    onChange={(e) => setGuarantorPhone(e.target.value)}
                     className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
                   />
                 </div>

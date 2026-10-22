@@ -179,7 +179,7 @@ export default function About() {
         <div className="mx-auto max-w-6xl px-6 text-center">
           <p className="text-royal text-sm mb-4">Now piloting</p>
           <h2 className="font-display text-4xl md:text-5xl mb-6">
-            Starting in Abuja
+            Starting in Nigeria
           </h2>
           <p className="text-paper/70 max-w-prose mx-auto leading-relaxed mb-10">
             We&apos;re launching local first, learning what works, and building

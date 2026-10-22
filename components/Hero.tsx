@@ -23,7 +23,7 @@ export default function Hero() {
       >
         <HeroTopStrip />
         <p className="text-royal text-sm mb-4">
-          AI-assisted briefs · women artisans in Abuja · money held until delivery
+          How it works · AI briefs · artisans across Nigeria · money held until delivery
         </p>
         <h1 className="font-display text-5xl md:text-6xl leading-[1.05] mb-6">
           Your fashion idea, planned and coordinated from start to finish.

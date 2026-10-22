@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-6 py-16 grid gap-10 md:grid-cols-3">
         <div>
           <p className="font-display text-2xl mb-3">Hopayola</p>
-          <p className="text-paper/70 text-sm">Fashion, thoughtfully orchestrated.</p>
+          <p className="text-paper/70 text-sm">Your fashion network platform</p>
         </div>
         <div>
           <p className="text-xs tracking-widest uppercase text-paper/40 mb-3">Explore</p>
@@ -26,7 +26,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-paper/10 py-6 text-center text-xs text-paper/40">
-        &copy; {new Date().getFullYear()} Hopayola. Abuja, Nigeria.
+        &copy; {new Date().getFullYear()} Hopayola. Nigeria.
       </div>
     </footer>
   );

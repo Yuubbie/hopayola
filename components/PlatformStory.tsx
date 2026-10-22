@@ -6,8 +6,8 @@ const pillars = [
     body: "You describe the occasion and send a photo of your fabric. Hopayola turns that into design concepts you can actually choose — not a mood board, a brief your artisan can sew from.",
   },
   {
-    title: "Women artisans, paid fairly",
-    body: "Verified tailors and designers in Abuja. They work from a real job board, send stage photos from their phone, and are paid 90% of the project when you confirm the finished outfit.",
+    title: "Artisans, paid fairly",
+    body: "Verified tailors and designers in Nigeria. They work from a real job board, send stage photos from their phone, and are paid 90% of the project when you confirm the finished outfit.",
   },
   {
     title: "Two workspaces, one project",
@@ -142,7 +142,7 @@ export default function PlatformStory() {
       <p className="text-royal text-sm mb-3">What Hopayola actually is</p>
       <h2 className="font-display text-3xl md:text-4xl mb-4 max-w-3xl">
         Not a shop. A coordinated studio for custom fashion — with AI in the
-        brief, and women artisans on the bench.
+        brief, and artisans on the bench.
       </h2>
       <p className="text-ink/65 max-w-2xl mb-10 leading-relaxed">
         This is the interface after you sign in. Judges and visitors should see

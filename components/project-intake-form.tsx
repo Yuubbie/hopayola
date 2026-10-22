@@ -70,6 +70,19 @@ const OCCASION_OPTIONS = [
   "Other",
 ];
 
+const FABRIC_OPTIONS = [
+  "Ankara / wax print",
+  "Aso-oke",
+  "Adire",
+  "Lace",
+  "Silk",
+  "Cotton",
+  "Linen",
+  "Suiting",
+  "Velvet",
+  "Not sure",
+];
+
 const STYLE_OPTIONS = [
   "Elegant",
   "Classic",
@@ -156,6 +169,7 @@ export default function ProjectIntakeForm({
       ? initialOccasion
       : ""
   );
+  const [fabricType, setFabricType] = useState("");
   const [styles, setStyles] = useState<string[]>([]);
   const [persona, setPersona] = useState("");
   const [startMode, setStartMode] = useState<(typeof START_MODES)[number]["id"]>(
@@ -263,6 +277,7 @@ export default function ProjectIntakeForm({
       curated ? `Hopayola start: ${curated.title}` : "",
       persona,
       jewelryLabel ? `Jewelry: ${jewelryLabel}` : "",
+      fabricType ? `Fabric type: ${fabricType}` : "",
       styles.join(", "),
       showOn === "photo"
         ? "Client consented to a personal photo for a visual mockup only. Not a fit or identity guarantee."
@@ -492,6 +507,20 @@ export default function ProjectIntakeForm({
                   label={o}
                   selected={occasion === o}
                   onClick={() => setOccasion(o)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-ink/50 mb-2">Fabric type</p>
+            <div className="flex flex-wrap gap-2">
+              {FABRIC_OPTIONS.map((f) => (
+                <Chip
+                  key={f}
+                  label={f}
+                  selected={fabricType === f}
+                  onClick={() => setFabricType(fabricType === f ? "" : f)}
                 />
               ))}
             </div>
