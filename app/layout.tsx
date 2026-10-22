@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import AppChrome from "@/components/AppChrome";
 import IntroSplash from "@/components/IntroSplash";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PwaInstall from "@/components/PwaInstall";
@@ -65,9 +64,7 @@ export default function RootLayout({
       >
         <GoogleAnalytics />
         <IntroSplash />
-        <Navbar />
-        {children}
-        <Footer />
+        <AppChrome>{children}</AppChrome>
         <PwaInstall />
         <HelpChat />
       </body>
