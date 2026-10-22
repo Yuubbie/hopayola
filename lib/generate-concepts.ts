@@ -1,22 +1,49 @@
 import { createServiceClient } from "@/lib/supabase/service";
+import { PERSONA_MEN, PERSONA_WOMEN } from "@/lib/studio-looks";
 
-const PERSONAS = [
-  "Rich Aunty",
-  "Pastor's Wife",
-  "Executive Woman",
-  "Young and Sophisticated",
-  "Abuja Luxury",
-  "Lagos Glam",
-  "Traditional Royalty",
+const WOMEN_SILHOUETTES = ["Fitted", "A-line", "Draped", "Structured", "Flowing"];
+const WOMEN_NECKLINES = [
+  "V-neck",
+  "Round neck",
+  "Off-shoulder",
+  "High neck",
+  "Sweetheart",
 ];
-const SILHOUETTES = ["Fitted", "A-line", "Draped", "Structured", "Flowing"];
-const NECKLINES = ["V-neck", "Round neck", "Off-shoulder", "High neck", "Sweetheart"];
-const SLEEVES = ["Sleeveless", "Cap sleeve", "Long sleeve", "Puff sleeve", "Three-quarter"];
+const WOMEN_SLEEVES = [
+  "Sleeveless",
+  "Cap sleeve",
+  "Long sleeve",
+  "Puff sleeve",
+  "Three-quarter",
+];
 
-/**
- * Creates the concept rows for a project. Images are generated later, on
- * demand, from the concepts page — so this stays fast and costs nothing.
- */
+const MEN_SILHOUETTES = ["Structured", "Straight", "Relaxed", "Flowing", "Fitted"];
+const MEN_NECKLINES = [
+  "Round neck",
+  "Mandarin collar",
+  "V-neck",
+  "Crew neck",
+  "High neck",
+];
+const MEN_SLEEVES = [
+  "Long sleeve",
+  "Three-quarter",
+  "Short sleeve",
+  "Cap sleeve",
+  "Long sleeve",
+];
+
+function isMenswear(style: string | null, garment: string | null) {
+  const t = `${style || ""} ${garment || ""}`.toLowerCase();
+  return (
+    t.includes("menswear") ||
+    t.includes("agbada") ||
+    t.includes("senator") ||
+    t.includes("kaftan / tunic") ||
+    /\bmen\b/.test(t)
+  );
+}
+
 export async function generateConceptsForProject(
   projectId: string,
   tier: string
@@ -28,16 +55,31 @@ export async function generateConceptsForProject(
     .eq("project_id", projectId);
   if ((count || 0) > 0) return;
 
+  const { data: project } = await service
+    .from("projects")
+    .select("style_direction, garment_type")
+    .eq("id", projectId)
+    .maybeSingle();
+
+  const male = isMenswear(
+    project?.style_direction || null,
+    project?.garment_type || null
+  );
+  const personas = male ? PERSONA_MEN : PERSONA_WOMEN;
+  const silhouettes = male ? MEN_SILHOUETTES : WOMEN_SILHOUETTES;
+  const necklines = male ? MEN_NECKLINES : WOMEN_NECKLINES;
+  const sleeves = male ? MEN_SLEEVES : WOMEN_SLEEVES;
+
   const n = tier === "premium" ? 7 : 3;
   const concepts = Array.from({ length: n }, (_, i) => ({
     project_id: projectId,
     concept_number: i + 1,
-    persona: PERSONAS[i % PERSONAS.length],
-    silhouette: SILHOUETTES[i % SILHOUETTES.length],
+    persona: personas[i % personas.length],
+    silhouette: silhouettes[i % silhouettes.length],
     modesty_level: i % 2 === 0 ? "Modest" : "Contemporary",
     embellishment: i % 3 === 0 ? "Beaded detail" : "Minimal",
-    sleeve_style: SLEEVES[i % SLEEVES.length],
-    neckline: NECKLINES[i % NECKLINES.length],
+    sleeve_style: sleeves[i % sleeves.length],
+    neckline: necklines[i % necklines.length],
     image_url: null,
     is_selected: false,
   }));

@@ -24,6 +24,11 @@ export function buildConceptPrompt(
     return v === null || v === undefined || v === "" ? null : String(v);
   };
 
+  const notes = String(project?.style_direction || "");
+  const menswear = /menswear|\bagbada\b|\bsenator\b/i.test(
+    `${notes} ${project?.garment_type || ""}`
+  );
+
   const direction = [
     concept.persona,
     concept.silhouette ? `${concept.silhouette} silhouette` : null,
@@ -45,7 +50,9 @@ export function buildConceptPrompt(
     .join(", ");
 
   return [
-    `Original fashion design of a ${project?.garment_type || "garment"} for ${project?.occasion || "a special occasion"}, contemporary Nigerian fashion. Use a full-length figure that matches the brief (menswear or womenswear as stated).`,
+    menswear
+      ? `Original menswear fashion design of a ${project?.garment_type || "garment"} for ${project?.occasion || "a special occasion"}, contemporary Nigerian fashion. Full-length adult man only. No women, no female model, no gown.`
+      : `Original fashion design of a ${project?.garment_type || "garment"} for ${project?.occasion || "a special occasion"}, contemporary Nigerian fashion. Full-length figure matching the brief.`,
     direction ? `Design direction: ${direction}.` : null,
     proportions ? `Figure proportions to respect: ${proportions}.` : null,
     project?.style_direction
