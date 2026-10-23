@@ -299,12 +299,20 @@ export default async function ArtisanAccount({
                 {jobs.map((p) => {
                   const list = myMilestonesFor(p.id);
                   const doneCount = list.filter((m) => m.confirmed_at).length;
-                  const percent =
-                    list.length > 0
-                      ? Math.round((doneCount / list.length) * 100)
-                      : p.client_received_at
-                        ? 100
-                        : 0;
+                  const percent = (() => {
+                    if (p.client_received_at || p.status === "completed") {
+                      return 100;
+                    }
+                    if (!p.fabric_sent_at) return 8;
+                    if (!p.fabric_received_at) return 18;
+                    if (!p.funded_at) return 30;
+                    if (list.length === 0) return 40;
+                    const stageShare = Math.round(
+                      (doneCount / list.length) * 50
+                    );
+                    const shipped = p.shipped_at ? 10 : 0;
+                    return Math.min(90, 40 + stageShare + shipped);
+                  })();
                   const started = workStarted(p);
                   const nextStage = list.find((m) => !m.confirmed_at);
 

@@ -48,10 +48,36 @@ async function stability(
   form.append("aspect_ratio", "2:3");
   if (fabric) {
     const blob = new Blob([new Uint8Array(fabric.bytes)], {
-      type: fabric.contentType,
+      type: fabric.contentType || "image/png",
     });
-    form.append("image", blob, "fabric.png");
-    form.append("strength", "0.65");
+    const sd3 = new FormData();
+    sd3.append(
+      "prompt",
+      `${prompt} Use the attached photo as the exact fabric print and colour on the garment.`
+    );
+    sd3.append("mode", "image-to-image");
+    sd3.append("strength", "0.55");
+    sd3.append("aspect_ratio", "2:3");
+    sd3.append("output_format", "png");
+    sd3.append("image", blob, "fabric.png");
+    const imgRes = await fetch(
+      "https://api.stability.ai/v2beta/stable-image/generate/sd3",
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + key,
+          Accept: "image/*",
+        },
+        body: sd3,
+      }
+    );
+    if (imgRes.ok) {
+      const type = imgRes.headers.get("content-type") || "image/png";
+      return {
+        bytes: Buffer.from(await imgRes.arrayBuffer()),
+        contentType: type.startsWith("image/") ? type : "image/png",
+      };
+    }
   }
   const res = await fetch(endpoint, {
     method: "POST",

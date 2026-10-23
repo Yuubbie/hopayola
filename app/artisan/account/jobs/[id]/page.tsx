@@ -86,6 +86,39 @@ export default async function ArtisanJobDetail({
   const milestoneList = await withProofUrls((milestones || []) as any[]);
   const payoutProofHref = await signedProofUrl(project.payout_proof_path);
 
+  let selectedLook: {
+    image_url: string | null;
+    persona: string | null;
+    concept_number: number | null;
+  } | null = null;
+  if (project.selected_concept_id) {
+    const { data: concept } = await service
+      .from("ai_design_concepts")
+      .select("image_url, persona, concept_number")
+      .eq("id", project.selected_concept_id)
+      .maybeSingle();
+    selectedLook = concept;
+  } else {
+    const { data: concept } = await service
+      .from("ai_design_concepts")
+      .select("image_url, persona, concept_number")
+      .eq("project_id", id)
+      .eq("is_selected", true)
+      .maybeSingle();
+    selectedLook = concept;
+  }
+
+  const fabricPaths: string[] = Array.isArray(project.fabric_image_urls)
+    ? project.fabric_image_urls
+    : [];
+  const fabricHrefs: string[] = [];
+  for (const path of fabricPaths.slice(0, 4)) {
+    const { data } = await service.storage
+      .from("project-fabrics")
+      .createSignedUrl(String(path), 3600);
+    if (data?.signedUrl) fabricHrefs.push(data.signedUrl);
+  }
+
   return (
     <div className="max-w-3xl">
       <Link
@@ -126,6 +159,48 @@ export default async function ArtisanJobDetail({
         the Hopayola box. The outer box is ours, so the client knows it came
         through the studio.
       </p>
+
+      <section className="border border-stone rounded-2xl p-6 mb-6">
+        <h2 className="font-display text-lg mb-3">Look to make</h2>
+        {selectedLook?.image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={selectedLook.image_url}
+            alt="Selected concept"
+            className="w-full max-w-sm rounded-xl border border-stone mb-3"
+          />
+        ) : (
+          <p className="text-sm text-ink/50 mb-3">
+            No selected drawing yet. The client still needs to pick a concept.
+          </p>
+        )}
+        {selectedLook?.persona && (
+          <p className="text-sm text-ink/70 mb-2">
+            Concept {selectedLook.concept_number}: {selectedLook.persona}
+          </p>
+        )}
+        {project.style_direction && (
+          <p className="text-sm text-ink/70 leading-relaxed">
+            {project.style_direction}
+          </p>
+        )}
+        {fabricHrefs.length > 0 && (
+          <div className="mt-4">
+            <p className="text-xs text-ink/50 mb-2">Client photos</p>
+            <div className="flex flex-wrap gap-2">
+              {fabricHrefs.map((src) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={src}
+                  src={src}
+                  alt="Client fabric or reference"
+                  className="w-24 h-24 object-cover rounded-lg border border-stone"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
 
       <section className="border border-stone rounded-2xl p-6 mb-6">
         <h2 className="font-display text-lg mb-4">What to do next</h2>
