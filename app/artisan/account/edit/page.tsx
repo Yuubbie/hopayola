@@ -29,6 +29,10 @@ export default async function EditArtisanProfile() {
     .eq("id", user.id)
     .single();
 
+  const city = (artisanProfile?.region || "")
+    .replace(/,?\s*Nigeria$/i, "")
+    .trim();
+
   return (
     <div className="max-w-2xl">
       <h1 className="font-display text-3xl mb-2">Edit your profile</h1>
@@ -41,6 +45,7 @@ export default async function EditArtisanProfile() {
         <ArtisanProfileEditForm
           userId={user.id}
           initialFullName={profile?.full_name || ""}
+          initialCity={city}
           initialAvailability={artisanProfile?.availability_status || "unavailable"}
           initialSpecialty={artisanProfile?.specialty || []}
           initialSkills={(artisanProfile?.skills || []).join(", ")}
@@ -55,6 +60,6 @@ export default async function EditArtisanProfile() {
           initialAccountName={artisanProfile?.bank_account_name || null}
         />
       </div>
-        </div>
+    </div>
   );
 }

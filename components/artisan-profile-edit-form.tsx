@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 type Props = {
   userId: string;
   initialFullName: string;
+  initialCity?: string;
   initialAvailability: string;
   initialSpecialty: string[];
   initialSkills: string;
@@ -31,6 +32,7 @@ const AVAILABILITY_OPTIONS = [
 export default function ArtisanProfileEditForm({
   userId,
   initialFullName,
+  initialCity = "",
   initialAvailability,
   initialSpecialty,
   initialSkills,
@@ -41,6 +43,7 @@ export default function ArtisanProfileEditForm({
   const supabase = createClient();
 
   const [fullName, setFullName] = useState(initialFullName);
+  const [city, setCity] = useState(initialCity);
   const [availability, setAvailability] = useState(initialAvailability);
   const [specialty, setSpecialty] = useState<string[]>(initialSpecialty);
   const [skills, setSkills] = useState(initialSkills);
@@ -89,6 +92,7 @@ export default function ArtisanProfileEditForm({
             .filter(Boolean),
           years_experience: yearsExperience ? Number(yearsExperience) : null,
           bio: bio.trim() || null,
+          region: city.trim() ? `${city.trim()}, Nigeria` : "Nigeria",
         })
         .eq("id", userId)
         .select();
@@ -109,13 +113,28 @@ export default function ArtisanProfileEditForm({
       <section className="border border-stone rounded-2xl p-6">
         <div>
           <label className="block text-sm text-ink/50 mb-1" htmlFor="full-name">
-            Full name
+            Brand name
           </label>
           <input
             id="full-name"
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
+            className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
+            required
+          />
+        </div>
+        <div className="mt-4">
+          <label className="block text-sm text-ink/50 mb-1" htmlFor="city">
+            City
+          </label>
+          <p className="text-[11px] text-ink/45 mb-1">Saved as City, Nigeria.</p>
+          <input
+            id="city"
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="Abuja"
             className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
             required
           />
@@ -172,7 +191,10 @@ export default function ArtisanProfileEditForm({
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm text-ink/50 mb-1" htmlFor="years-experience">
+          <label
+            className="block text-sm text-ink/50 mb-1"
+            htmlFor="years-experience"
+          >
             Years of experience <span className="text-ink/30">(optional)</span>
           </label>
           <input
