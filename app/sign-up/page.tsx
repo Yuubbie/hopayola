@@ -15,7 +15,24 @@ export default function SignUp() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [resendNote, setResendNote] = useState<string | null>(null);
   const supabase = createClient();
+
+  async function resendConfirmation() {
+    setResendNote(null);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    setResendNote(
+      error
+        ? error.message
+        : "Sent again. Open the newest email, including spam and promotions."
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -53,6 +70,20 @@ export default function SignUp() {
                 We sent a confirmation link to <strong>{email}</strong>.
                 Click it to finish creating your account.
               </p>
+              <p className="text-ink/55 text-sm mt-4 leading-relaxed">
+                If it is not in the inbox, check spam and promotions. That is
+                normal with some mail apps.
+              </p>
+              <button
+                type="button"
+                onClick={resendConfirmation}
+                className="mt-6 text-sm text-royal underline underline-offset-2"
+              >
+                Didn&apos;t get it? Send again
+              </button>
+              {resendNote && (
+                <p className="text-sm text-ink/60 mt-2">{resendNote}</p>
+              )}
             </div>
           ) : (
             <>

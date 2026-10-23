@@ -119,6 +119,9 @@ export default function SignIn() {
 
             {unconfirmed && (
               <div className="text-sm">
+                <p className="text-ink/55 mb-2">
+                  Check spam and promotions if the first email did not show.
+                </p>
                 <button
                   type="button"
                   onClick={resendConfirmation}

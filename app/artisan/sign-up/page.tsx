@@ -119,6 +119,10 @@ export default function ArtisanSignUp() {
                 We sent a confirmation link to <strong>{email}</strong>.
                 Click it to activate your artisan profile.
               </p>
+              <p className="text-ink/55 text-sm mt-4 leading-relaxed">
+                If it is not in the inbox, check spam and promotions. That is
+                normal with some mail apps.
+              </p>
               <button
                 type="button"
                 onClick={resendConfirmation}
