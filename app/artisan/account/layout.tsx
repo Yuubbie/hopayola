@@ -6,6 +6,7 @@ const ARTISAN_LINKS = [
   { href: "/artisan/account", label: "Dashboard", exact: true },
   { href: "/artisan/account#jobs", label: "My jobs" },
   { href: "/artisan/account#open", label: "Open jobs" },
+  { href: "/fashion/hire-a-talent", label: "Fashion jobs to claim" },
   { href: "/artisan/account/payouts", label: "Payouts" },
   { href: "/artisan/account/messages", label: "Messages" },
   { href: "/artisan/account/edit", label: "My profile" },
@@ -43,6 +44,7 @@ export default async function ArtisanAccountLayout({
       roleLabel="Artisan"
       links={ARTISAN_LINKS}
       promo={null}
+      headerAction={{ href: "/fashion/hire-a-talent", label: "Jobs to claim" }}
       messagesHref="/artisan/account/messages"
     >
       {children}

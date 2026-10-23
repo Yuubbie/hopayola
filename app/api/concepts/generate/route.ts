@@ -69,8 +69,24 @@ export async function POST(request: Request) {
     .update({ status: "generating", prompt, error: null })
     .eq("id", conceptId);
 
+  let fabric: { bytes: Buffer; contentType: string } | null = null;
+  const fabricPath = Array.isArray(project.fabric_image_urls)
+    ? project.fabric_image_urls[0]
+    : null;
+  if (fabricPath) {
+    const { data } = await service.storage
+      .from("project-fabrics")
+      .download(String(fabricPath));
+    if (data) {
+      fabric = {
+        bytes: Buffer.from(await data.arrayBuffer()),
+        contentType: data.type || "image/png",
+      };
+    }
+  }
+
   try {
-    const image = await generateFashionImage(prompt);
+    const image = await generateFashionImage(prompt, fabric);
     const ext = image.contentType.includes("jpeg") ? "jpg" : "png";
     const path = `${concept.project_id}/${conceptId}.${ext}`;
 

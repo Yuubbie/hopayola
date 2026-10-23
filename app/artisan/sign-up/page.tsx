@@ -18,6 +18,7 @@ const SPECIALTY_OPTIONS = [
 export default function ArtisanSignUp() {
   const [fullName, setFullName] = useState("");
   const [legalName, setLegalName] = useState("");
+  const [city, setCity] = useState("");
   const [shopAddress, setShopAddress] = useState("");
   const [guarantorPhone, setGuarantorPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -77,7 +78,9 @@ export default function ArtisanSignUp() {
         data: {
           full_name: fullName,
           intended_role: "artisan",
-          artisan_region: "nigeria",
+          artisan_region: city.trim()
+            ? `${city.trim()}, Nigeria`
+            : "Nigeria",
           artisan_specialty: specialty.join(","),
           artisan_skills: skills
             .split(",")
@@ -193,10 +196,21 @@ export default function ArtisanSignUp() {
                 />
 
                 <div>
-                  <p className="text-sm mb-1">Region</p>
-                  <p className="text-sm text-ink/50 border border-stone rounded-lg px-4 py-2.5">
-                    Nigeria
+                  <label className="block text-sm mb-1" htmlFor="city">
+                    City
+                  </label>
+                  <p className="text-[11px] text-ink/45 mb-1">
+                    Where you work. Saved as City, Nigeria.
                   </p>
+                  <input
+                    id="city"
+                    type="text"
+                    required
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Abuja"
+                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
+                  />
                 </div>
 
                 <div>

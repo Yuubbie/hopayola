@@ -25,8 +25,14 @@ export function buildConceptPrompt(
   };
 
   const notes = String(project?.style_direction || "");
-  const menswear = /menswear|\bagbada\b|\bsenator\b/i.test(
-    `${notes} ${project?.garment_type || ""}`
+  const blob = `${notes} ${project?.garment_type || ""}`.toLowerCase();
+  const womenswear =
+    blob.includes("womenswear") ||
+    blob.includes("jewellery") ||
+    blob.includes("jewelry");
+  const menswear = !womenswear && blob.includes("menswear");
+  const fabricNote = /fabric type:|aso-oke|ankara|adire|lace|uploaded/i.test(
+    notes
   );
 
   const direction = [
@@ -52,7 +58,10 @@ export function buildConceptPrompt(
   return [
     menswear
       ? `Original menswear fashion design of a ${project?.garment_type || "garment"} for ${project?.occasion || "a special occasion"}, contemporary Nigerian fashion. Full-length adult man only. No women, no female model, no gown.`
-      : `Original fashion design of a ${project?.garment_type || "garment"} for ${project?.occasion || "a special occasion"}, contemporary Nigerian fashion. Full-length figure matching the brief.`,
+      : `Original womenswear fashion design of a ${project?.garment_type || "garment"} for ${project?.occasion || "a special occasion"}, contemporary Nigerian fashion. Full-length adult woman only. No men, no male model.`,
+    fabricNote
+      ? "The garment textile must match the client's uploaded fabric photo: same print, colour and weave. Do not invent a different fabric."
+      : null,
     direction ? `Design direction: ${direction}.` : null,
     proportions ? `Figure proportions to respect: ${proportions}.` : null,
     project?.style_direction

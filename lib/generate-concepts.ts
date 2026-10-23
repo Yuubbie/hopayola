@@ -35,13 +35,14 @@ const MEN_SLEEVES = [
 
 function isMenswear(style: string | null, garment: string | null) {
   const t = `${style || ""} ${garment || ""}`.toLowerCase();
-  return (
-    t.includes("menswear") ||
-    t.includes("agbada") ||
-    t.includes("senator") ||
-    t.includes("kaftan / tunic") ||
-    /\bmen\b/.test(t)
-  );
+  if (
+    t.includes("womenswear") ||
+    t.includes("jewellery") ||
+    t.includes("jewelry")
+  ) {
+    return false;
+  }
+  return t.includes("menswear");
 }
 
 export async function generateConceptsForProject(

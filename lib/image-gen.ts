@@ -33,7 +33,10 @@ async function fromUrl(url: string): Promise<ImageBytes> {
   return { bytes: buf, contentType: type.startsWith("image/") ? type : "image/png" };
 }
 
-async function stability(prompt: string): Promise<ImageBytes> {
+async function stability(
+  prompt: string,
+  fabric?: ImageBytes | null
+): Promise<ImageBytes> {
   const key = process.env.STABILITY_API_KEY;
   if (!key) throw new Error("STABILITY_API_KEY is missing.");
   const endpoint =
@@ -43,6 +46,13 @@ async function stability(prompt: string): Promise<ImageBytes> {
   form.append("prompt", prompt);
   form.append("output_format", "png");
   form.append("aspect_ratio", "2:3");
+  if (fabric) {
+    const blob = new Blob([new Uint8Array(fabric.bytes)], {
+      type: fabric.contentType,
+    });
+    form.append("image", blob, "fabric.png");
+    form.append("strength", "0.65");
+  }
   const res = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -175,10 +185,13 @@ async function custom(prompt: string): Promise<ImageBytes> {
   throw new Error("Custom image API returned neither url nor image bytes.");
 }
 
-export async function generateFashionImage(prompt: string): Promise<ImageBytes> {
+export async function generateFashionImage(
+  prompt: string,
+  fabric?: ImageBytes | null
+): Promise<ImageBytes> {
   const provider = configuredProvider();
   if (!provider) throw new Error(imageGenMissingMessage());
-  if (provider === "stability") return stability(prompt);
+  if (provider === "stability") return stability(prompt, fabric);
   if (provider === "openai") return openai(prompt);
   if (provider === "replicate") return replicate(prompt);
   if (provider === "fal") return fal(prompt);
