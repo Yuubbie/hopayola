@@ -115,6 +115,20 @@ export default async function ArtisanAccount({
       new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
   );
 
+  const selectedIds = jobs
+    .map((p) => p.selected_concept_id)
+    .filter(Boolean) as string[];
+  const { data: selectedRows } =
+    selectedIds.length > 0
+      ? await service
+          .from("ai_design_concepts")
+          .select("id, image_url")
+          .in("id", selectedIds)
+      : { data: [] as { id: string; image_url: string | null }[] };
+  const lookUrl = new Map(
+    (selectedRows || []).map((c) => [c.id, c.image_url as string | null])
+  );
+
   const { data: openProjects } = await service
     .from("projects")
     .select("*")
@@ -300,7 +314,7 @@ export default async function ArtisanAccount({
                   const list = myMilestonesFor(p.id);
                   const doneCount = list.filter((m) => m.confirmed_at).length;
                   const percent = (() => {
-                    if (p.client_received_at || p.status === "completed") {
+                    if (p.client_received_at) {
                       return 100;
                     }
                     if (!p.fabric_sent_at) return 8;
@@ -330,6 +344,14 @@ export default async function ArtisanAccount({
                           {STATUS_LABELS[p.status] ?? p.status}
                         </span>
                       </div>
+                      {lookUrl.get(p.selected_concept_id) && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={lookUrl.get(p.selected_concept_id) as string}
+                          alt="Selected look"
+                          className="w-full h-40 object-cover rounded-xl border border-stone mb-3"
+                        />
+                      )}
                       <p className="text-xs text-ink/50 capitalize mb-4">
                         {p.tier || "standard"} package
                         {p.delivery_deadline
