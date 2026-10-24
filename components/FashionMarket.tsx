@@ -94,7 +94,7 @@ export default async function FashionMarket() {
         )}
       </section>
 
-      <section>
+      <section id="jobs">
         <h2 className="font-display text-2xl mb-2">Projects available</h2>
         <p className="text-ink/55 text-sm mb-6">
           Open briefs. Artisans can claim here or from their account.

@@ -5,6 +5,8 @@ import ProjectChat from "@/components/ProjectChat";
 import ProjectSequence from "@/components/ProjectSequence";
 import { withProofUrls } from "@/lib/milestone-proofs";
 import DeleteProjectButton from "@/components/delete-project-button";
+import { attachMeasurementsToProject } from "@/app/actions/account-profile";
+import ClientAfterReceive from "@/components/client-after-receive";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -187,6 +189,38 @@ export default async function ProjectDetail({
           </div>
         )}
       </section>
+
+      <section className="border border-stone rounded-2xl p-6 mb-6">
+        <h2 className="font-display text-lg mb-2">Measurement guide</h2>
+        <p className="text-sm text-ink/55 mb-3">
+          Attach the numbers from your Measurements page. The artisan sees
+          these, not your personal photos.
+        </p>
+        <form action={attachMeasurementsToProject}>
+          <input type="hidden" name="projectId" value={project.id} />
+          <button
+            type="submit"
+            className="text-sm bg-royal text-paper rounded-full px-4 py-2 hover:bg-royal-deep"
+          >
+            Attach measurement guide
+          </button>
+        </form>
+        <a
+          href="/account/measurements"
+          className="block text-xs text-royal mt-3"
+        >
+          Edit my saved measurements
+        </a>
+      </section>
+
+      {project.client_received_at && (
+        <ClientAfterReceive
+          projectId={project.id}
+          rating={project.artisan_rating || null}
+          review={project.artisan_review || null}
+          trendingPath={project.trending_photo_path || null}
+        />
+      )}
 
       <section className="border border-stone rounded-2xl p-6 mb-6">
         <h2 className="font-display text-lg mb-4">Your team</h2>

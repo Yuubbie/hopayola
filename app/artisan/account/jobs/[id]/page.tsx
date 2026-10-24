@@ -108,16 +108,17 @@ export default async function ArtisanJobDetail({
     selectedLook = concept;
   }
 
-  const fabricPaths: string[] = Array.isArray(project.fabric_image_urls)
-    ? project.fabric_image_urls
-    : [];
-  const fabricHrefs: string[] = [];
-  for (const path of fabricPaths.slice(0, 4)) {
-    const { data } = await service.storage
-      .from("project-fabrics")
-      .createSignedUrl(String(path), 3600);
-    if (data?.signedUrl) fabricHrefs.push(data.signedUrl);
-  }
+  const measures = (project.measurements || {}) as Record<string, string>;
+  const measureRows = [
+    ["Bust", measures.bust],
+    ["Waist", measures.waist],
+    ["Hip", measures.hip],
+    ["Height", measures.height],
+    ["Shoulder", measures.shoulder],
+    ["Sleeve", measures.sleeve],
+    ["Neck", measures.neck],
+    ["Round body", measures.round_body],
+  ].filter(([, v]) => Boolean(v));
 
   return (
     <div className="max-w-3xl">
@@ -184,21 +185,26 @@ export default async function ArtisanJobDetail({
             {project.style_direction}
           </p>
         )}
-        {fabricHrefs.length > 0 && (
-          <div className="mt-4">
-            <p className="text-xs text-ink/50 mb-2">Client photos</p>
-            <div className="flex flex-wrap gap-2">
-              {fabricHrefs.map((src) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={src}
-                  src={src}
-                  alt="Client fabric or reference"
-                  className="w-24 h-24 object-cover rounded-lg border border-stone"
-                />
-              ))}
-            </div>
-          </div>
+      </section>
+
+      <section className="border border-stone rounded-2xl p-6 mb-6">
+        <h2 className="font-display text-lg mb-3">Measurement guide</h2>
+        {measureRows.length === 0 && !measures.notes ? (
+          <p className="text-sm text-ink/50">
+            The client has not attached measurements yet.
+          </p>
+        ) : (
+          <dl className="grid grid-cols-2 gap-2 text-sm">
+            {measureRows.map(([k, v]) => (
+              <div key={k}>
+                <dt className="text-ink/45 text-xs">{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+        {measures.notes && (
+          <p className="text-sm text-ink/70 mt-3">{measures.notes}</p>
         )}
       </section>
 

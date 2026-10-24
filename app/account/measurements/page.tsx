@@ -23,8 +23,8 @@ export default async function MeasurementsPage() {
     <div className="max-w-xl">
       <h1 className="font-display text-3xl mb-2">Measurements</h1>
       <p className="text-sm text-ink/55 mb-8">
-        Save them once. New projects will start with these numbers — you can
-        still change them for a single outfit.
+        Generic guide you can update anytime. Attach it on a project so the
+        artisan sees the numbers, not your photos.
       </p>
 
       <form action={saveClientMeasurements} className="space-y-4">
@@ -34,6 +34,10 @@ export default async function MeasurementsPage() {
             ["waist", "Waist"],
             ["hip", "Hip"],
             ["height", "Height"],
+            ["shoulder", "Shoulder"],
+            ["sleeve", "Sleeve"],
+            ["neck", "Neck"],
+            ["round_body", "Round body"],
           ].map(([name, label]) => (
             <div key={name}>
               <label className="block text-sm text-ink/50 mb-1" htmlFor={name}>

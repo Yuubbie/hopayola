@@ -133,7 +133,6 @@ export default async function ArtisanAccount({
     .from("projects")
     .select("*")
     .in("status", OPEN_STATUSES)
-    .eq("region", artisanProfile?.region || "abuja")
     .order("created_at", { ascending: false });
 
   const { data: myMilestones } =
@@ -408,8 +407,11 @@ export default async function ArtisanAccount({
 
           <section id="open" className="mb-10 scroll-mt-24">
             <h2 className="font-display text-xl mb-1">Open projects near you</h2>
-            <p className="text-xs text-ink/50 mb-5 capitalize">
-              Matching your region: {artisanProfile?.region || "abuja"}
+            <p className="text-xs text-ink/50 mb-5">
+              Open briefs across Nigeria. Same list as Fashion.{" "}
+              <a href="/fashion#jobs" className="text-royal">
+                Open on Fashion
+              </a>
             </p>
 
             {!openProjects || openProjects.length === 0 ? (

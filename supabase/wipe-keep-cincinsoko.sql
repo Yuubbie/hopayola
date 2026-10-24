@@ -1,26 +1,18 @@
--- Night wipe. KEEP admins + cincinsoko. Deletes other clients and artisans.
--- Cannot be undone. Does not touch Paystack or shop.hopayola.com.
---
--- 1. Put the real admin emails and cincinsoko email below.
--- 2. Supabase → SQL Editor → Run when the site is quiet.
--- 3. Check the two selects at the end before you close.
+-- Night wipe. Keeps every admin + CincinSoko Egbunu.
+-- Cannot be undone. Run once in Supabase SQL Editor.
 
 begin;
 
 create temporary table keep_ids as
 select id
-from auth.users
-where lower(email) in (
-  lower('ADMIN_EMAIL_1@example.com'),
-  lower('ADMIN_EMAIL_2@example.com'),
-  lower('cincinsoko@example.com')
-)
-or lower(email) like '%cincinsoko%';
+from public.profiles
+where role = 'admin'
+   or full_name ilike '%cincinsoko%';
 
 do $$
 begin
   if (select count(*) from keep_ids) < 1 then
-    raise exception 'Stop: no matching users. Fix the emails.';
+    raise exception 'Stop: no admin or CincinSoko profile found.';
   end if;
 end $$;
 
