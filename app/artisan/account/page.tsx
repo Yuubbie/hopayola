@@ -601,7 +601,7 @@ export default async function ArtisanAccount({
             <h2 className="font-display text-lg mb-4">Quick actions</h2>
             <ul className="space-y-1 text-sm">
               <li>
-                <Link href="#open" className="text-royal hover:text-royal-deep">
+                <Link href="/fashion#jobs" className="text-royal hover:text-royal-deep">
                   Find a job to claim
                 </Link>
               </li>
