@@ -77,6 +77,24 @@ export default async function AdminProjectDetail({
   const milestones = await withProofUrls((rawMilestones || []) as any[]);
   const payoutProofHref = await signedProofUrl(project.payout_proof_path);
 
+  let selectedLookUrl: string | null = null;
+  if (project.selected_concept_id) {
+    const { data: concept } = await supabase
+      .from("ai_design_concepts")
+      .select("image_url")
+      .eq("id", project.selected_concept_id)
+      .maybeSingle();
+    selectedLookUrl = concept?.image_url || null;
+  }
+
+  const fabricHrefs: string[] = [];
+  for (const path of (project.fabric_image_urls || []).slice(0, 4)) {
+    const { data } = await supabase.storage
+      .from("project-fabrics")
+      .createSignedUrl(String(path), 3600);
+    if (data?.signedUrl) fabricHrefs.push(data.signedUrl);
+  }
+
   const projectTotal = Number(
     project.funded_subtotal || project.budget_max || project.budget_min || 0
   );
@@ -106,6 +124,44 @@ export default async function AdminProjectDetail({
         {project.tier} package | {project.status.replace(/_/g, " ")} |{" "}
         {project.region}
       </p>
+
+      <section className="border border-stone rounded-2xl p-6 mb-8">
+        <h2 className="font-display text-lg mb-4">Look and client uploads</h2>
+        <div className="grid sm:grid-cols-2 gap-6">
+          <div>
+            <p className="text-xs text-ink/45 mb-2">Selected studio concept</p>
+            {selectedLookUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={selectedLookUrl}
+                alt="Selected concept"
+                className="w-full rounded-xl border border-stone"
+              />
+            ) : (
+              <p className="text-sm text-ink/50">No concept selected yet.</p>
+            )}
+          </div>
+          <div>
+            <p className="text-xs text-ink/45 mb-2">Client uploads</p>
+            {fabricHrefs.length === 0 ? (
+              <p className="text-sm text-ink/50">No photos uploaded.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {fabricHrefs.map((src) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={src}
+                    src={src}
+                    alt="Client upload"
+                    className="w-28 h-28 object-cover rounded-lg border border-stone"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       {project.funded_at ? (
         <p className="text-sm text-green-700 mb-12">
           Client payment recorded {new Date(project.funded_at).toLocaleString("en-GB")}

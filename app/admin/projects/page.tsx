@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateProjectStatus, generateConcepts } from "./actions";
-// Navigation lives in the admin shell layout.
 
 const STATUS_OPTIONS = [
   "draft",
@@ -60,14 +59,26 @@ export default async function AdminProjects() {
           .createSignedUrl(p.fabric_image_urls[0], 3600);
         photoUrl = data?.signedUrl || null;
       }
-      return { ...p, photoUrl, client: clientMap.get(p.client_id) };
+      let conceptUrl: string | null = null;
+      if (p.selected_concept_id) {
+        const { data: concept } = await supabase
+          .from("ai_design_concepts")
+          .select("image_url")
+          .eq("id", p.selected_concept_id)
+          .maybeSingle();
+        conceptUrl = concept?.image_url || null;
+      }
+      return {
+        ...p,
+        photoUrl,
+        conceptUrl,
+        client: clientMap.get(p.client_id),
+      };
     })
   );
 
   return (
     <div className="max-w-4xl">
-      
-
       <h1 className="font-display text-3xl mb-2">Projects</h1>
       <p className="text-ink/60 mb-12">
         Review submitted projects and move them through the pipeline
@@ -83,14 +94,24 @@ export default async function AdminProjects() {
               key={p.id}
               className="border border-stone rounded-2xl p-6 flex gap-6"
             >
-              {p.photoUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={p.photoUrl}
-                  alt="Fabric"
-                  className="w-24 h-24 object-cover rounded-lg border border-stone shrink-0"
-                />
-              )}
+              <div className="flex gap-2 shrink-0">
+                {p.conceptUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={p.conceptUrl}
+                    alt="Selected concept"
+                    className="w-24 h-24 object-cover rounded-lg border border-stone"
+                  />
+                ) : null}
+                {p.photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={p.photoUrl}
+                    alt="Client upload"
+                    className="w-24 h-24 object-cover rounded-lg border border-stone"
+                  />
+                ) : null}
+              </div>
 
               <div className="flex-1">
                 <div className="flex items-start justify-between gap-3 mb-1">
@@ -106,8 +127,8 @@ export default async function AdminProjects() {
                 {p.client_marked_paid_at && !p.funded_at && (
                   <p className="text-xs text-royal-deep bg-royal/10 border border-royal/20 rounded-lg px-3 py-2 mb-3">
                     Client marked this as paid on{" "}
-                    {new Date(p.client_marked_paid_at).toLocaleDateString("en-GB")} —
-                    open the project to confirm it.
+                    {new Date(p.client_marked_paid_at).toLocaleDateString("en-GB")}{" "}
+                    - open the project to confirm it.
                   </p>
                 )}
 
