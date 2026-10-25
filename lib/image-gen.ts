@@ -33,52 +33,83 @@ async function fromUrl(url: string): Promise<ImageBytes> {
   return { bytes: buf, contentType: type.startsWith("image/") ? type : "image/png" };
 }
 
+function fabricFile(fabric: ImageBytes) {
+  const type = fabric.contentType?.startsWith("image/")
+    ? fabric.contentType
+    : "image/png";
+  const name = type.includes("jpeg") || type.includes("jpg") ? "fabric.jpg" : "fabric.png";
+  return new File([new Uint8Array(fabric.bytes)], name, { type });
+}
+
+async function stabilityPost(
+  key: string,
+  url: string,
+  form: FormData
+): Promise<ImageBytes> {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + key,
+      Accept: "image/*",
+    },
+    body: form,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Stability error (${res.status}): ${text.slice(0, 280)}`);
+  }
+  const type = res.headers.get("content-type") || "image/png";
+  return {
+    bytes: Buffer.from(await res.arrayBuffer()),
+    contentType: type.startsWith("image/") ? type : "image/png",
+  };
+}
+
 async function stability(
   prompt: string,
   fabric?: ImageBytes | null
 ): Promise<ImageBytes> {
   const key = process.env.STABILITY_API_KEY;
   if (!key) throw new Error("STABILITY_API_KEY is missing.");
-  const endpoint =
-    process.env.STABILITY_IMAGE_URL ||
-    "https://api.stability.ai/v2beta/stable-image/generate/core";
+  const garmentPrompt = `${prompt} The garment MUST be made from the attached fabric photo: same print, colour and weave. Do not invent a different textile.`;
+
+  if (fabric) {
+    const file = fabricFile(fabric);
+    const style = new FormData();
+    style.append("prompt", garmentPrompt);
+    style.append("image", file);
+    style.append("output_format", "png");
+    style.append("aspect_ratio", "2:3");
+    style.append("fidelity", "0.9");
+    try {
+      return await stabilityPost(
+        key,
+        "https://api.stability.ai/v2beta/stable-image/control/style",
+        style
+      );
+    } catch {
+      const sd3 = new FormData();
+      sd3.append("prompt", garmentPrompt);
+      sd3.append("mode", "image-to-image");
+      sd3.append("strength", "0.82");
+      sd3.append("aspect_ratio", "2:3");
+      sd3.append("output_format", "png");
+      sd3.append("image", file);
+      return await stabilityPost(
+        key,
+        "https://api.stability.ai/v2beta/stable-image/generate/sd3",
+        sd3
+      );
+    }
+  }
+
   const form = new FormData();
   form.append("prompt", prompt);
   form.append("output_format", "png");
   form.append("aspect_ratio", "2:3");
-  if (fabric) {
-    const blob = new Blob([new Uint8Array(fabric.bytes)], {
-      type: fabric.contentType || "image/png",
-    });
-    const sd3 = new FormData();
-    sd3.append(
-      "prompt",
-      `${prompt} Use the attached photo as the exact fabric print and colour on the garment.`
-    );
-    sd3.append("mode", "image-to-image");
-    sd3.append("strength", "0.55");
-    sd3.append("aspect_ratio", "2:3");
-    sd3.append("output_format", "png");
-    sd3.append("image", blob, "fabric.png");
-    const imgRes = await fetch(
-      "https://api.stability.ai/v2beta/stable-image/generate/sd3",
-      {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + key,
-          Accept: "image/*",
-        },
-        body: sd3,
-      }
-    );
-    if (imgRes.ok) {
-      const type = imgRes.headers.get("content-type") || "image/png";
-      return {
-        bytes: Buffer.from(await imgRes.arrayBuffer()),
-        contentType: type.startsWith("image/") ? type : "image/png",
-      };
-    }
-  }
+  const endpoint =
+    process.env.STABILITY_IMAGE_URL ||
+    "https://api.stability.ai/v2beta/stable-image/generate/core";
   const res = await fetch(endpoint, {
     method: "POST",
     headers: {

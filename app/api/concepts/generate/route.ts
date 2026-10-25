@@ -69,23 +69,36 @@ export async function POST(request: Request) {
     .update({ status: "generating", prompt, error: null })
     .eq("id", conceptId);
 
+  try {
   let fabric: { bytes: Buffer; contentType: string } | null = null;
-  const fabricPath = Array.isArray(project.fabric_image_urls)
-    ? project.fabric_image_urls[0]
-    : null;
-  if (fabricPath) {
-    const { data } = await service.storage
+  const rawFabrics = project.fabric_image_urls;
+  const fabricPaths: string[] = Array.isArray(rawFabrics)
+    ? rawFabrics.map(String)
+    : typeof rawFabrics === "string" && rawFabrics
+      ? (() => {
+          try {
+            const parsed = JSON.parse(rawFabrics);
+            return Array.isArray(parsed) ? parsed.map(String) : [rawFabrics];
+          } catch {
+            return [rawFabrics];
+          }
+        })()
+      : [];
+  if (fabricPaths[0]) {
+    const { data, error: fabricError } = await service.storage
       .from("project-fabrics")
-      .download(String(fabricPath));
-    if (data) {
-      fabric = {
-        bytes: Buffer.from(await data.arrayBuffer()),
-        contentType: data.type || "image/png",
-      };
+      .download(String(fabricPaths[0]));
+    if (fabricError || !data) {
+      throw new Error(
+        `Could not load the uploaded fabric photo: ${fabricError?.message || "empty file"}`
+      );
     }
+    fabric = {
+      bytes: Buffer.from(await data.arrayBuffer()),
+      contentType: data.type || "image/png",
+    };
   }
 
-  try {
     const image = await generateFashionImage(prompt, fabric);
     const ext = image.contentType.includes("jpeg") ? "jpg" : "png";
     const path = `${concept.project_id}/${conceptId}.${ext}`;
@@ -117,7 +130,7 @@ export async function POST(request: Request) {
       const turnPrompt =
         prompt +
         " Same garment as a 3D-style fashion mockup on a mannequin, three-quarter turnaround view. Visual guide only, not a true fitted 3D garment.";
-      const turn = await generateFashionImage(turnPrompt);
+      const turn = await generateFashionImage(turnPrompt, fabric);
       const turnPath = `${concept.project_id}/${conceptId}-3d.${ext}`;
       const { error: turnErr } = await service.storage
         .from("concept-images")
