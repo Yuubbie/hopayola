@@ -9,6 +9,7 @@ import { notifySignup } from "@/app/actions/notifications";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -43,7 +44,7 @@ export default function SignUp() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, phone: phone.trim() },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
@@ -105,6 +106,23 @@ export default function SignUp() {
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
+                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm mb-1" htmlFor="phone">
+                    Phone number
+                  </label>
+                  <p className="text-[11px] text-ink/45 mb-1">
+                    So Hopayola can reach you about your project.
+                  </p>
+                  <input
+                    id="phone"
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
                   />
                 </div>

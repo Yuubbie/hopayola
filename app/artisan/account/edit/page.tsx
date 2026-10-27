@@ -45,7 +45,9 @@ export default async function EditArtisanProfile() {
         <ArtisanProfileEditForm
           userId={user.id}
           initialFullName={profile?.full_name || ""}
+          initialPhone={profile?.phone || ""}
           initialCity={city}
+          hasId={Boolean(artisanProfile?.id_document_path)}
           initialAvailability={artisanProfile?.availability_status || "unavailable"}
           initialSpecialty={artisanProfile?.specialty || []}
           initialSkills={(artisanProfile?.skills || []).join(", ")}

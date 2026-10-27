@@ -39,10 +39,18 @@ async function finish(
     data: { user },
   } = await supabase.auth.getUser();
 
+  const phone = String(user?.user_metadata?.phone || "").trim();
+  if (phone && user) {
+    await supabase.from("profiles").update({ phone }).eq("id", user.id);
+  }
+
   if (next !== "/reset-password" && user?.user_metadata?.intended_role === "artisan") {
     const metadata = user.user_metadata;
 
-    await supabase.from("profiles").update({ role: "artisan" }).eq("id", user.id);
+    await supabase
+      .from("profiles")
+      .update({ role: "artisan", phone: phone || undefined })
+      .eq("id", user.id);
 
     await supabase.from("artisan_profiles").upsert({
       id: user.id,

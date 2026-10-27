@@ -71,6 +71,7 @@ export async function saveClientSettings(formData: FormData) {
     .slice(0, 400);
 
   if (!fullName) throw new Error("Name cannot be empty.");
+  if (!phone) throw new Error("Phone number is required so we can reach you.");
 
   const { data: existing } = await supabase
     .from("profiles")

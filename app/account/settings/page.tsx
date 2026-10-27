@@ -63,6 +63,7 @@ export default async function SettingsPage() {
             id="phone"
             name="phone"
             type="tel"
+            required
             defaultValue={profile?.phone || ""}
             className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
           />

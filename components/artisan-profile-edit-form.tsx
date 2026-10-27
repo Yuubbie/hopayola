@@ -7,7 +7,9 @@ import { createClient } from "@/lib/supabase/client";
 type Props = {
   userId: string;
   initialFullName: string;
+  initialPhone?: string;
   initialCity?: string;
+  hasId?: boolean;
   initialAvailability: string;
   initialSpecialty: string[];
   initialSkills: string;
@@ -32,7 +34,9 @@ const AVAILABILITY_OPTIONS = [
 export default function ArtisanProfileEditForm({
   userId,
   initialFullName,
+  initialPhone = "",
   initialCity = "",
+  hasId = false,
   initialAvailability,
   initialSpecialty,
   initialSkills,
@@ -43,6 +47,8 @@ export default function ArtisanProfileEditForm({
   const supabase = createClient();
 
   const [fullName, setFullName] = useState(initialFullName);
+  const [phone, setPhone] = useState(initialPhone);
+  const [idFile, setIdFile] = useState<File | null>(null);
   const [city, setCity] = useState(initialCity);
   const [availability, setAvailability] = useState(initialAvailability);
   const [specialty, setSpecialty] = useState<string[]>(initialSpecialty);
@@ -63,6 +69,14 @@ export default function ArtisanProfileEditForm({
     e.preventDefault();
     setError(null);
 
+    if (!phone.trim()) {
+      setError("Phone number is required.");
+      return;
+    }
+    if (!hasId && !idFile) {
+      setError("Upload a photo of a recognised ID card.");
+      return;
+    }
     if (specialty.length === 0) {
       setError("Pick at least one specialty.");
       return;
@@ -73,12 +87,24 @@ export default function ArtisanProfileEditForm({
     try {
       const { error: profileError } = await supabase
         .from("profiles")
-        .update({ full_name: fullName.trim() })
+        .update({ full_name: fullName.trim(), phone: phone.trim() })
         .eq("id", userId)
         .select();
 
       if (profileError) {
         throw new Error(`Could not update name: ${profileError.message}`);
+      }
+
+      let idPath: string | undefined;
+      if (idFile) {
+        const ext = idFile.name.split(".").pop() || "jpg";
+        idPath = `${userId}/id.${ext}`;
+        const { error: idError } = await supabase.storage
+          .from("project-fabrics")
+          .upload(idPath, idFile, { upsert: true });
+        if (idError) {
+          throw new Error(`Could not upload ID: ${idError.message}`);
+        }
       }
 
       const { error: artisanError } = await supabase
@@ -93,6 +119,7 @@ export default function ArtisanProfileEditForm({
           years_experience: yearsExperience ? Number(yearsExperience) : null,
           bio: bio.trim() || null,
           region: city.trim() ? `${city.trim()}, Nigeria` : "Nigeria",
+          ...(idPath ? { id_document_path: idPath } : {}),
         })
         .eq("id", userId)
         .select();
@@ -122,6 +149,35 @@ export default function ArtisanProfileEditForm({
             onChange={(e) => setFullName(e.target.value)}
             className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
             required
+          />
+        </div>
+        <div className="mt-4">
+          <label className="block text-sm text-ink/50 mb-1" htmlFor="phone">
+            Phone number
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
+            required
+          />
+        </div>
+        <div className="mt-4">
+          <label className="block text-sm text-ink/50 mb-1" htmlFor="id-card">
+            Recognised ID
+          </label>
+          <p className="text-[11px] text-ink/45 mb-1">
+            National ID card, passport or driver&apos;s licence. Not BVN or NIN
+            numbers. {hasId ? "Already on file. Upload again to replace." : ""}
+          </p>
+          <input
+            id="id-card"
+            type="file"
+            accept="image/*,.pdf"
+            onChange={(e) => setIdFile(e.target.files?.[0] || null)}
+            className="w-full text-sm"
           />
         </div>
         <div className="mt-4">

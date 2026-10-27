@@ -17,6 +17,7 @@ const SPECIALTY_OPTIONS = [
 
 export default function ArtisanSignUp() {
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [legalName, setLegalName] = useState("");
   const [city, setCity] = useState("");
   const [shopAddress, setShopAddress] = useState("");
@@ -64,6 +65,10 @@ export default function ArtisanSignUp() {
       setError("Pick at least one specialty.");
       return;
     }
+    if (!phone.trim()) {
+      setError("Your phone number is required.");
+      return;
+    }
     if (!shopAddress.trim() || !guarantorPhone.trim()) {
       setError("Shop address and a guarantor phone number are required.");
       return;
@@ -92,6 +97,7 @@ export default function ArtisanSignUp() {
           artisan_legal_name: legalName || null,
           artisan_shop_address: shopAddress.trim(),
           artisan_guarantor_phone: guarantorPhone.trim(),
+          phone: phone.trim(),
         },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
@@ -140,9 +146,11 @@ export default function ArtisanSignUp() {
                 Join as an artisan
               </h1>
               <p className="text-ink/60 mb-8">
-                Use your <strong>brand name</strong> as the name on this form.
-                That is how clients will see you. We also need your shop
-                address and a guarantor&apos;s number.
+                Business name, city, your phone, shop address, a guarantor
+                number, and a photo of a recognised ID (national ID, passport
+                or driver&apos;s licence). We do not ask for BVN or NIN
+                numbers. You upload the ID after you confirm email, on My
+                profile.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -173,6 +181,23 @@ export default function ArtisanSignUp() {
                     required
                     value={legalName}
                     onChange={(e) => setLegalName(e.target.value)}
+                    className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm mb-1" htmlFor="phone">
+                    Phone number
+                  </label>
+                  <p className="text-[11px] text-ink/45 mb-1">
+                    So Hopayola can reach you. Not the guarantor.
+                  </p>
+                  <input
+                    id="phone"
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     className="w-full border border-stone rounded-lg px-4 py-2.5 focus:border-royal outline-none"
                   />
                 </div>
