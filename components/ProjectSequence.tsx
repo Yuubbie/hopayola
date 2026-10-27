@@ -96,11 +96,13 @@ export default function ProjectSequence({
   role,
   milestones = [],
   viewerId,
+  pickupAddress,
 }: {
   project: Project;
   role: "client" | "artisan" | "admin";
   milestones?: Milestone[];
   viewerId?: string;
+  pickupAddress?: string;
 }) {
   const ordered = [...milestones].sort(
     (a, b) => (a.milestone_order || 0) - (b.milestone_order || 0)
@@ -325,28 +327,30 @@ export default function ProjectSequence({
           </form>
         )}
 
-      {allReviewed && !project.shipped_at && (
+      {role === "client" && allReviewed && !project.shipped_at && (
         <>
-          <CourierOpen prompt="All stages reviewed. Book GIG or Bolt to collect the outfit. Client tracks the rider. Hopayola does not store a home address." />
-          {role === "client" && (
-            <ConfirmCourier
-              action={clientRequestOutfit}
-              projectId={project.id}
-              prompt="I booked collection through"
-            />
-          )}
-          {role !== "client" && (
-            <p className="text-xs text-ink/55 mt-1">
-              The client confirms I booked collection on their project page.
+          {pickupAddress ? (
+            <p className="text-xs text-ink/70 mt-2 mb-1 leading-relaxed">
+              Pickup address for GIG or Bolt: {pickupAddress}
+            </p>
+          ) : (
+            <p className="text-xs text-ink/50 mt-2 mb-1">
+              Ask Hopayola for the artisan shop address, then book pickup.
             </p>
           )}
+          <CourierOpen prompt="Book GIG or Bolt to pick up your clothes from the artisan. You track the rider. We do not store your home address." />
+          <ConfirmCourier
+            action={clientRequestOutfit}
+            projectId={project.id}
+            prompt="I sent GIG or Bolt to pick up through"
+          />
         </>
       )}
 
       {role === "artisan" && allReviewed && !project.shipped_at && (
         <p className="text-xs text-ink/60 mt-2 leading-relaxed">
-          Stages are reviewed. Pack the outfit in the Hopayola box. The client
-          books GIG or Bolt to collect. You do not need their home address.
+          Pack the outfit in the Hopayola box. The client sends GIG or Bolt to
+          your shop. Do not book the rider yourself.
         </p>
       )}
 

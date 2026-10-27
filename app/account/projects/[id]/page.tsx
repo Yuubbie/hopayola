@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import ProjectChat from "@/components/ProjectChat";
 import ProjectSequence from "@/components/ProjectSequence";
 import { withProofUrls } from "@/lib/milestone-proofs";
@@ -68,13 +69,34 @@ export default async function ProjectDetail({
 
   const { data: teamAssignments } = await supabase
     .from("project_team_members")
-    .select("project_id, role_on_project, profiles(full_name)")
+    .select("project_id, artisan_id, role_on_project, profiles(full_name)")
     .eq("project_id", id);
 
   const team = (teamAssignments || []).map((row: any) => ({
     name: row.profiles?.full_name || "An artisan",
     role: row.role_on_project,
   }));
+
+  const artisanIds = (teamAssignments || [])
+    .map((row: any) => row.artisan_id)
+    .filter(Boolean);
+  let pickupAddress = "";
+  if (artisanIds.length > 0) {
+    const service = createServiceClient();
+    const { data: ap } = await service
+      .from("artisan_profiles")
+      .select("shop_address, region, id")
+      .eq("id", artisanIds[0])
+      .maybeSingle();
+    const { data: apName } = await service
+      .from("profiles")
+      .select("full_name")
+      .eq("id", artisanIds[0])
+      .maybeSingle();
+    pickupAddress = [apName?.full_name, ap?.shop_address, ap?.region]
+      .filter(Boolean)
+      .join(" · ");
+  }
 
   const { data: milestones } = await supabase
     .from("project_milestones")
@@ -140,6 +162,7 @@ export default async function ProjectDetail({
             status: project.status,
           }}
           role="client"
+          pickupAddress={pickupAddress}
           milestones={milestoneList.map((m: any) => ({
             id: m.id,
             milestone_name: m.milestone_name,
