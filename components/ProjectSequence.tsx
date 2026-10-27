@@ -7,6 +7,7 @@ import {
   clientMarkPaid,
   clientSendFabric,
 } from "@/app/actions/project-flow";
+import { reopenMilestone } from "@/app/actions/milestone-flow";
 import { COURIER_LINKS } from "@/lib/couriers";
 import PayProjectButton from "@/components/pay-project-button";
 import MilestoneSubmitForm from "@/components/milestone-submit-form";
@@ -30,6 +31,7 @@ type Milestone = {
   status?: string | null;
   submitted_at?: string | null;
   confirmed_at?: string | null;
+  disputed_at?: string | null;
   artisan_id?: string | null;
   proof_url?: string | null;
   proof_href?: string | null;
@@ -241,8 +243,9 @@ export default function ProjectSequence({
                 )}
                 {role === "artisan" &&
                   mine &&
-                  !m.submitted_at &&
-                  m.status !== "paid" && (
+                  m.status !== "paid" &&
+                  !m.confirmed_at &&
+                  (!m.submitted_at || m.disputed_at) && (
                     <MilestoneSubmitForm
                       milestoneId={m.id}
                       projectId={project.id}
@@ -253,10 +256,25 @@ export default function ProjectSequence({
                     Assigned to another artisan
                   </p>
                 )}
-                {role === "artisan" && m.submitted_at && !m.confirmed_at && (
+                {role === "artisan" &&
+                  m.submitted_at &&
+                  !m.confirmed_at &&
+                  !m.disputed_at && (
                   <p className="text-[11px] text-ink/50 mt-1">
                     Waiting for the client to review this stage.
                   </p>
+                )}
+                {role === "admin" && m.status !== "paid" && (
+                  <form action={reopenMilestone} className="mt-2">
+                    <input type="hidden" name="milestoneId" value={m.id} />
+                    <input type="hidden" name="projectId" value={project.id} />
+                    <button
+                      type="submit"
+                      className="text-xs border border-royal text-royal rounded-full px-3 py-1.5"
+                    >
+                      Refresh as a new send
+                    </button>
+                  </form>
                 )}
                 {role === "client" && (
                   <MilestoneClientActions

@@ -147,6 +147,7 @@ export default async function ProjectDetail({
             status: m.status,
             submitted_at: m.submitted_at,
             confirmed_at: m.confirmed_at,
+            disputed_at: m.disputed_at,
             artisan_id: m.artisan_id,
             proof_href: m.proof_href,
           }))}

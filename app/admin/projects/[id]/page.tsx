@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { addMilestone, updateMilestoneStatus } from "./actions";
+import { reopenMilestone } from "@/app/actions/milestone-flow";
 import PayProjectButton from "@/components/pay-project-button";
 import {
   adminCancelProject,
@@ -374,6 +375,18 @@ export default async function AdminProjectDetail({
                     Update
                   </button>
                 </form>
+                {m.status !== "paid" && m.status !== "paid_out" && (
+                  <form action={reopenMilestone} className="mt-2">
+                    <input type="hidden" name="milestoneId" value={m.id} />
+                    <input type="hidden" name="projectId" value={id} />
+                    <button
+                      type="submit"
+                      className="text-xs border border-royal text-royal rounded-full px-3 py-1.5"
+                    >
+                      Refresh as a new send
+                    </button>
+                  </form>
+                )}
                 {m.paystack_transfer_reference && (
                   <p className="text-[11px] text-ink/40 mt-2 break-all">
                     Transfer reference: {m.paystack_transfer_reference}

@@ -163,11 +163,50 @@ export async function disputeMilestone(formData: FormData) {
       status: "pending",
       disputed_at: new Date().toISOString(),
       confirmed_at: null,
+      submitted_at: null,
+      proof_url: null,
     })
     .eq("id", milestoneId)
     .eq("project_id", projectId)
     .neq("status", "paid");
 
   if (error) throw new Error(error.message);
+  refresh(projectId);
+}
+
+export async function reopenMilestone(formData: FormData) {
+  const milestoneId = formData.get("milestoneId") as string;
+  const projectId = formData.get("projectId") as string;
+  const { user } = await getUser();
+  const service = createServiceClient();
+  const { data: profile } = await service
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (profile?.role !== "admin") {
+    throw new Error("Only the coordinator can reopen a stage.");
+  }
+  const milestone = await loadMilestone(service, milestoneId, projectId);
+  if (isLocked(milestone)) {
+    throw new Error("This milestone is already paid.");
+  }
+  const { error } = await service
+    .from("project_milestones")
+    .update({
+      status: "pending",
+      submitted_at: null,
+      proof_url: null,
+      confirmed_at: null,
+      disputed_at: new Date().toISOString(),
+    })
+    .eq("id", milestoneId)
+    .eq("project_id", projectId)
+    .neq("status", "paid");
+  if (error) throw new Error(error.message);
+  await service
+    .from("projects")
+    .update({ status: "in_production" })
+    .eq("id", projectId);
   refresh(projectId);
 }
