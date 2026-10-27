@@ -7,7 +7,6 @@ import {
   clientSendFabric,
   clientRequestOutfit,
 } from "@/app/actions/project-flow";
-import { reopenMilestone } from "@/app/actions/milestone-flow";
 import { COURIER_LINKS } from "@/lib/couriers";
 import PayProjectButton from "@/components/pay-project-button";
 import MilestoneSubmitForm from "@/components/milestone-submit-form";
@@ -268,18 +267,6 @@ export default function ProjectSequence({
                   <p className="text-[11px] text-ink/50 mt-1">
                     Waiting for the client to review this stage.
                   </p>
-                )}
-                {role === "admin" && m.status !== "paid" && (
-                  <form action={reopenMilestone} className="mt-2">
-                    <input type="hidden" name="milestoneId" value={m.id} />
-                    <input type="hidden" name="projectId" value={project.id} />
-                    <button
-                      type="submit"
-                      className="text-xs border border-royal text-royal rounded-full px-3 py-1.5"
-                    >
-                      Refresh as a new send
-                    </button>
-                  </form>
                 )}
                 {role === "client" && (
                   <MilestoneClientActions
