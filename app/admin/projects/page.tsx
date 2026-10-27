@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { updateProjectStatus, generateConcepts } from "./actions";
 
 const STATUS_OPTIONS = [
@@ -50,6 +51,37 @@ export default async function AdminProjects() {
     (clientProfiles || []).map((c) => [c.id, c])
   );
 
+  const service = createServiceClient();
+  const projectIds = (projects || []).map((p) => p.id);
+  const { data: teamRows } =
+    projectIds.length > 0
+      ? await service
+          .from("project_team_members")
+          .select("project_id, artisan_id")
+          .in("project_id", projectIds)
+      : { data: [] as { project_id: string; artisan_id: string }[] };
+  const artisanIds = [
+    ...new Set((teamRows || []).map((t) => t.artisan_id).filter(Boolean)),
+  ];
+  const { data: artisanNames } =
+    artisanIds.length > 0
+      ? await service
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", artisanIds)
+      : { data: [] as { id: string; full_name: string | null }[] };
+  const artisanNameById = new Map(
+    (artisanNames || []).map((a) => [a.id, a.full_name || "Artisan"])
+  );
+  const artisansByProject = new Map<string, string[]>();
+  for (const row of teamRows || []) {
+    const name = artisanNameById.get(row.artisan_id);
+    if (!name) continue;
+    const list = artisansByProject.get(row.project_id) || [];
+    if (!list.includes(name)) list.push(name);
+    artisansByProject.set(row.project_id, list);
+  }
+
   const projectsWithPhotos = await Promise.all(
     (projects || []).map(async (p) => {
       let photoUrl: string | null = null;
@@ -73,6 +105,7 @@ export default async function AdminProjects() {
         photoUrl,
         conceptUrl,
         client: clientMap.get(p.client_id),
+        artisans: artisansByProject.get(p.id) || [],
       };
     })
   );
@@ -138,6 +171,12 @@ export default async function AdminProjects() {
                   {" | "}
                   {p.tier} package
                   {p.region ? ` | ${p.region}` : ""}
+                </p>
+                <p className="text-ink/70 text-xs mb-3">
+                  Artisan:{" "}
+                  {p.artisans.length > 0
+                    ? p.artisans.join(", ")
+                    : "Not assigned yet"}
                 </p>
 
                 {p.style_direction && (

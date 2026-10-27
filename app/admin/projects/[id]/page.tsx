@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { addMilestone, updateMilestoneStatus } from "./actions";
 import PayProjectButton from "@/components/pay-project-button";
 import {
@@ -63,10 +64,22 @@ export default async function AdminProjectDetail({
     .eq("id", project.client_id)
     .single();
 
-  const { data: team } = await supabase
+  const service = createServiceClient();
+  const { data: team } = await service
     .from("project_team_members")
-    .select("artisan_id, role_on_project, profiles(full_name)")
+    .select("artisan_id, role_on_project")
     .eq("project_id", id);
+  const teamIds = (team || []).map((t) => t.artisan_id).filter(Boolean);
+  const { data: teamProfiles } =
+    teamIds.length > 0
+      ? await service
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", teamIds)
+      : { data: [] as { id: string; full_name: string | null }[] };
+  const teamName = new Map(
+    (teamProfiles || []).map((p) => [p.id, p.full_name || "Artisan"])
+  );
 
   const { data: rawMilestones } = await supabase
     .from("project_milestones")
@@ -205,18 +218,23 @@ export default async function AdminProjectDetail({
         </div>
       )}
 
-      {team && team.length > 0 && (
-        <section className="border border-stone rounded-2xl p-6 mb-6">
-          <h2 className="font-display text-lg mb-4">Team</h2>
+      <section className="border border-stone rounded-2xl p-6 mb-6">
+        <h2 className="font-display text-lg mb-4">Artisan assigned</h2>
+        {!team || team.length === 0 ? (
+          <p className="text-sm text-ink/50">Not assigned yet.</p>
+        ) : (
           <ul className="text-sm space-y-1">
-            {team.map((t: any) => (
+            {team.map((t) => (
               <li key={t.artisan_id}>
-                {t.profiles?.full_name || "Unknown"} - {t.role_on_project}
+                {teamName.get(t.artisan_id) || "Artisan"}
+                {t.role_on_project
+                  ? ` - ${String(t.role_on_project).replace(/_/g, " ")}`
+                  : ""}
               </li>
             ))}
           </ul>
-        </section>
-      )}
+        )}
+      </section>
 
       <section className="border border-stone rounded-2xl p-6 mb-8">
         <h2 className="font-display text-lg mb-1">Artisan payout</h2>
@@ -420,9 +438,7 @@ export default async function AdminProjectDetail({
               <option value="">Same as claimed artisan</option>
               {(team || []).map((t: any) => (
                 <option key={t.artisan_id} value={t.artisan_id}>
-                  {t.profiles?.full_name ||
-                    t.profiles?.[0]?.full_name ||
-                    t.artisan_id}
+                  {teamName.get(t.artisan_id) || t.artisan_id}
                 </option>
               ))}
             </select>
