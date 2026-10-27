@@ -15,7 +15,18 @@ export default function MilestoneClientActions({
 }) {
   if (status === "paid" || status === "paid_out") return null;
   if (confirmedAt) {
-    return <p className="text-xs text-ink/50 mt-1">Milestone reviewed.</p>;
+    return (
+      <div className="mt-2">
+        <p className="text-xs text-ink/50">Milestone reviewed.</p>
+        <form action={disputeMilestone}>
+          <input type="hidden" name="milestoneId" value={milestoneId} />
+          <input type="hidden" name="projectId" value={projectId} />
+          <button type="submit" className="text-xs text-red-700 mt-1">
+            Not satisfied
+          </button>
+        </form>
+      </div>
+    );
   }
   if (!submittedAt) return null;
 
