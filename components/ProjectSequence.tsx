@@ -206,7 +206,8 @@ export default function ProjectSequence({
           </div>
         )}
 
-      {workStarted && (role === "client" || role === "artisan") && (
+      {(role === "artisan" ||
+        (role === "client" && (workStarted || ordered.some((m) => m.submitted_at)))) && (
         <ul className="space-y-3 mb-3 mt-3">
           {ordered.map((m, i) => {
             const mine =
@@ -244,8 +245,8 @@ export default function ProjectSequence({
                 {role === "artisan" &&
                   mine &&
                   m.status !== "paid" &&
-                  !m.confirmed_at &&
-                  (!m.submitted_at || m.disputed_at) && (
+                  m.status !== "paid_out" &&
+                  !m.confirmed_at && (
                     <MilestoneSubmitForm
                       milestoneId={m.id}
                       projectId={project.id}
