@@ -228,6 +228,16 @@ export default async function Account({
       });
       continue;
     }
+    const allReviewed =
+      milestones.length > 0 && milestones.every((m) => Boolean(m.confirmed_at));
+    if (allReviewed && !p.shipped_at) {
+      todo.push({
+        label: "Book GIG or Bolt to collect your outfit",
+        href: `/account/projects/${p.id}`,
+        project: p,
+      });
+      continue;
+    }
     if (p.shipped_at && !p.client_received_at) {
       todo.push({
         label: "Confirm the outfit arrived",

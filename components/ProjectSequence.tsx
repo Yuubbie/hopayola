@@ -325,14 +325,21 @@ export default function ProjectSequence({
           </form>
         )}
 
-      {role === "client" && allReviewed && !project.shipped_at && (
+      {allReviewed && !project.shipped_at && (
         <>
-          <CourierOpen prompt="All stages reviewed. Book GIG or Bolt to collect your outfit. You track the delivery. Hopayola does not store your home address." />
-          <ConfirmCourier
-            action={clientRequestOutfit}
-            projectId={project.id}
-            prompt="I booked collection through"
-          />
+          <CourierOpen prompt="All stages reviewed. Book GIG or Bolt to collect the outfit. Client tracks the rider. Hopayola does not store a home address." />
+          {role === "client" && (
+            <ConfirmCourier
+              action={clientRequestOutfit}
+              projectId={project.id}
+              prompt="I booked collection through"
+            />
+          )}
+          {role !== "client" && (
+            <p className="text-xs text-ink/55 mt-1">
+              The client confirms I booked collection on their project page.
+            </p>
+          )}
         </>
       )}
 
