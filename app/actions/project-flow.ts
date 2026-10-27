@@ -46,6 +46,34 @@ export async function clientSendFabric(formData: FormData) {
   revalidate(projectId);
 }
 
+export async function clientRequestOutfit(formData: FormData) {
+  const projectId = String(formData.get("projectId") || "");
+  const courier = String(formData.get("courier") || "");
+  if (courier !== "gig" && courier !== "bolt") {
+    throw new Error("Choose GIG or Bolt.");
+  }
+  const { supabase, user } = await load();
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
+  const { data: ms } = await service
+    .from("project_milestones")
+    .select("confirmed_at")
+    .eq("project_id", projectId);
+  if (!ms?.length || ms.some((m) => !m.confirmed_at)) {
+    throw new Error("Every stage must be reviewed before you book collection.");
+  }
+  const { error } = await supabase
+    .from("projects")
+    .update({
+      shipped_at: new Date().toISOString(),
+      shipped_courier: courier,
+    })
+    .eq("id", projectId)
+    .eq("client_id", user.id);
+  if (error) throw new Error(error.message);
+  revalidate(projectId);
+}
+
 export async function clientCancelProject(formData: FormData) {
   const projectId = String(formData.get("projectId") || "");
   const { supabase, user } = await load();

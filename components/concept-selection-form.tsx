@@ -38,6 +38,8 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [ownLooks, setOwnLooks] = useState<Concept[]>([]);
+  const [ownBusy, setOwnBusy] = useState(false);
 
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [phase, setPhase] = useState<Record<string, Phase>>(() =>
@@ -138,7 +140,63 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
     }
   }
 
+  async function useMyConcept(file: File) {
+    setOwnBusy(true);
+    setError(null);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Sign in again.");
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/own-${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("project-fabrics")
+        .upload(path, file);
+      if (upErr) throw new Error(upErr.message);
+      const { data: pub } = supabase.storage
+        .from("project-fabrics")
+        .getPublicUrl(path);
+      const n =
+        Math.max(
+          0,
+          ...concepts.map((c) => c.concept_number),
+          ...ownLooks.map((c) => c.concept_number)
+        ) + 1;
+      const { data: row, error: insErr } = await supabase
+        .from("ai_design_concepts")
+        .insert({
+          project_id: projectId,
+          concept_number: n,
+          persona: "Use my concept",
+          image_url: pub.publicUrl,
+          is_selected: false,
+        })
+        .select("id, concept_number, persona, image_url")
+        .single();
+      if (insErr || !row) throw new Error(insErr?.message || "Could not add look.");
+      const added: Concept = {
+        id: row.id,
+        concept_number: row.concept_number,
+        persona: row.persona,
+        silhouette: null,
+        modesty_level: null,
+        embellishment: null,
+        sleeve_style: null,
+        neckline: null,
+        image_url: row.image_url,
+      };
+      setOwnLooks((prev) => [...prev, added]);
+      setPhase((prev) => ({ ...prev, [added.id]: "ready" }));
+      setUrls((prev) => ({ ...prev, [added.id]: added.image_url || "" }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not add your picture.");
+    }
+    setOwnBusy(false);
+  }
+
   const readyCount = concepts.filter((c) => phase[c.id] === "ready").length;
+  const allCards = [...concepts, ...ownLooks];
 
   return (
     <div>
@@ -156,7 +214,7 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-        {concepts.map((c) => {
+        {allCards.map((c) => {
           const p = phase[c.id];
           const image = urls[c.id] || c.image_url || PLACEHOLDER;
           const image3d = urls[c.id + "-3d"] || c.image_3d_url;
@@ -268,6 +326,26 @@ export default function ConceptSelectionForm({ projectId, concepts }: Props) {
             </div>
           );
         })}
+        <div className="border border-dashed border-stone rounded-2xl p-4 flex flex-col justify-center">
+          <p className="text-sm font-medium mb-1">Use my concept</p>
+          <p className="text-xs text-ink/50 mb-3">
+            Upload your own picture. It appears in this pocket so you can
+            choose it like the others.
+          </p>
+          <input
+            type="file"
+            accept="image/*"
+            disabled={ownBusy}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) void useMyConcept(f);
+            }}
+            className="text-xs"
+          />
+          {ownBusy && (
+            <p className="text-xs text-ink/50 mt-2">Adding your look...</p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -2,10 +2,10 @@
 
 import {
   artisanConfirmFabric,
-  artisanShipProject,
   clientMarkReceived,
   clientMarkPaid,
   clientSendFabric,
+  clientRequestOutfit,
 } from "@/app/actions/project-flow";
 import { reopenMilestone } from "@/app/actions/milestone-flow";
 import { COURIER_LINKS } from "@/lib/couriers";
@@ -133,7 +133,9 @@ export default function ProjectSequence({
                   : ""}
           </li>
         ))}
-        <li>{project.shipped_at ? "✓" : "○"} Outfit sent (after all reviews)</li>
+        <li>
+          {project.shipped_at ? "✓" : "○"} Client books GIG/Bolt for the outfit
+        </li>
         <li>
           {project.client_received_at ? "✓" : "○"} Received · artisan paid
         </li>
@@ -323,19 +325,22 @@ export default function ProjectSequence({
           </form>
         )}
 
-      {role === "artisan" && allReviewed && !project.shipped_at && (
+      {role === "client" && allReviewed && !project.shipped_at && (
         <>
-          <CourierOpen prompt="Send outfit through (opens GIG or Bolt — mark sent only after it has gone)" />
+          <CourierOpen prompt="All stages reviewed. Book GIG or Bolt to collect your outfit. You track the delivery. Hopayola does not store your home address." />
           <ConfirmCourier
-            action={artisanShipProject}
+            action={clientRequestOutfit}
             projectId={project.id}
-            prompt="I have sent the outfit through"
+            prompt="I booked collection through"
           />
-          <p className="text-[11px] text-ink/50 leading-relaxed">
-            Put the garment in the Hopayola shipping box before GIG/Bolt. Your
-            own branded packaging can sit inside that box.
-          </p>
         </>
+      )}
+
+      {role === "artisan" && allReviewed && !project.shipped_at && (
+        <p className="text-xs text-ink/60 mt-2 leading-relaxed">
+          Stages are reviewed. Pack the outfit in the Hopayola box. The client
+          books GIG or Bolt to collect. You do not need their home address.
+        </p>
       )}
 
       {role === "admin" && (
