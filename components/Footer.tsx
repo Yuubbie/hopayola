@@ -1,3 +1,5 @@
+import SocialIcons from "@/components/SocialIcons";
+
 export default function Footer() {
   return (
     <footer className="bg-plum text-paper mt-32">
@@ -26,20 +28,9 @@ export default function Footer() {
           </ul>
         </div>
       </div>
-      <div className="mx-auto max-w-6xl px-6 pb-4 text-sm text-paper/70 flex flex-wrap gap-x-4 gap-y-2">
-        <a href="https://www.instagram.com/hopayola" className="hover:text-lilac">
-          Instagram @hopayola
-        </a>
-        <a href="https://www.tiktok.com/@hopayola" className="hover:text-lilac">
-          TikTok @hopayola
-        </a>
-        <a href="https://x.com/hopayola" className="hover:text-lilac">
-          X @hopayola
-        </a>
-        <a href="https://www.facebook.com/hopayolaltd" className="hover:text-lilac">
-          Facebook @hopayola
-        </a>
-        <a href="https://wa.me/2347026888665" className="hover:text-lilac">
+      <div className="mx-auto max-w-6xl px-6 pb-4 flex flex-wrap items-center gap-4 text-paper/80">
+        <SocialIcons />
+        <a href="https://wa.me/2347026888665" className="text-sm hover:text-lilac">
           WhatsApp +234 702 688 8665
         </a>
       </div>

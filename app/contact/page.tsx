@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { submitInquiry } from "./actions";
+import SocialIcons from "@/components/SocialIcons";
 
 export const metadata: Metadata = {
   title: "Contact — Hopayola",
@@ -70,20 +71,7 @@ export default function Contact() {
               <span className="block text-ink/40 text-xs uppercase tracking-widest mb-1">
                 Social
               </span>
-              <span className="flex flex-wrap gap-x-3 gap-y-1">
-                <a href="https://www.instagram.com/hopayola" className="hover:text-royal">
-                  Instagram @hopayola
-                </a>
-                <a href="https://www.tiktok.com/@hopayola" className="hover:text-royal">
-                  TikTok @hopayola
-                </a>
-                <a href="https://x.com/hopayola" className="hover:text-royal">
-                  X @hopayola
-                </a>
-                <a href="https://www.facebook.com/hopayolaltd" className="hover:text-royal">
-                  Facebook @hopayola
-                </a>
-              </span>
+              <SocialIcons className="text-ink" />
             </li>
           </ul>
 
