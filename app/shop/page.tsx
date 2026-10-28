@@ -110,8 +110,10 @@ export default function ShopPage() {
         <div className="mx-auto max-w-3xl px-6 py-20 text-center">
           <h2 className="font-display text-3xl mb-4">Need a Custom Garment?</h2>
           <p className="text-ink/65 leading-relaxed mb-8">
-            Send fabric, choose a look, an artisan sews it. Hopayola holds the
-            money until it is in your hands.
+            This lives outside the shop. Start a project, send your fabric,
+            choose a concept from the ai design studio, and watch an artisan
+            bring it to life, with Hopayola coordinating your project until
+            it&apos;s safely in your hands.
           </p>
           <Link
             href="/projects/new"
