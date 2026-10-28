@@ -53,13 +53,37 @@ export default function Contact() {
               <span className="block text-ink/40 text-xs uppercase tracking-widest mb-1">
                 WhatsApp / Direct Line
               </span>
-              +234 702 688 8665
+              <a
+                href="https://wa.me/2347026888665"
+                className="hover:text-royal transition-colors"
+              >
+                +234 702 688 8665
+              </a>
             </li>
             <li>
               <span className="block text-ink/40 text-xs uppercase tracking-widest mb-1">
                 Primary Operations Hub
               </span>
               Abuja, Federal Capital Territory, Nigeria
+            </li>
+            <li>
+              <span className="block text-ink/40 text-xs uppercase tracking-widest mb-1">
+                Social
+              </span>
+              <span className="flex flex-wrap gap-x-3 gap-y-1">
+                <a href="https://www.instagram.com/hopayola" className="hover:text-royal">
+                  Instagram @hopayola
+                </a>
+                <a href="https://www.tiktok.com/@hopayola" className="hover:text-royal">
+                  TikTok @hopayola
+                </a>
+                <a href="https://x.com/hopayola" className="hover:text-royal">
+                  X @hopayola
+                </a>
+                <a href="https://www.facebook.com/hopayola" className="hover:text-royal">
+                  Facebook @hopayola
+                </a>
+              </span>
             </li>
           </ul>
 

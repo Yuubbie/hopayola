@@ -130,6 +130,12 @@ export default function DashboardShell({
         {nav}
         <div className="mt-auto pt-8">
           {promo !== null && promo}
+          <a
+            href="mailto:support@hopayola.com?subject=Help%20us%20improve%20Hopayola"
+            className="mt-4 block rounded-xl px-4 py-3 text-[11px] leading-relaxed text-paper/75 bg-paper/10 hover:bg-paper/15"
+          >
+            Help us improve our service to you. Email support@hopayola.com
+          </a>
           <button
             type="button"
             onClick={handleSignOut}
@@ -203,6 +209,12 @@ export default function DashboardShell({
                 </span>
               </Link>
               {nav}
+              <a
+                href="mailto:support@hopayola.com?subject=Help%20us%20improve%20Hopayola"
+                className="mt-6 block rounded-xl px-4 py-3 text-[11px] leading-relaxed text-paper/75 bg-paper/10"
+              >
+                Help us improve our service to you. Email support@hopayola.com
+              </a>
               <button
                 type="button"
                 onClick={handleSignOut}

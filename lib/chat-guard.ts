@@ -1,7 +1,7 @@
 export const HOPAYOLA_SUPPORT_EMAIL = "support@hopayola.com";
-export const HOPAYOLA_WHATSAPP = "+2348105173313";
+export const HOPAYOLA_WHATSAPP = "+234 702 688 8665";
 export const HOPAYOLA_WHATSAPP_LINK =
-  "https://wa.me/2348105173313";
+  "https://wa.me/2347026888665";
 
 const PATTERNS: { name: string; re: RegExp }[] = [
   { name: "phone", re: /\+?234[\s-]?\d{8,11}\b/i },
