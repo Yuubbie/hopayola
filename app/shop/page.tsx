@@ -41,13 +41,13 @@ export default function ShopPage() {
     <main>
       <section className="bg-ink text-paper">
         <div className="mx-auto max-w-4xl px-6 md:px-10 py-24 md:py-32 text-center">
-          <p className="text-royal text-sm mb-5 tracking-wide">Shop</p>
           <h1 className="font-display text-4xl md:text-5xl mb-6 leading-tight">
-            Ready-made from Hopayola. Custom still lives in the studio.
+            Ready-made from Hopayola.
           </h1>
           <p className="text-paper/70 max-w-prose mx-auto leading-relaxed">
-            Buy guides and goods here. If you want something sewn, start a
-            project in the studio.
+            Curated goods and guides, shipped straight to your doorstep. Prefer
+            something one-of-a-kind? Head over to the design studio to brief an
+            artisan for a custom piece.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-10">
             <a
@@ -67,10 +67,11 @@ export default function ShopPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 md:px-10 py-20 md:py-28">
-        <h2 className="font-display text-3xl mb-3">What you can buy</h2>
+        <h2 className="font-display text-3xl mb-3">Creative Tools &amp; Guides</h2>
         <p className="text-ink/60 text-sm mb-10 max-w-xl">
-          Checkout happens on shop.hopayola.com. This page is the map so Shop
-          on hopayola.com does not feel like a different brand.
+          Download instant worksheets, coloring books, and design templates to
+          spark your next project, or complete your checkout for ready-made
+          apparel over at shop.hopayola.com.
         </p>
         <div className="grid md:grid-cols-3 gap-8">
           {goods.map((item) => (
@@ -107,10 +108,10 @@ export default function ShopPage() {
 
       <section className="bg-stone/30">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-          <h2 className="font-display text-3xl mb-4">Need a garment made?</h2>
+          <h2 className="font-display text-3xl mb-4">Need a Custom Garment?</h2>
           <p className="text-ink/65 leading-relaxed mb-8">
-            That is not the shop. Send fabric, choose a look, an artisan sews
-            it, Hopayola holds the money until it is in your hands.
+            Send fabric, choose a look, an artisan sews it. Hopayola holds the
+            money until it is in your hands.
           </p>
           <Link
             href="/projects/new"

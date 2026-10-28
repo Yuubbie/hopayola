@@ -36,7 +36,7 @@ export default function Footer() {
         <a href="https://x.com/hopayola" className="hover:text-lilac">
           X @hopayola
         </a>
-        <a href="https://www.facebook.com/hopayola" className="hover:text-lilac">
+        <a href="https://www.facebook.com/hopayolaltd" className="hover:text-lilac">
           Facebook @hopayola
         </a>
         <a href="https://wa.me/2347026888665" className="hover:text-lilac">

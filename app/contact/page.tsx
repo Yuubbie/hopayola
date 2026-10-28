@@ -80,7 +80,7 @@ export default function Contact() {
                 <a href="https://x.com/hopayola" className="hover:text-royal">
                   X @hopayola
                 </a>
-                <a href="https://www.facebook.com/hopayola" className="hover:text-royal">
+                <a href="https://www.facebook.com/hopayolaltd" className="hover:text-royal">
                   Facebook @hopayola
                 </a>
               </span>
