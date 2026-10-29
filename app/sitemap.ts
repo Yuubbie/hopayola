@@ -16,6 +16,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/terms",
     "/projects/new",
     "/lifestyle",
+    "/custom-outfit-nigeria",
+    "/hire-a-tailor",
+    "/aso-ebi",
+    "/wedding-outfit",
+    "/artisan-jobs",
   ];
 
   return pages.map((path) => ({
