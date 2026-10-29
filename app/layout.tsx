@@ -63,6 +63,9 @@ export const metadata: Metadata = {
       "Commission a custom outfit in Nigeria. Vetted artisans, held payment, design studio.",
   },
   robots: { index: true, follow: true },
+  verification: {
+    google: "google82859dfdd6727ab1.html",
+  },
 };
 
 export default function RootLayout({
