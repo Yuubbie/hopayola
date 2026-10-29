@@ -10,7 +10,6 @@ export default function Lifestyle() {
     <main>
       <section className="bg-ink text-paper min-h-[70vh] flex items-center">
         <div className="mx-auto max-w-2xl px-6 md:px-10 py-24 md:py-32 text-center">
-          <p className="text-royal text-sm mb-5 tracking-wide">Lifestyle</p>
           <h1 className="font-display text-4xl md:text-5xl mb-6 leading-tight">
             Coming soon
           </h1>
