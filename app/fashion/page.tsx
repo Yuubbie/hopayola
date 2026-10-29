@@ -3,9 +3,9 @@ import FashionPathways from "@/components/FashionPathways";
 import FashionMarket from "@/components/FashionMarket";
 
 export const metadata: Metadata = {
-  title: "Fashion — Hopayola",
+  title: "Hire a tailor or claim a sewing job",
   description:
-    "Hire a fashion talent, create a team, or join as an artisan. Explore the ways to work with Hopayola.",
+    "Open fashion jobs in Nigeria. Clients hire a talent. Artisans claim briefs nationwide. Custom sewing coordinated by Hopayola.",
 };
 
 export default function Fashion() {

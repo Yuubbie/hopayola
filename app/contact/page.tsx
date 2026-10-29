@@ -3,7 +3,7 @@ import { submitInquiry } from "./actions";
 import SocialIcons from "@/components/SocialIcons";
 
 export const metadata: Metadata = {
-  title: "Contact — Hopayola",
+  title: "Contact",
   description:
     "Get in touch with Hopayola for custom commissions, partner onboarding, or platform questions.",
 };

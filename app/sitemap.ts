@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const baseUrl = "https://hopayola.com";
+const baseUrl = "https://www.hopayola.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = [
@@ -9,12 +9,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/fashion",
     "/fashion/hire-a-talent",
     "/fashion/create-a-team",
+    "/fashion/design-my-outfit",
     "/artisan/sign-up",
+    "/shop",
+    "/contact",
+    "/terms",
+    "/projects/new",
     "/lifestyle",
   ];
 
   return pages.map((path) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
+    changeFrequency: path === "" ? "weekly" : "monthly",
+    priority: path === "" ? 1 : 0.7,
   }));
 }

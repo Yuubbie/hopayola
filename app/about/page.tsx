@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About — Hopayola",
+  title: "About",
   description:
     "Hopayola transforms custom tailoring by connecting clients, curated artisans, and AI-driven design intelligence into a seamless bespoke ecosystem.",
 };

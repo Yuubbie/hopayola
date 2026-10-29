@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Shop - Hopayola",
+  title: "Shop ready-made goods and design guides",
   description:
-    "Ready-made guides and goods from Hopayola. Custom outfits still go through the design studio.",
+    "Buy Hopayola guides, worksheets, and ready-made apparel at shop.hopayola.com. Custom garments still start in the design studio.",
 };
 
 const STORE = "https://shop.hopayola.com";
