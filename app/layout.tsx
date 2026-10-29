@@ -20,7 +20,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.hopayola.com"),
+  metadataBase: new URL("https://hopayola.com"),
   title: {
     default: "Hopayola | Custom outfits with Nigerian artisans",
     template: "%s | Hopayola",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "fashion artisan",
     "Hopayola",
   ],
-  alternates: { canonical: "https://www.hopayola.com" },
+  alternates: { canonical: "https://hopayola.com" },
   manifest: "/manifest.webmanifest",
   themeColor: "#5b2d8e",
   appleWebApp: {
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     title: "Hopayola | Custom outfits with Nigerian artisans",
     description:
       "Commission a custom outfit in Nigeria. Hopayola matches you with a vetted artisan, holds payment, and coordinates fabric, design studio, and delivery.",
-    url: "https://www.hopayola.com",
+    url: "https://hopayola.com",
     siteName: "Hopayola",
     type: "website",
     locale: "en_NG",
@@ -83,8 +83,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Hopayola",
-              url: "https://www.hopayola.com",
-              logo: "https://www.hopayola.com/images/logo.png",
+              url: "https://hopayola.com",
+              logo: "https://hopayola.com/images/logo.png",
               email: "support@hopayola.com",
               telephone: "+2347026888665",
               address: {

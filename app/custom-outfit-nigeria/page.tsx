@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Custom outfit in Nigeria",
   description:
     "Commission a custom outfit in Nigeria. Brief the look, send fabric, a Hopayola artisan sews it. Payment is held until the garment is in your hands.",
-  alternates: { canonical: "https://www.hopayola.com/custom-outfit-nigeria" },
+  alternates: { canonical: "https://hopayola.com/custom-outfit-nigeria" },
 };
 
 export default function Page() {

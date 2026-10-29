@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/account", "/admin", "/artisan/account", "/auth"],
     },
-    sitemap: "https://www.hopayola.com/sitemap.xml",
+    sitemap: "https://hopayola.com/sitemap.xml",
   };
 }

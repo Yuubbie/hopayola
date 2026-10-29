@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Hire a tailor in Nigeria",
   description:
     "Hire a tailor in Nigeria through Hopayola. Vetted artisans, held payment, your fabric, your measurements. Work stays on the platform.",
-  alternates: { canonical: "https://www.hopayola.com/hire-a-tailor" },
+  alternates: { canonical: "https://hopayola.com/hire-a-tailor" },
 };
 
 export default function Page() {

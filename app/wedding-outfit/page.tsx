@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Custom wedding outfit Nigeria",
   description:
     "Commission a custom wedding or guest outfit in Nigeria. Hopayola artisans, fabric you send, payment held until the garment arrives.",
-  alternates: { canonical: "https://www.hopayola.com/wedding-outfit" },
+  alternates: { canonical: "https://hopayola.com/wedding-outfit" },
 };
 
 export default function Page() {

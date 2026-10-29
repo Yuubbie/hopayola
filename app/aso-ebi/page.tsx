@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Aso ebi and occasion outfits",
   description:
     "Sew aso ebi and occasion outfits in Nigeria with Hopayola. Your fabric, a studio look, an artisan, payment held until delivery.",
-  alternates: { canonical: "https://www.hopayola.com/aso-ebi" },
+  alternates: { canonical: "https://hopayola.com/aso-ebi" },
 };
 
 export default function Page() {

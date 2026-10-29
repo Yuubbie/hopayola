@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Fashion artisan jobs in Nigeria",
   description:
     "Claim sewing jobs on Hopayola. Nationwide briefs, your shop address for pickup, 90 percent to the artisan when the client receives the outfit.",
-  alternates: { canonical: "https://www.hopayola.com/artisan-jobs" },
+  alternates: { canonical: "https://hopayola.com/artisan-jobs" },
 };
 
 export default function Page() {
