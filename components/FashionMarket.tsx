@@ -48,10 +48,24 @@ export default async function FashionMarket() {
     .order("created_at", { ascending: false })
     .limit(24);
 
-  const closed = new Set(["completed", "cancelled", "paid"]);
-  const projects = (allProjects || []).filter(
-    (p) => !closed.has(String(p.status || ""))
+  const claimable = new Set([
+    "submitted",
+    "concepts_ready",
+    "concept_selected",
+  ]);
+  const candidate = (allProjects || []).filter((p) =>
+    claimable.has(String(p.status || ""))
   );
+  const candIds = candidate.map((p) => p.id);
+  const { data: takenRows } =
+    candIds.length > 0
+      ? await supabase
+          .from("project_team_members")
+          .select("project_id")
+          .in("project_id", candIds)
+      : { data: [] as { project_id: string }[] };
+  const taken = new Set((takenRows || []).map((r) => r.project_id));
+  const projects = candidate.filter((p) => !taken.has(p.id));
 
   return (
     <div className="mx-auto max-w-6xl px-6 md:px-10 pb-24 md:pb-32 space-y-20">

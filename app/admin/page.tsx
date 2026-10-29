@@ -78,7 +78,9 @@ export default async function AdminOverview() {
       p.funded_at &&
       p.client_received_at &&
       p.status !== "cancelled" &&
-      !paidProjectIds.has(p.id)
+      !paidProjectIds.has(p.id) &&
+      !p.payout_proof_at &&
+      !p.payout_confirmed_at
   );
 
   const { data: unverified } = await supabase

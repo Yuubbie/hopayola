@@ -41,20 +41,46 @@ export async function claimProject(formData: FormData) {
     redirect(`${DASHBOARD}?claim=missing`);
   }
 
-  const { data: existing } = await service
+  const { data: existingMine } = await service
     .from("project_team_members")
     .select("id")
     .eq("project_id", projectId)
     .eq("artisan_id", user.id)
     .maybeSingle();
 
-  if (existing) {
+  if (existingMine) {
     revalidatePath(DASHBOARD);
+    revalidatePath("/fashion");
     redirect(`${DASHBOARD}?claim=already`);
+  }
+
+  const { data: anyone } = await service
+    .from("project_team_members")
+    .select("id")
+    .eq("project_id", projectId)
+    .limit(1)
+    .maybeSingle();
+
+  if (anyone) {
+    revalidatePath(DASHBOARD);
+    revalidatePath("/fashion");
+    redirect(`${DASHBOARD}?claim=taken`);
   }
 
   const claimable = ["submitted", "concepts_ready", "concept_selected"];
   if (!claimable.includes(project.status)) {
+    redirect(`${DASHBOARD}?claim=taken`);
+  }
+
+  const { data: locked } = await service
+    .from("projects")
+    .update({ status: "artisan_assigned" })
+    .eq("id", projectId)
+    .in("status", claimable)
+    .select("id");
+
+  if (!locked?.length) {
+    revalidatePath("/fashion");
     redirect(`${DASHBOARD}?claim=taken`);
   }
 
@@ -69,13 +95,13 @@ export async function claimProject(formData: FormData) {
     });
 
   if (teamError) {
+    await service
+      .from("projects")
+      .update({ status: project.status })
+      .eq("id", projectId)
+      .eq("status", "artisan_assigned");
     redirect(`${DASHBOARD}?claim=failed`);
   }
-
-  await service
-    .from("projects")
-    .update({ status: "artisan_assigned" })
-    .eq("id", projectId);
 
   revalidatePath(DASHBOARD);
   revalidatePath("/fashion");

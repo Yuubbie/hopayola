@@ -129,11 +129,22 @@ export default async function ArtisanAccount({
     (selectedRows || []).map((c) => [c.id, c.image_url as string | null])
   );
 
-  const { data: openProjects } = await service
+  const { data: openRows } = await service
     .from("projects")
     .select("*")
     .in("status", OPEN_STATUSES)
     .order("created_at", { ascending: false });
+
+  const openIds = (openRows || []).map((p: any) => p.id);
+  const { data: claimedRows } =
+    openIds.length > 0
+      ? await service
+          .from("project_team_members")
+          .select("project_id")
+          .in("project_id", openIds)
+      : { data: [] as { project_id: string }[] };
+  const claimedSet = new Set((claimedRows || []).map((r) => r.project_id));
+  const openProjects = (openRows || []).filter((p: any) => !claimedSet.has(p.id));
 
   const { data: myMilestones } =
     assignedIds.length > 0
