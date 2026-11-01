@@ -71,10 +71,6 @@ export default async function FashionMarket() {
     <div className="mx-auto max-w-6xl px-6 md:px-10 pb-24 md:pb-32 space-y-20">
       <section>
         <h2 className="font-display text-2xl mb-2">Artisans available</h2>
-        <p className="text-ink/55 text-sm mb-6">
-          Anyone can browse. Sign in to start a project — work stays on
-          Hopayola.
-        </p>
         {!artisans?.length ? (
           <p className="text-sm text-ink/45">No artisans listed yet.</p>
         ) : (
