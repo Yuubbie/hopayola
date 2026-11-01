@@ -70,7 +70,7 @@ export default async function FashionMarket() {
   return (
     <div className="mx-auto max-w-6xl px-6 md:px-10 pb-24 md:pb-32 space-y-20">
       <section>
-        <h2 className="font-display text-2xl mb-2">Artisans available</h2>
+        <h2 className="font-display text-2xl mb-6">Artisans available</h2>
         {!artisans?.length ? (
           <p className="text-sm text-ink/45">No artisans listed yet.</p>
         ) : (
