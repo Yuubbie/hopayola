@@ -308,7 +308,7 @@ export default async function ArtisanAccount({
             {jobs.length === 0 ? (
               <div className="border border-stone rounded-2xl p-8 text-center">
                 <p className="text-ink/55 text-sm mb-4">
-                  No claimed jobs yet. If Hope assigned you in admin, give it a
+                  No claimed jobs yet. If Hopayola assigned you in admin, give it a
                   refresh.
                 </p>
                 <Link

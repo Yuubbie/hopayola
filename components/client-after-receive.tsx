@@ -62,8 +62,8 @@ export default function ClientAfterReceive({
       <div>
         <h2 className="font-display text-lg mb-2">Trending styles photo</h2>
         <p className="text-sm text-ink/55 mb-3">
-          Optional. A well photographed finished piece for Hope to approve for
-          Trending styles.
+          Optional. A well photographed finished piece for Hopayola to approve
+          for Trending styles.
         </p>
         {trendingPath ? (
           <p className="text-sm text-ink/70">Photo submitted. Waiting on approval.</p>
