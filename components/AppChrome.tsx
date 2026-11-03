@@ -8,7 +8,7 @@ function isWorkspace(path: string) {
   return (
     path.startsWith("/account") ||
     path.startsWith("/admin") ||
-    path.startsWith("/artisan") ||
+    (path.startsWith("/artisan") && !path.startsWith("/artisan/sign-up")) ||
     path.startsWith("/projects")
   );
 }
