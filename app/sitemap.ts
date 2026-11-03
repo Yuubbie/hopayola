@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/aso-ebi",
     "/wedding-outfit",
     "/artisan-jobs",
+    "/fashion-project-coordinator",
   ];
 
   return pages.map((path) => ({

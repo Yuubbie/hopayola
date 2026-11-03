@@ -16,6 +16,11 @@ export default function Footer() {
             <li><a href="/lifestyle" className="hover:text-lilac transition-colors">Lifestyle</a></li>
             <li><a href="/shop" className="hover:text-lilac transition-colors">Shop</a></li>
             <li><a href="/hire-a-tailor" className="hover:text-lilac transition-colors">Hire a tailor</a></li>
+            <li>
+              <a href="/fashion-project-coordinator" className="hover:text-lilac transition-colors">
+                Project coordinator
+              </a>
+            </li>
             <li><a href="/artisan-jobs" className="hover:text-lilac transition-colors">Artisan jobs</a></li>
           </ul>
         </div>
