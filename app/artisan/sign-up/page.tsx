@@ -142,25 +142,15 @@ export default function ArtisanSignUp() {
             </div>
           ) : (
             <>
-              <h1 className="font-display text-3xl mb-2">
+              <h1 className="font-display text-3xl mb-8">
                 Join as an artisan
               </h1>
-              <p className="text-ink/60 mb-8">
-                Business name, city, your phone, shop address, a guarantor
-                number, and a photo of a recognised ID (national ID, passport
-                or driver&apos;s licence). We do not ask for BVN or NIN
-                numbers. You upload the ID after you confirm email, on My
-                profile.
-              </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm mb-1" htmlFor="fullName">
                     Brand name
                   </label>
-                  <p className="text-[11px] text-ink/45 mb-1">
-                    Not a personal nickname. The name of your fashion house.
-                  </p>
                   <input
                     id="fullName"
                     type="text"
@@ -189,9 +179,6 @@ export default function ArtisanSignUp() {
                   <label className="block text-sm mb-1" htmlFor="phone">
                     Phone number
                   </label>
-                  <p className="text-[11px] text-ink/45 mb-1">
-                    So Hopayola can reach you. Not the guarantor.
-                  </p>
                   <input
                     id="phone"
                     type="tel"
