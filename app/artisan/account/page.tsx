@@ -22,6 +22,7 @@ const CLAIM_MESSAGES: Record<string, string> = {
   already: "You have already claimed this project.",
   taken: "Another artisan has already claimed this one.",
   not_artisan: "Only artisan accounts can claim. Finish your artisan sign-up first.",
+  need_id: "Upload a recognised ID on My profile before you claim a job.",
   missing: "That project no longer exists.",
   failed: "Could not claim just now. Please try again.",
 };
@@ -251,6 +252,17 @@ export default async function ArtisanAccount({
       {welcome && (
         <div className="mb-6 border border-royal/20 bg-royal/5 rounded-2xl p-4 text-sm text-royal-deep">
           Welcome to Hopayola. Claim a job below when one matches your work.
+        </div>
+      )}
+
+      {!artisanProfile?.id_document_path && (
+        <div className="mb-6 border border-stone rounded-2xl p-4 text-sm">
+          <p className="text-ink/75">
+            Upload a recognised ID on My profile before you can claim a job.
+          </p>
+          <Link href="/artisan/account/edit" className="text-royal text-xs mt-2 inline-block">
+            My profile
+          </Link>
         </div>
       )}
 

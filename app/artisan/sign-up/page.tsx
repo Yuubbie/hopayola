@@ -65,8 +65,16 @@ export default function ArtisanSignUp() {
       setError("Pick at least one specialty.");
       return;
     }
+    if (!fullName.trim() || !legalName.trim()) {
+      setError("Brand name and full legal name are required.");
+      return;
+    }
     if (!phone.trim()) {
       setError("Your phone number is required.");
+      return;
+    }
+    if (!city.trim()) {
+      setError("City is required.");
       return;
     }
     if (!shopAddress.trim() || !guarantorPhone.trim()) {

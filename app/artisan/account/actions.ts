@@ -23,12 +23,15 @@ export async function claimProject(formData: FormData) {
 
   const { data: artisanProfile } = await service
     .from("artisan_profiles")
-    .select("specialty")
+    .select("specialty, id_document_path")
     .eq("id", user.id)
     .maybeSingle();
 
   if (!artisanProfile) {
     redirect(`${DASHBOARD}?claim=not_artisan`);
+  }
+  if (!artisanProfile.id_document_path) {
+    redirect(`${DASHBOARD}?claim=need_id`);
   }
 
   const { data: project } = await service
