@@ -27,7 +27,7 @@ export default async function AdminArtisans() {
   const { data: artisans } = await service
     .from("artisan_profiles")
     .select(
-      "id, region, specialty, skills, years_experience, bio, verified, shop_address, legal_name, guarantor_phone, id_document_path, bank_account_number, bank_code, bank_account_name"
+      "id, region, specialty, skills, years_experience, bio, verified, shop_address, legal_name, guarantor_phone, id_document_path, logo_path, bank_account_number, bank_code, bank_account_name"
     )
     .order("id", { ascending: false });
 
@@ -42,12 +42,20 @@ export default async function AdminArtisans() {
   const personById = new Map((people || []).map((p) => [p.id, p]));
 
   const idHrefs = new Map<string, string>();
+  const logoHrefs = new Map<string, string>();
   for (const a of artisans || []) {
-    if (!a.id_document_path) continue;
-    const { data } = await service.storage
-      .from("project-fabrics")
-      .createSignedUrl(a.id_document_path, 60 * 60);
-    if (data?.signedUrl) idHrefs.set(a.id, data.signedUrl);
+    if (a.id_document_path) {
+      const { data } = await service.storage
+        .from("project-fabrics")
+        .createSignedUrl(a.id_document_path, 60 * 60);
+      if (data?.signedUrl) idHrefs.set(a.id, data.signedUrl);
+    }
+    if (a.logo_path) {
+      const { data } = await service.storage
+        .from("project-fabrics")
+        .createSignedUrl(a.logo_path, 60 * 60);
+      if (data?.signedUrl) logoHrefs.set(a.id, data.signedUrl);
+    }
   }
 
   return (
@@ -65,13 +73,28 @@ export default async function AdminArtisans() {
           {artisans.map((a) => {
             const person = personById.get(a.id);
             const idHref = idHrefs.get(a.id);
+            const logoHref = logoHrefs.get(a.id);
             return (
               <li key={a.id} className="border border-stone rounded-2xl p-6">
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div>
-                    <span className="font-medium text-sm block">
-                      {person?.full_name || a.legal_name || "Unknown"}
-                    </span>
+                    <div className="flex items-center gap-3 mb-1">
+                      {logoHref ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={logoHref}
+                          alt=""
+                          className="h-12 w-12 rounded-full object-cover border border-stone"
+                        />
+                      ) : (
+                        <span className="h-12 w-12 rounded-full bg-stone text-ink/40 flex items-center justify-center text-xs">
+                          No logo
+                        </span>
+                      )}
+                      <span className="font-medium text-sm block">
+                        {person?.full_name || a.legal_name || "Unknown"}
+                      </span>
+                    </div>
                     <span className="text-ink/50 text-xs capitalize">
                       {a.region} - {a.years_experience ?? "?"} yrs experience
                     </span>
