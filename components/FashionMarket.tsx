@@ -27,7 +27,7 @@ export default async function FashionMarket() {
 
   const { data: artisans } = await supabase
     .from("artisan_profiles")
-    .select("id, region, specialty, bio, verified")
+    .select("id, region, specialty, bio, verified, logo_path")
     .limit(24);
 
   const artisanIds = (artisans || []).map((a) => a.id);
@@ -80,6 +80,18 @@ export default async function FashionMarket() {
                 key={a.id}
                 className="border border-stone rounded-2xl p-5"
               >
+                {a.logo_path ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={
+                      supabase.storage
+                        .from("project-fabrics")
+                        .getPublicUrl(a.logo_path).data.publicUrl
+                    }
+                    alt=""
+                    className="h-12 w-12 rounded-full object-cover mb-3"
+                  />
+                ) : null}
                 <p className="font-medium text-sm">
                   {nameById.get(a.id) || "Artisan"}
                   {a.verified ? (

@@ -38,10 +38,21 @@ export default async function ArtisanAccountLayout({
     redirect("/account");
   }
 
+  const { data: artisanRow } = await supabase
+    .from("artisan_profiles")
+    .select("logo_path")
+    .eq("id", user.id)
+    .maybeSingle();
+  const avatarUrl = artisanRow?.logo_path
+    ? supabase.storage.from("project-fabrics").getPublicUrl(artisanRow.logo_path)
+        .data.publicUrl
+    : null;
+
   return (
     <DashboardShell
       userName={profile?.full_name || ""}
       roleLabel="Artisan"
+      avatarUrl={avatarUrl}
       links={ARTISAN_LINKS}
       promo={null}
       headerAction={{ href: "/fashion#jobs", label: "Jobs to claim" }}

@@ -10,6 +10,7 @@ type Props = {
   initialPhone?: string;
   initialCity?: string;
   hasId?: boolean;
+  initialLogoUrl?: string | null;
   initialAvailability: string;
   initialSpecialty: string[];
   initialSkills: string;
@@ -37,6 +38,7 @@ export default function ArtisanProfileEditForm({
   initialPhone = "",
   initialCity = "",
   hasId = false,
+  initialLogoUrl = null,
   initialAvailability,
   initialSpecialty,
   initialSkills,
@@ -49,6 +51,7 @@ export default function ArtisanProfileEditForm({
   const [fullName, setFullName] = useState(initialFullName);
   const [phone, setPhone] = useState(initialPhone);
   const [idFile, setIdFile] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [city, setCity] = useState(initialCity);
   const [availability, setAvailability] = useState(initialAvailability);
   const [specialty, setSpecialty] = useState<string[]>(initialSpecialty);
@@ -95,6 +98,18 @@ export default function ArtisanProfileEditForm({
         throw new Error(`Could not update name: ${profileError.message}`);
       }
 
+      let logoPath: string | undefined;
+      if (logoFile) {
+        const ext = logoFile.name.split(".").pop() || "jpg";
+        logoPath = `${userId}/logo.${ext}`;
+        const { error: logoError } = await supabase.storage
+          .from("project-fabrics")
+          .upload(logoPath, logoFile, { upsert: true });
+        if (logoError) {
+          throw new Error(`Could not upload logo: ${logoError.message}`);
+        }
+      }
+
       let idPath: string | undefined;
       if (idFile) {
         const ext = idFile.name.split(".").pop() || "jpg";
@@ -120,6 +135,7 @@ export default function ArtisanProfileEditForm({
           bio: bio.trim() || null,
           region: city.trim() ? `${city.trim()}, Nigeria` : "Nigeria",
           ...(idPath ? { id_document_path: idPath } : {}),
+          ...(logoPath ? { logo_path: logoPath } : {}),
         })
         .eq("id", userId)
         .select();
@@ -149,6 +165,29 @@ export default function ArtisanProfileEditForm({
             onChange={(e) => setFullName(e.target.value)}
             className="w-full border border-stone rounded-lg px-3 py-2 text-sm"
             required
+          />
+        </div>
+        <div className="mt-4">
+          <label className="block text-sm text-ink/50 mb-1" htmlFor="logo">
+            Brand logo
+          </label>
+          <p className="text-[11px] text-ink/45 mb-1">
+            This is your profile picture on Fashion and on your dashboard.
+          </p>
+          {initialLogoUrl && !logoFile && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={initialLogoUrl}
+              alt=""
+              className="h-16 w-16 rounded-full object-cover border border-stone mb-2"
+            />
+          )}
+          <input
+            id="logo"
+            type="file"
+            accept="image/*"
+            onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
+            className="w-full text-sm"
           />
         </div>
         <div className="mt-4">

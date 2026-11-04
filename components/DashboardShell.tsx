@@ -59,6 +59,7 @@ export default function DashboardShell({
   promo = <PremiumPromo />,
   headerAction = { href: "/projects/new", label: "Start a project" },
   messagesHref = "/account/messages",
+  avatarUrl,
   children,
 }: {
   userName: string;
@@ -67,6 +68,7 @@ export default function DashboardShell({
   promo?: React.ReactNode;
   headerAction?: { href: string; label: string } | null;
   messagesHref?: string | null;
+  avatarUrl?: string | null;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -188,9 +190,18 @@ export default function DashboardShell({
                 </Link>
               )}
               <span className="flex items-center gap-2">
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={avatarUrl}
+                    alt=""
+                    className="h-9 w-9 rounded-full object-cover"
+                  />
+                ) : (
                 <span className="h-9 w-9 rounded-full bg-royal text-paper flex items-center justify-center text-sm font-medium">
                   {initial}
                 </span>
+                )}
                 <span className="hidden lg:block text-sm">
                   <span className="block leading-tight">{userName || "Client"}</span>
                   <span className="block text-[11px] text-ink/40">{roleLabel}</span>

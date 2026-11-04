@@ -48,6 +48,13 @@ export default async function EditArtisanProfile() {
           initialPhone={profile?.phone || ""}
           initialCity={city}
           hasId={Boolean(artisanProfile?.id_document_path)}
+          initialLogoUrl={
+            artisanProfile?.logo_path
+              ? supabase.storage
+                  .from("project-fabrics")
+                  .getPublicUrl(artisanProfile.logo_path).data.publicUrl
+              : null
+          }
           initialAvailability={artisanProfile?.availability_status || "unavailable"}
           initialSpecialty={artisanProfile?.specialty || []}
           initialSkills={(artisanProfile?.skills || []).join(", ")}
