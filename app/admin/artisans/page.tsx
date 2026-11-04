@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { setArtisanVerified } from "./actions";
+import { setArtisanVerified, rejectArtisanId } from "./actions";
 
 export default async function AdminArtisans() {
   const supabase = await createClient();
@@ -90,14 +90,24 @@ export default async function AdminArtisans() {
                       </p>
                     )}
                     {idHref ? (
-                      <a
-                        href={idHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs text-royal mt-1 inline-block"
-                      >
-                        Open ID document
-                      </a>
+                      <div className="mt-2">
+                        <a href={idHref} target="_blank" rel="noreferrer">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={idHref}
+                            alt="Uploaded ID"
+                            className="w-40 h-28 object-cover rounded-lg border border-stone"
+                          />
+                          <span className="block text-xs text-royal mt-1">
+                            Open full file
+                          </span>
+                        </a>
+                        <p className="text-[11px] text-ink/50 mt-1 max-w-xs">
+                          Must look like a national ID, passport or licence.
+                          Not a selfie or family photo. Do not verify until it
+                          is an ID.
+                        </p>
+                      </div>
                     ) : (
                       <p className="text-xs text-ink/40 mt-1">No ID uploaded yet</p>
                     )}
@@ -129,24 +139,37 @@ export default async function AdminArtisans() {
                   <p className="text-sm text-ink/70 mb-3">{a.bio}</p>
                 )}
 
-                <form action={setArtisanVerified} className="mt-3">
-                  <input type="hidden" name="artisanId" value={a.id} />
-                  <input
-                    type="hidden"
-                    name="verified"
-                    value={(!a.verified).toString()}
-                  />
-                  <button
-                    type="submit"
-                    className={`text-sm rounded-lg px-4 py-1.5 transition-colors ${
-                      a.verified
-                        ? "border border-stone hover:border-ink"
-                        : "bg-royal text-paper hover:bg-royal-deep"
-                    }`}
-                  >
-                    {a.verified ? "Revoke verification" : "Verify artisan"}
-                  </button>
-                </form>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <form action={setArtisanVerified}>
+                    <input type="hidden" name="artisanId" value={a.id} />
+                    <input
+                      type="hidden"
+                      name="verified"
+                      value={(!a.verified).toString()}
+                    />
+                    <button
+                      type="submit"
+                      className={`text-sm rounded-lg px-4 py-1.5 transition-colors ${
+                        a.verified
+                          ? "border border-stone hover:border-ink"
+                          : "bg-royal text-paper hover:bg-royal-deep"
+                      }`}
+                    >
+                      {a.verified ? "Revoke verification" : "Verify artisan"}
+                    </button>
+                  </form>
+                  {idHref && (
+                    <form action={rejectArtisanId}>
+                      <input type="hidden" name="artisanId" value={a.id} />
+                      <button
+                        type="submit"
+                        className="text-sm rounded-lg px-4 py-1.5 border border-red-200 text-red-800"
+                      >
+                        Not an ID · ask them to upload again
+                      </button>
+                    </form>
+                  )}
+                </div>
               </li>
             );
           })}

@@ -23,6 +23,7 @@ const CLAIM_MESSAGES: Record<string, string> = {
   taken: "Another artisan has already claimed this one.",
   not_artisan: "Only artisan accounts can claim. Finish your artisan sign-up first.",
   need_id: "Upload a recognised ID on My profile before you claim a job.",
+  need_verify: "Hopayola is still reviewing your ID. You can claim after you are verified.",
   missing: "That project no longer exists.",
   failed: "Could not claim just now. Please try again.",
 };

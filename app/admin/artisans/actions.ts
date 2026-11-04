@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 
 export async function setArtisanVerified(formData: FormData) {
   const artisanId = formData.get("artisanId") as string;
@@ -22,5 +23,28 @@ export async function setArtisanVerified(formData: FormData) {
     throw new Error("Update was blocked - check permissions.");
   }
 
+  revalidatePath("/admin/artisans");
+}
+
+export async function rejectArtisanId(formData: FormData) {
+  const artisanId = String(formData.get("artisanId") || "");
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Sign in.");
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (profile?.role !== "admin") throw new Error("Admin only.");
+
+  const service = createServiceClient();
+  const { error } = await service
+    .from("artisan_profiles")
+    .update({ id_document_path: null, verified: false })
+    .eq("id", artisanId);
+  if (error) throw new Error(error.message);
   revalidatePath("/admin/artisans");
 }
