@@ -27,7 +27,7 @@ export default async function AdminArtisans() {
   const { data: artisans } = await service
     .from("artisan_profiles")
     .select(
-      "id, region, specialty, skills, years_experience, bio, verified, shop_address, legal_name, guarantor_phone, id_document_path"
+      "id, region, specialty, skills, years_experience, bio, verified, shop_address, legal_name, guarantor_phone, id_document_path, bank_account_number, bank_code, bank_account_name"
     )
     .order("id", { ascending: false });
 
@@ -88,6 +88,16 @@ export default async function AdminArtisans() {
                       <p className="text-xs text-ink/70">
                         Guarantor: {a.guarantor_phone}
                       </p>
+                    )}
+                    {a.bank_account_number ? (
+                      <p className="text-xs text-ink/70 mt-2">
+                        Bank: {a.bank_account_name || "Name TBC"}
+                        {" · "}
+                        {a.bank_account_number}
+                        {a.bank_code ? ` · code ${a.bank_code}` : ""}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-ink/40 mt-2">No bank details yet</p>
                     )}
                     {idHref ? (
                       <div className="mt-2">
