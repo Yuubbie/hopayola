@@ -49,7 +49,7 @@ Email: ${email}`,
 }
 
 function fromHopayola() {
-  return "Hopayola <notifications@mail.hopayola.com>";
+  return "Hopayola <noreply@hopayola.com>";
 }
 
 export async function emailArtisanWelcome(name: string, to: string) {
