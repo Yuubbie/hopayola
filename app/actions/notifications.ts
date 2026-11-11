@@ -48,20 +48,31 @@ Email: ${email}`,
   }
 }
 
-function fromHopayola() {
-  return "Hopayola <noreply@hopayola.com>";
+async function sendUserMail(to: string, subject: string, text: string) {
+  const resend = mail();
+  if (!resend || !to) return false;
+  const froms = [
+    "Hopayola <noreply@hopayola.com>",
+    "Hopayola <notifications@mail.hopayola.com>",
+  ];
+  for (const from of froms) {
+    try {
+      const { error } = await resend.emails.send({ from, to, subject, text });
+      if (!error) return true;
+      console.error("Resend from failed", from, error);
+    } catch (err) {
+      console.error("Resend from failed", from, err);
+    }
+  }
+  return false;
 }
 
 export async function emailArtisanWelcome(name: string, to: string) {
-  const resend = mail();
-  if (!resend || !to) return;
   const n = name.trim() || "there";
-  try {
-    await resend.emails.send({
-      from: fromHopayola(),
-      to,
-      subject: `Welcome to Hopayola, ${n}! The Fashion Network and Coordinator for your business.`,
-      text: `Hi ${n},
+  await sendUserMail(
+    to,
+    `Welcome to Hopayola, ${n}! The Fashion Network and Coordinator for your business.`,
+    `Hi ${n},
 
 Welcome to Hopayola! We are excited to partner with top-tier Nigerian artisans to deliver exceptional custom wear.
 
@@ -78,23 +89,37 @@ Hopayola Boxes: Note that branded Hopayola packaging boxes will be provided for 
 Need help? Reach out to support at support@hopayola.com or WhatsApp +234 702 688 8665.
 
 Best regards,
-The Hopayola Team`,
-    });
-  } catch (err) {
-    console.error("Failed artisan welcome email:", err);
-  }
+The Hopayola Team`
+  );
+}
+
+export async function sendArtisanWelcomeOnce(
+  artisanId: string,
+  name: string,
+  to: string
+) {
+  if (!artisanId || !to) return;
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const service = createServiceClient();
+  const { data: row } = await service
+    .from("artisan_profiles")
+    .select("welcome_email_sent_at")
+    .eq("id", artisanId)
+    .maybeSingle();
+  if (row?.welcome_email_sent_at) return;
+  await emailArtisanWelcome(name, to);
+  await service
+    .from("artisan_profiles")
+    .update({ welcome_email_sent_at: new Date().toISOString() })
+    .eq("id", artisanId);
 }
 
 export async function emailArtisanVerified(name: string, to: string) {
-  const resend = mail();
-  if (!resend || !to) return;
   const n = name.trim() || "there";
-  try {
-    await resend.emails.send({
-      from: fromHopayola(),
-      to,
-      subject: `Congratulations, ${n}! You are now verified on Hopayola`,
-      text: `Hi ${n},
+  await sendUserMail(
+    to,
+    `Congratulations, ${n}! You are now verified on Hopayola`,
+    `Hi ${n},
 
 Great news! Your profile and credentials have been successfully reviewed and verified.
 
@@ -107,23 +132,16 @@ A Quick Reminder: Always maintain high-quality craftsmanship, treat every projec
 Welcome aboard, and let's grow together!
 
 Best regards,
-The Hopayola Team`,
-    });
-  } catch (err) {
-    console.error("Failed artisan verified email:", err);
-  }
+The Hopayola Team`
+  );
 }
 
 export async function emailClientFirstComplete(name: string, to: string) {
-  const resend = mail();
-  if (!resend || !to) return;
   const n = name.trim() || "there";
-  try {
-    await resend.emails.send({
-      from: fromHopayola(),
-      to,
-      subject: `How do you love your new look, ${n}?`,
-      text: `Hi ${n},
+  await sendUserMail(
+    to,
+    `How do you love your new look, ${n}?`,
+    `Hi ${n},
 
 Your very first Hopayola project is officially complete, and we hope your new custom outfit fits you like a glove!
 
@@ -138,11 +156,8 @@ Because you trusted us with your first piece, we want to make your next style jo
 Whenever you have your next event or asoebi fabric ready, we'll be right here to bring it to life.
 
 Warmly,
-The Hopayola Team`,
-    });
-  } catch (err) {
-    console.error("Failed first complete email:", err);
-  }
+The Hopayola Team`
+  );
 }
 
 export async function notifyProjectSubmission(

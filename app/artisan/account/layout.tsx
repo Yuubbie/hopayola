@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import DashboardShell from "@/components/DashboardShell";
+import { sendArtisanWelcomeOnce } from "@/app/actions/notifications";
 
 const ARTISAN_LINKS = [
   { href: "/artisan/account", label: "Dashboard", exact: true },
@@ -36,6 +37,14 @@ export default async function ArtisanAccountLayout({
 
   if (profile?.role !== "artisan") {
     redirect("/account");
+  }
+
+  if (user.email) {
+    await sendArtisanWelcomeOnce(
+      user.id,
+      profile?.full_name || "",
+      user.email
+    );
   }
 
   const { data: artisanRow } = await supabase

@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import PasswordInput from "@/components/password-input";
-import { notifySignup, emailArtisanWelcome } from "@/app/actions/notifications";
+import { notifySignup } from "@/app/actions/notifications";
 
 const SPECIALTY_OPTIONS = [
   "Tailoring",
@@ -120,7 +120,6 @@ export default function ArtisanSignUp() {
 
     setSubmitted(true);
     notifySignup(fullName, email, "artisan");
-    emailArtisanWelcome(fullName, email);
   }
 
   return (
