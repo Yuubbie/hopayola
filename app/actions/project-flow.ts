@@ -561,6 +561,24 @@ export async function clientMarkReceived(formData: FormData) {
 
   const { createServiceClient } = await import("@/lib/supabase/service");
   const service = createServiceClient();
+
+  const { count } = await service
+    .from("projects")
+    .select("id", { count: "exact", head: true })
+    .eq("client_id", user.id)
+    .eq("status", "completed")
+    .neq("id", projectId);
+  if (!count) {
+    const { data: person } = await service
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .maybeSingle();
+    const { emailClientFirstComplete } = await import(
+      "@/app/actions/notifications"
+    );
+    await emailClientFirstComplete(person?.full_name || "", user.email || "");
+  }
   const { data: prof } = await service
     .from("profiles")
     .select("points")

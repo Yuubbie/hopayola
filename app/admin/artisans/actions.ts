@@ -24,6 +24,21 @@ export async function setArtisanVerified(formData: FormData) {
   }
 
   revalidatePath("/admin/artisans");
+
+  if (verified) {
+    const service = createServiceClient();
+    const { data: person } = await service
+      .from("profiles")
+      .select("full_name")
+      .eq("id", artisanId)
+      .maybeSingle();
+    const { data: authUser } = await service.auth.admin.getUserById(artisanId);
+    const to = authUser.user?.email;
+    if (to) {
+      const { emailArtisanVerified } = await import("@/app/actions/notifications");
+      await emailArtisanVerified(person?.full_name || "", to);
+    }
+  }
 }
 
 export async function rejectArtisanId(formData: FormData) {
