@@ -48,7 +48,51 @@ Email: ${email}`,
   }
 }
 
-async function sendUserMail(to: string, subject: string, text: string) {
+function hopayolaEmailHtml(heading: string, innerHtml: string) {
+  return `<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#FAFAF8;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#FAFAF8;padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #E8E5DE;">
+          <tr>
+            <td style="background:#2E1B4D;padding:28px 32px;text-align:center;">
+              <img src="https://hopayola.com/images/logo.png" alt="Hopayola" width="48" height="48" style="display:block;margin:0 auto 12px;border-radius:8px;" />
+              <p style="margin:0;font-family:Georgia,serif;font-size:22px;color:#FAFAF8;letter-spacing:0.12em;text-transform:uppercase;">Hopayola</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="height:6px;background:#5B2A86;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+          <tr>
+            <td style="padding:32px;font-family:Arial,Helvetica,sans-serif;color:#0A0A0A;font-size:15px;line-height:1.6;">
+              <h1 style="margin:0 0 16px;font-family:Georgia,serif;font-size:22px;color:#2E1B4D;font-weight:normal;">${heading}</h1>
+              ${innerHtml}
+              <p style="margin:28px 0 0;color:#5B2A86;font-size:14px;">The Hopayola Team</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#2E1B4D;padding:16px 32px;text-align:center;">
+              <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#D8C2F0;">
+                support@hopayola.com · WhatsApp +234 702 688 8665
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+async function sendUserMail(
+  to: string,
+  subject: string,
+  text: string,
+  html: string
+) {
   const resend = mail();
   if (!resend || !to) return false;
   const froms = [
@@ -57,7 +101,13 @@ async function sendUserMail(to: string, subject: string, text: string) {
   ];
   for (const from of froms) {
     try {
-      const { error } = await resend.emails.send({ from, to, subject, text });
+      const { error } = await resend.emails.send({
+        from,
+        to,
+        subject,
+        text,
+        html,
+      });
       if (!error) return true;
       console.error("Resend from failed", from, error);
     } catch (err) {
@@ -89,7 +139,21 @@ Hopayola Boxes: Note that branded Hopayola packaging boxes will be provided for 
 Need help? Reach out to support at support@hopayola.com or WhatsApp +234 702 688 8665.
 
 Best regards,
-The Hopayola Team`
+The Hopayola Team`,
+    hopayolaEmailHtml(
+      `Welcome, ${n}`,
+      `<p>Hi ${n},</p>
+<p>Welcome to Hopayola. We partner with Nigerian artisans to deliver exceptional custom wear.</p>
+<p style="margin:20px 0 8px;color:#5B2A86;font-weight:bold;">Complete your profile</p>
+<p>Finish your profile, upload a valid ID, and add your details so you can claim client projects.</p>
+<p style="margin:20px 0 8px;color:#5B2A86;font-weight:bold;">Handle projects with care</p>
+<p>Treat every job professionally so quality stays high and reviews stay strong.</p>
+<p style="margin:20px 0 8px;color:#5B2A86;font-weight:bold;">Use the chatroom</p>
+<p>Always use the Hopayola chatroom to get client consent before changing styles or measurements.</p>
+<p style="margin:20px 0 8px;color:#5B2A86;font-weight:bold;">Hopayola boxes</p>
+<p>Branded Hopayola packaging will be provided for premium client deliveries.</p>
+<p>Need help? <a href="mailto:support@hopayola.com" style="color:#5B2A86;">support@hopayola.com</a> or WhatsApp +234 702 688 8665.</p>`
+    )
   );
 }
 
@@ -132,7 +196,18 @@ A Quick Reminder: Always maintain high-quality craftsmanship, treat every projec
 Welcome aboard, and let's grow together!
 
 Best regards,
-The Hopayola Team`
+The Hopayola Team`,
+    hopayolaEmailHtml(
+      `You are verified, ${n}`,
+      `<p>Hi ${n},</p>
+<p>Great news. Your profile and credentials have been reviewed and verified.</p>
+<p>You can now claim and accept client tailoring projects on Hopayola.</p>
+<p style="margin:20px 0 8px;color:#5B2A86;font-weight:bold;">What is next</p>
+<p>Watch your dashboard for incoming client requests.</p>
+<p style="margin:20px 0 8px;color:#5B2A86;font-weight:bold;">A quick reminder</p>
+<p>Keep craftsmanship high, treat every project with care, and use the chatroom to confirm updates and measurements with clients.</p>
+<p>Welcome aboard. Let's grow together.</p>`
+    )
   );
 }
 
@@ -156,7 +231,17 @@ Because you trusted us with your first piece, we want to make your next style jo
 Whenever you have your next event or asoebi fabric ready, we'll be right here to bring it to life.
 
 Warmly,
-The Hopayola Team`
+The Hopayola Team`,
+    hopayolaEmailHtml(
+      `How do you love your new look, ${n}?`,
+      `<p>Hi ${n},</p>
+<p>Your first Hopayola project is complete. We hope the outfit fits like a glove.</p>
+<p style="margin:20px 0 8px;color:#5B2A86;font-weight:bold;">Care</p>
+<p>Dry clean or hand wash embellished or delicate fabrics. Store in a cool, dry place.</p>
+<p style="margin:20px 0 8px;color:#5B2A86;font-weight:bold;">10% off your next order</p>
+<p>Use code <strong style="color:#5B2A86;">HOPAYOLAN23</strong> on your next piece.</p>
+<p>Whenever you have your next event or asoebi fabric ready, we will bring it to life.</p>`
+    )
   );
 }
 
